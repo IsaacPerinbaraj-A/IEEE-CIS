@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="/brand/rec-main-logo.png" />
+    <title>IEEE CIS REC | Computational Intelligence Society, Rajalakshmi Engineering College</title>
+    <meta name="description" content="The student chapter of the IEEE Computational Intelligence Society at Rajalakshmi Engineering College, Chennai. Workshops, talks and competitions in ML, data science, computer vision and IoT." />
+    <meta name="theme-color" content="#0F0A1C" />
+    <!-- Link previews on WhatsApp, LinkedIn and Instagram -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="IEEE CIS REC" />
+    <meta property="og:description" content="Where REC learns how machines learn. The IEEE Computational Intelligence Society student chapter at Rajalakshmi Engineering College." />
+    <meta property="og:image" content="/images/events/rewired.webp" />
+  </head>
+  <body>
+    <script>
+      // The landing intro plays on every load of the home page: hide the page chrome before first paint and start at the top
+      try {
+        if (location.pathname === "/" && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          document.body.dataset.intro = "on";
+          if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+        }
+      } catch (e) {}
+    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

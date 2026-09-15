@@ -1,0 +1,332 @@
+{
+  "sessions": [
+    {
+      "id": "2025-26",
+      "label": "2025–26",
+      "faculty": [],
+      "groups": [
+        {
+          "domain": "Management",
+          "slug": "management",
+          "members": [
+            {
+              "name": "Swarna Lakshmi B",
+              "role": "Chair",
+              "photo": "/images/team/swarna-lakshmi-b.webp",
+              "linkedin": "https://www.linkedin.com/in/swarna-lakshmi-b-511314311",
+              "github": "https://github.com/Swarna-68",
+              "instagram": "https://instagram.com/Swarzzz_05"
+            },
+            {
+              "name": "Surweesh SP",
+              "role": "Vice Chair",
+              "photo": "/images/team/surweesh-sp.webp",
+              "linkedin": "https://www.linkedin.com/in/surweesh-sprabakaran",
+              "github": "https://github.com/SurweeshSP",
+              "instagram": "https://instagram.com/surweeshsprabakaran"
+            },
+            {
+              "name": "Harish Kumar V",
+              "role": "Secretary",
+              "photo": "/images/team/harish-kumar-v.webp",
+              "linkedin": "https://www.linkedin.com/in/harish-kumar-v",
+              "github": "https://github.com/Harish-57-AIML-A",
+              "instagram": ""
+            },
+            {
+              "name": "Mervin Anto Santhosh A",
+              "role": "HR",
+              "photo": "/images/team/mervin-anto-santhosh-a.webp",
+              "linkedin": "https://www.linkedin.com/in/mervin-anto-santhosh-a-b7a4152a2/",
+              "github": "https://github.com/MervinAntoSanthosh",
+              "instagram": "https://www.instagram.com/mervin_anto_05/"
+            },
+            {
+              "name": "Sajiv Jess B",
+              "role": "Treasurer",
+              "photo": "/images/team/sajiv-jess-b.webp",
+              "linkedin": "http://www.linkedin.com/in/sajivjess",
+              "github": "https://github.com/SajivJess",
+              "instagram": "http://httwww.instagram.com/sajivjess.b.i"
+            }
+          ]
+        },
+        {
+          "domain": "Web Development",
+          "slug": "web-development",
+          "members": [
+            {
+              "name": "Tarun Aanand S G",
+              "role": "Web Dev Team",
+              "photo": "/images/team/tarun-aanand-s-g.webp",
+              "linkedin": "https://www.linkedin.com/in/tarun-aanand-s-g-12092b2a2/",
+              "github": "https://github.com/TarunAanand",
+              "instagram": "https://instagram.com/tarun_aanand"
+            },
+            {
+              "name": "Ashikhashree Karthikeyan",
+              "role": "Web Dev Team",
+              "photo": "/images/team/ashikhashree-karthikeyan.webp",
+              "linkedin": "https://www.linkedin.com/in/ashikha-shree-175665287/",
+              "github": "https://github.com/Ashikhashree",
+              "instagram": "https://instagram.com/blythe._.wexler"
+            },
+            {
+              "name": "Surya Prajin S",
+              "role": "Web Dev Team",
+              "photo": "/images/team/surya-prajin-s.webp",
+              "linkedin": "https://www.linkedin.com/in/surya-prajin-s-7052112a3",
+              "github": "https://github.com/SuryaPrajin",
+              "instagram": ""
+            },
+            {
+              "name": "Gunavazhagan B",
+              "role": "Web Dev Team",
+              "photo": "/images/team/gunavazhagan-b.webp",
+              "linkedin": "http://linkedin.com/in/gunavazhagan-b-a779112a2",
+              "github": "https://github.com/Gunavazhagan-B",
+              "instagram": ""
+            }
+          ]
+        },
+        {
+          "domain": "Machine Learning",
+          "slug": "machine-learning",
+          "members": [
+            {
+              "name": "Shriram N",
+              "role": "ML Head",
+              "photo": "/images/team/shriram-n.webp",
+              "linkedin": "https://www.linkedin.com/in/shriram-n-a4a916294",
+              "github": "https://github.com/Shriram154",
+              "instagram": "https://www.instagram.com/nshriram0024?igsh=MTdid2ZzdDFvZGk3Yg=="
+            },
+            {
+              "name": "Shri Dharashini M",
+              "role": "ML Head",
+              "photo": "/images/team/shri-dharashini-m.webp",
+              "linkedin": "https://www.linkedin.com/in/shri-dharshini-m",
+              "github": "https://github.com/shridharshinim",
+              "instagram": "https://instagram.com/dharshhiniii_"
+            },
+            {
+              "name": "Sanjay R",
+              "role": "ML Senior Associate",
+              "photo": "/images/team/sanjay-r.webp",
+              "linkedin": "https://www.linkedin.com/in/sanjay-rox7",
+              "github": "https://github.com/Sanjayrox",
+              "instagram": "https://instagram.com/Sanjayrox7"
+            }
+          ]
+        },
+        {
+          "domain": "Data Science",
+          "slug": "data-science",
+          "members": [
+            {
+              "name": "Sai Sanjay SV",
+              "role": "DS Head",
+              "photo": "/images/team/sai-sanjay-sv.webp",
+              "linkedin": "https://www.linkedin.com/in/sai-sanjay-b7b4082a2/",
+              "github": "https://github.com/sanjaytypes",
+              "instagram": "https://www.instagram.com/___.sxnjxy/"
+            },
+            {
+              "name": "Dilip Kannan",
+              "role": "DS Head",
+              "photo": "/images/team/dilip-kannan.webp",
+              "linkedin": "https://www.linkedin.com/in/dilip-kannan-k-4834182a2",
+              "github": "https://github.com/DILIP-KANNAN/",
+              "instagram": "https://www.instagram.com/dilipkannan_/"
+            },
+            {
+              "name": "Lokaa V",
+              "role": "DS Senior Associate",
+              "photo": "/images/team/lokaa-v.webp",
+              "linkedin": "https://www.linkedin.com/in/lokaa-v-0345b42a2",
+              "github": "NIL",
+              "instagram": "https://www.instagram.com/lokaa_1910?igsh=MWczMmFyZm85M2xyeA%3D%3D&utm_source=qr"
+            }
+          ]
+        },
+        {
+          "domain": "Computer Vision",
+          "slug": "computer-vision",
+          "members": [
+            {
+              "name": "Lakshiya Sri KM",
+              "role": "CV Head",
+              "photo": "/images/team/lakshiya-sri-km.webp",
+              "linkedin": "https://www.linkedin.com/in/lakshiya-sri-k-m-ba91772a2/",
+              "github": "https://github.com/LAKSHIYA24",
+              "instagram": "https://instagram.com/lakshiya_05"
+            },
+            {
+              "name": "Prathisha R",
+              "role": "CV Head",
+              "photo": "/images/team/prathisha-r.webp",
+              "linkedin": "https://www.linkedin.com/in/prathisha-rammohan-b755b32a2",
+              "github": "https://github.com/231501119",
+              "instagram": "https://www.instagram.com/prathisha_05?igsh=MTZ4aGs4ODBtMzl5YQ=="
+            },
+            {
+              "name": "Devesh D",
+              "role": "CV Senior Associate",
+              "photo": "/images/team/devesh-d.webp",
+              "linkedin": "http://www.linkedin.com/in/devesh09",
+              "github": "https://github.com/devesh09D",
+              "instagram": "https://instagram.com/_itz_me_dev_sh"
+            }
+          ]
+        },
+        {
+          "domain": "Internet of Things",
+          "slug": "iot",
+          "members": [
+            {
+              "name": "Doneeswaran J",
+              "role": "IoT Head",
+              "photo": "/images/team/doneeswaran-j.webp",
+              "linkedin": "https://www.linkedin.com/in/doneeswaran-j",
+              "github": "https://github.com/Doneeswaran",
+              "instagram": "https://www.instagram.com/j.doneeswaran?igsh=eThlbWpmcHMyaDVu"
+            },
+            {
+              "name": "Harish M",
+              "role": "IoT Head",
+              "photo": "/images/team/harish-m.webp",
+              "linkedin": "linkedin.com/in/harishm007",
+              "github": "git.harishm.tech",
+              "instagram": ""
+            },
+            {
+              "name": "Umesh Sarathy",
+              "role": "IoT Senior Associate",
+              "photo": "/images/team/umesh-sarathy.webp",
+              "linkedin": "https://www.linkedin.com/in/umesh-sarathy-s-k-0771122a0",
+              "github": "https://github.com/umeshsarathy",
+              "instagram": "https://www.instagram.com/umeshsarathy_?igsh=MXkyazdsM21vN2hseQ=="
+            }
+          ]
+        },
+        {
+          "domain": "Design",
+          "slug": "design",
+          "members": [
+            {
+              "name": "Gnaanesh BB",
+              "role": "Design Head",
+              "photo": "/images/team/gnaanesh-bb.webp",
+              "linkedin": "https://www.linkedin.com/in/gnaanesh-b-b-920401295",
+              "github": "https://github.com/Gnaaneshbb",
+              "instagram": "https://instagram.com/_adventurous_boy_"
+            },
+            {
+              "name": "Antony Jadrian A",
+              "role": "Design Head",
+              "photo": "/images/team/antony-jadrian-a.webp",
+              "linkedin": "https://www.linkedin.com/in/antony-jadrien-a-904001311",
+              "github": "AntonyJadrien ",
+              "instagram": "https://instagram.com/jadrien_ un_official"
+            },
+            {
+              "name": "Vijay R",
+              "role": "Design Senior Associate",
+              "photo": "/images/team/vijay-r.webp",
+              "linkedin": "https://www.linkedin.com/in/vijay-r-678a5631b",
+              "github": "https://github.com/Vijay-R57",
+              "instagram": "https://www.instagram.com/__im__rv?igsh=MTdzdmhpNTQ2Z2RlaA=="
+            }
+          ]
+        },
+        {
+          "domain": "Event Management",
+          "slug": "event-management",
+          "members": [
+            {
+              "name": "Sathyanath L",
+              "role": "Event Head",
+              "photo": "/images/team/sathyanath-l.webp",
+              "linkedin": "https://www.linkedin.com/in/sathyanath-l-246b65310",
+              "github": "@Sathyanath-L",
+              "instagram": "https://www.instagram.com/its__sakthi_?igsh=ZHl6dmd5eDVzdHB0"
+            },
+            {
+              "name": "Mani Shankar Raju R",
+              "role": "Event Head",
+              "photo": "/images/team/mani-shankar-raju-r.webp",
+              "linkedin": "https://www.linkedin.com/in/mani-shankar-raju-r-6465b12a2",
+              "github": "https://github.com/ManiShankarRaju",
+              "instagram": "https://www.instagram.com/_msr1010_?igsh=cnF1bHI5eDRkdGlj"
+            }
+          ]
+        },
+        {
+          "domain": "Public Relations",
+          "slug": "public-relations",
+          "members": [
+            {
+              "name": "Rashmi R",
+              "role": "PR Head",
+              "photo": "/images/team/rashmi-r.webp",
+              "linkedin": "https://www.linkedin.com/in/rashmi-r-64b4102a2",
+              "github": "https://github.com/RashmiRavikumar1985",
+              "instagram": "https://www.instagram.com/rashh_1802?igsh=bzR1cDg3Z2VvN2Zt"
+            },
+            {
+              "name": "Dejaswini G",
+              "role": "PR Head",
+              "photo": "/images/team/dejaswini-g.webp",
+              "linkedin": "https://www.linkedin.com/in/dejaswini-b-g-bb220a2a2",
+              "github": "https://github.com/Dejaswini",
+              "instagram": "https://instagram.com/dejaswini"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2024-25",
+      "label": "2024–25",
+      "note": "Office bearers listed on the chapter's 2024–25 event posters.",
+      "faculty": [
+        {
+          "name": "Vijay K",
+          "role": "Staff Coordinator"
+        }
+      ],
+      "groups": [
+        {
+          "domain": "Management",
+          "slug": "management",
+          "members": [
+            {
+              "name": "Pugal M",
+              "role": "Chair",
+              "photo": "",
+              "linkedin": "",
+              "github": "",
+              "instagram": ""
+            },
+            {
+              "name": "Shrinithi S",
+              "role": "Vice Chair",
+              "photo": "",
+              "linkedin": "",
+              "github": "",
+              "instagram": ""
+            },
+            {
+              "name": "Akshaya M",
+              "role": "Secretary",
+              "photo": "",
+              "linkedin": "",
+              "github": "",
+              "instagram": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
