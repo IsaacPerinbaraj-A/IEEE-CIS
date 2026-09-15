@@ -5,7 +5,7 @@ import { useTitle } from "../lib/useTitle";
 import { Reveal, Tilt } from "../components/Motion";
 
 export default function Resources() {
-  useTitle("Resources");
+  useTitle("Resources", "Free, trustworthy places to keep learning after a workshop, sorted by domain.");
   return (
     <>
       <PageHeader title="Resources" shape="helix">Free, trustworthy places to keep learning after a workshop, sorted by domain.</PageHeader>

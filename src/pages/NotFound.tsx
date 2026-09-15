@@ -3,7 +3,7 @@ import { RevealWords } from "../components/Motion";
 import { useTitle } from "../lib/useTitle";
 import HeaderParticles from "../components/particles/HeaderParticles";
 export default function NotFound() {
-  useTitle("Page not found");
+  useTitle("Page not found", undefined, true);
   return (
     <section className="relative overflow-hidden">
       <HeaderParticles shape="chaos" />

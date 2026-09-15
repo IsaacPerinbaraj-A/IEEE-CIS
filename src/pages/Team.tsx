@@ -7,7 +7,7 @@ import { useTitle } from "../lib/useTitle";
 import { revealChip } from "../lib/motion";
 
 export default function Team() {
-  useTitle("Team");
+  useTitle("Team", "The students who run IEEE CIS REC, by team and academic year.");
   const [params, setParams] = useSearchParams();
   const session = sessions.find(s => s.id === params.get("year")) || sessions[0];
   const domain = params.get("domain") || "all";

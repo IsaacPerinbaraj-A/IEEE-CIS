@@ -21,7 +21,7 @@ const benefits = [
 ];
 
 export default function Join() {
-  useTitle("Join");
+  useTitle("Join", "Open to every REC student, in any department and any year. How to become an IEEE student member, add the Computational Intelligence Society and join the chapter.");
   return (
     <>
       <PageHeader title="Join the chapter" shape="swarm">Open to every REC student, in any department and any year. You don't need to know AI yet, just want to learn it.</PageHeader>

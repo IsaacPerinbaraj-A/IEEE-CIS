@@ -3,6 +3,7 @@ import { ParticleField, type ShapeSpec } from "./engine";
 import { chaos, sphere, neural, fuzzy, helix, swarm, rings, constellation, ripple } from "./shapes";
 import { sessions } from "../../lib/data";
 import { BOUNDS, fitShape, type Region } from "./layout";
+import { deviceTier } from "../../lib/device";
 
 export type HeaderShape = "sphere" | "neural" | "fuzzy" | "helix" | "swarm" | "chaos" | "rings" | "constellation" | "ripple";
 
@@ -40,9 +41,10 @@ export default function HeaderParticles({ shape }: { shape: HeaderShape }) {
       const place = fitShape(BOUNDS[shape] ?? BOUNDS.sphere, region, w, h, 0.95);
       return { offset: place.offset, scale: place.scale, mobile };
     };
-    const L = layout(), P = PRESETS[shape], count = L.mobile ? 1500 : 3000;
+    const tier = deviceTier();
+    const L = layout(), P = PRESETS[shape], count = tier === "low" ? (L.mobile ? 900 : 1800) : (L.mobile ? 1500 : 3000);
     let field: ParticleField;
-    try { field = new ParticleField(canvas, count); } catch { return; }
+    try { field = new ParticleField(canvas, count, { highPerformance: tier === "high", maxDpr: tier === "low" ? 1 : undefined }); } catch { return; }
     field.motion = reduce ? 0 : 1;
     const start: ShapeSpec = { positions: chaos(count), colors: ["#8B5CF6", "#EC4899"], offset: [0, 0, 0], scale: L.mobile ? 0.7 : 1.4, spin: 0.3, sway: 0, flutter: 0.5, size: 1.3 };
     const target: ShapeSpec = { positions: P.gen(count), colors: P.colors, offset: L.offset, scale: L.scale, spin: P.spin, sway: P.sway, flutter: P.flutter, size: P.size };

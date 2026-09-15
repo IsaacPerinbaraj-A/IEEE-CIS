@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowDown } from "lucide-react";
 import { ParticleField, type ShapeSpec } from "./engine";
 import { prefersReducedMotion } from "../../lib/motion";
+import { deviceTier } from "../../lib/device";
 import { chaos, sphere, neural, fuzzy, helix, swarm, textShape, yBounds } from "./shapes";
 import { BOUNDS, VIS_H, fitShape, isSideLayout, type Placement, type Region } from "./layout";
 
@@ -105,9 +106,10 @@ export default function ParticleStory({ hero, steps, labels, skipTo }: { hero: R
     if (playIntro) { if ("scrollRestoration" in history) history.scrollRestoration = "manual"; window.scrollTo(0, 0); }
 
     const L0 = layout(canvas.clientWidth, canvas.clientHeight, measure(canvas, contentRef.current));
-    const count = L0.mobile ? 2600 : 6500;
+    const tier = deviceTier();
+    const count = tier === "low" ? (L0.mobile ? 1900 : 4000) : (L0.mobile ? 2600 : 6500);
     let field: ParticleField;
-    try { field = new ParticleField(canvas, count); } catch { setWebgl(false); done(); return; }
+    try { field = new ParticleField(canvas, count, { highPerformance: tier === "high", maxDpr: tier === "low" ? 1 : undefined }); } catch { setWebgl(false); done(); return; }
     field.motion = reduce ? 0 : 1;
     field.interactive = !playIntro;
 

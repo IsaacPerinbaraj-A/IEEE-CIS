@@ -5,7 +5,7 @@ import { achievements } from "../lib/data";
 import { useTitle } from "../lib/useTitle";
 
 export default function Achievements() {
-  useTitle("Achievements");
+  useTitle("Achievements", "Wins, papers and milestones from IEEE CIS REC members.");
   return (
     <>
       <PageHeader title="Achievements" shape="fuzzy">Wins, papers and milestones from our members.</PageHeader>

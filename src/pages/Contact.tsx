@@ -9,7 +9,7 @@ import { Reveal, Tilt } from "../components/Motion";
 const topics = ["Joining the chapter", "An event", "Collaboration or sponsorship", "Something else"];
 
 export default function Contact() {
-  useTitle("Contact");
+  useTitle("Contact", "Questions about joining, an idea for an event, or a collaboration? Reach IEEE CIS REC by email, Instagram or LinkedIn.");
   const [f, setF] = useState({ name: "", email: "", topic: topics[0], message: "" });
   const [error, setError] = useState("");
   const send = () => {

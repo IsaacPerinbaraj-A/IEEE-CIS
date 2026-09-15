@@ -117,10 +117,16 @@ export class ParticleField {
   }
 
   private canvas: HTMLCanvasElement;
+  private maxDpr?: number;
 
-  constructor(canvas: HTMLCanvasElement, count: number) {
+  /**
+   * `highPerformance` asks for the fast GPU (only worth it on strong devices; it can wake a laptop's discrete GPU).
+   * `maxDpr` caps the pixel ratio, e.g. 1 on low-power devices.
+   */
+  constructor(canvas: HTMLCanvasElement, count: number, opts: { highPerformance?: boolean; maxDpr?: number } = {}) {
     this.canvas = canvas;
-    const gl = canvas.getContext("webgl", { alpha: true, antialias: false, premultipliedAlpha: true, powerPreference: "high-performance" });
+    this.maxDpr = opts.maxDpr;
+    const gl = canvas.getContext("webgl", { alpha: true, antialias: false, premultipliedAlpha: true, powerPreference: opts.highPerformance ? "high-performance" : "default" });
     if (!gl) throw new Error("WebGL not available");
     this.gl = gl; this.count = count;
     const sh = (type: number, src: string) => { const s = gl.createShader(type)!; gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s) || "shader"); return s; };
@@ -166,7 +172,7 @@ export class ParticleField {
 
   resize() {
     const r = this.canvas.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio || 1, r.width < 760 ? 1.5 : 1.75);
+    const dpr = Math.min(window.devicePixelRatio || 1, this.maxDpr ?? (r.width < 760 ? 1.5 : 1.75));
     this.canvas.width = Math.max(1, Math.round(r.width * dpr)); this.canvas.height = Math.max(1, Math.round(r.height * dpr));
     this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
     this.draw();

@@ -57,6 +57,11 @@
   *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
 
+/* ---------- Low-power devices (html[data-tier="low"], set from src/lib/device.ts): cheaper blur layers ---------- */
+html[data-tier="low"] .blur-\[120px\] { filter: blur(48px); }
+html[data-tier="low"] .backdrop-blur, html[data-tier="low"] .backdrop-blur-md { -webkit-backdrop-filter: none; backdrop-filter: none; }
+html[data-tier="low"] .step-card { background-color: rgba(15,10,28,.9); }
+
 /* ---------- Scroll reveal ---------- */
 .reveal { opacity: 0; transform: translateY(34px) scale(.985); filter: blur(6px);
   transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1), filter .9s ease; transition-delay: var(--d, 0ms); }

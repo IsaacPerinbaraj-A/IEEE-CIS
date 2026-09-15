@@ -14,7 +14,7 @@ const areas = [
 ] as const;
 
 export default function About() {
-  useTitle("About");
+  useTitle("About", "IEEE CIS REC is the student chapter of the IEEE Computational Intelligence Society at Rajalakshmi Engineering College, Chennai.");
   const typeCounts = Object.entries(events.reduce<Record<string, number>>((a, e) => ({ ...a, [e.type]: (a[e.type] || 0) + 1 }), {})).sort((a, b) => b[1] - a[1]);
   const plural = (t: string, n: number) => n === 1 ? t.toLowerCase() : t === "Training" ? "training programs" : `${t.toLowerCase()}s`;
   return (

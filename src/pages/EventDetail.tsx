@@ -10,7 +10,7 @@ import { Reveal, RevealWords, Tilt } from "../components/Motion";
 export default function EventDetail() {
   const { slug } = useParams();
   const e = events.find(x => x.slug === slug);
-  useTitle(e?.title || "Event not found");
+  useTitle(e?.title || "Event not found", e?.summary, !e);
   const [copied, setCopied] = useState(false);
   const [posterFailed, setPosterFailed] = useState(false);
   if (!e) return <NotFound />;

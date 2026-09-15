@@ -25,7 +25,7 @@ function EmptyPanel({ icon, title, text, children }: { icon: ReactNode; title: s
 }
 
 export default function Events() {
-  useTitle("Events");
+  useTitle("Events", "Workshops, talks, trainings and competitions in machine learning, data science, computer vision and IoT, run by IEEE CIS REC.");
   const [params, setParams] = useSearchParams();
   const upcoming = upcomingEvents(), past = pastEvents();
   const tab = params.get("tab") === "past" || (!params.get("tab") && upcoming.length === 0) ? "past" : "upcoming";
