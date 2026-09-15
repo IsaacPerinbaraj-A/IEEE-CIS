@@ -4,6 +4,7 @@ import MemberCard from "../components/MemberCard";
 import { Reveal } from "../components/Motion";
 import { sessions } from "../lib/data";
 import { useTitle } from "../lib/useTitle";
+import { revealChip } from "../lib/motion";
 
 export default function Team() {
   useTitle("Team");
@@ -37,10 +38,11 @@ export default function Team() {
 
       <div className="wrap mt-10">
         {session.groups.length > 1 && (
-          <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by team">
-            <button aria-pressed={domain === "all"} className={`chip ${domain === "all" ? "chip-on" : ""}`} onClick={() => set("domain", "")}>Everyone</button>
+          // One sideways-scrolling row on phones so member photos start on the first screen; wraps from sm up
+          <div className="snap-row snap-row-fade flex gap-2 sm:flex-wrap" role="group" aria-label="Filter by team">
+            <button aria-pressed={domain === "all"} className={`chip ${domain === "all" ? "chip-on" : ""}`} onClick={e => { set("domain", ""); revealChip(e.currentTarget); }}>Everyone</button>
             {session.groups.map(g => (
-              <button key={g.slug} aria-pressed={domain === g.slug} className={`chip ${domain === g.slug ? "chip-on" : ""}`} onClick={() => set("domain", g.slug)}>{g.domain}</button>
+              <button key={g.slug} aria-pressed={domain === g.slug} className={`chip ${domain === g.slug ? "chip-on" : ""}`} onClick={e => { set("domain", g.slug); revealChip(e.currentTarget); }}>{g.domain}</button>
             ))}
           </div>
         )}

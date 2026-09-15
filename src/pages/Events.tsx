@@ -5,6 +5,7 @@ import { PosterCard, UpcomingCard } from "../components/EventCards";
 import { Reveal } from "../components/Motion";
 import { upcomingEvents, pastEvents, sessionLabel, site } from "../lib/data";
 import { useTitle } from "../lib/useTitle";
+import { revealChip } from "../lib/motion";
 
 export default function Events() {
   useTitle("Events");
@@ -36,8 +37,8 @@ export default function Events() {
           ))}
         </div>
         {list.length > 1 && types.length > 2 && (
-          <div className="mt-6 flex flex-wrap gap-2" role="group" aria-label="Filter by type">
-            {types.map(t => <button key={t} aria-pressed={type === t} onClick={() => set({ type: t === "All" ? "" : t })} className={`chip ${type === t ? "chip-on" : ""}`}>{t}</button>)}
+          <div className="snap-row snap-row-fade mt-6 flex gap-2 sm:flex-wrap" role="group" aria-label="Filter by type">
+            {types.map(t => <button key={t} aria-pressed={type === t} onClick={e => { set({ type: t === "All" ? "" : t }); revealChip(e.currentTarget); }} className={`chip ${type === t ? "chip-on" : ""}`}>{t}</button>)}
           </div>
         )}
 
