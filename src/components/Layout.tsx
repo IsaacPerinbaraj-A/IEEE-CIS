@@ -5,6 +5,7 @@ import { RecMark } from "./Brand";
 import { Linkedin, Instagram } from "../lib/icons";
 import { site, achievements } from "../lib/data";
 import { ScrollProgress, CursorAura, BackToTop } from "./Motion";
+import { usePageTransitions } from "../lib/pageTransitions";
 
 const nav = [
   { to: "/events", label: "Events" },
@@ -58,7 +59,7 @@ function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-line/70 bg-ink/85 backdrop-blur-md">
+      <header className="site-header sticky top-0 z-50 border-b border-line/70 bg-ink/85 backdrop-blur-md">
         <div className="wrap flex h-[68px] items-center justify-between gap-3">
           <Link to="/" onClick={closeFor("/")} className="flex min-w-0 items-center gap-3" aria-label={`${site.name} home`}>
             <RecMark />
@@ -159,6 +160,7 @@ function FooterCol({ title, links, external }: { title: string; links: [string, 
 export default function Layout() {
   const { pathname } = useLocation();
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  usePageTransitions();
   return (
     <div className="flex min-h-screen flex-col">
       <a href="#main" className="skip-link sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[60] focus:rounded-lg focus:bg-gold focus:px-4 focus:py-2 focus:text-ink">Skip to content</a>
@@ -171,6 +173,8 @@ export default function Layout() {
       <Footer />
       <BackToTop />
       <CursorAura />
+      {/* Only shown while a page transition runs (see src/lib/pageTransitions.ts) */}
+      <div aria-hidden className="page-curtain" />
     </div>
   );
 }
