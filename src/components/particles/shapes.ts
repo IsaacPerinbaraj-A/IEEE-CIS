@@ -38,7 +38,7 @@ export const sphere = (n: number) => {
   });
 };
 
-/** Neural networks: layers of nodes, with particles streaming along the connections. */
+/** Network: layers of nodes, with particles streaming along the connections (abstract decoration). */
 export const neural = (n: number) => {
   const layers = [3, 4, 5, 4, 2];
   const nodes = layers.map((c, li) => Array.from({ length: c }, (_, j) => [
@@ -56,7 +56,7 @@ export const neural = (n: number) => {
   });
 };
 
-/** Fuzzy systems: overlapping membership-function hills over a floor grid. */
+/** Landscape: overlapping hills over a floor grid (abstract decoration). */
 export const fuzzy = (n: number) => {
   const centres = [-1.25, 0, 1.25];
   const mu = (x: number, z: number) => Math.max(...centres.map(c => Math.exp(-((x - c) ** 2) / (2 * 0.36 ** 2)))) * (0.82 + 0.18 * Math.cos(z * 3));
@@ -68,7 +68,7 @@ export const fuzzy = (n: number) => {
   });
 };
 
-/** Evolutionary computation: a DNA double helix. */
+/** Helix: a double helix (abstract decoration). */
 export const helix = (n: number) => {
   const strand = Math.floor(n * 0.38), rungs = 20;
   return fill(n, i => {
@@ -82,7 +82,7 @@ export const helix = (n: number) => {
   });
 };
 
-/** Swarm intelligence: flocks spread around a loop (particles also wander in the shader). */
+/** Swarm: flocks spread around a loop; particles also wander in the shader (abstract decoration). */
 export const swarm = (n: number) => {
   const flocks = 7;
   return fill(n, i => {

@@ -9,6 +9,10 @@ Full history, data sources, open questions and pending work: `docs/HANDOFF.md` (
 - UI quality matters most. The look is dark purple (REC purple) with REC gold, vibrant particle effects,
   3D motion and scroll animation. Keep new work consistent with that identity.
 - Content is edited by rotating student office bearers, so content must stay in `src/data/*.json`, never hardcoded in pages.
+- Home hero, About the Society and What We Do copy live in `src/data/home.json` (`**bold**` supported via `richText`).
+  The Home scroll story shows the first six What We Do items, one particle formation each (`STEPS = 6` in
+  `ParticleStory.tsx`). The four CI ideas (neural networks, fuzzy systems, evolutionary computation, swarm intelligence)
+  were removed from visible content at the club's request; particle shape names in code are just abstract shapes.
 - The admin lives at `/admin` (`src/admin/`, lazy-loaded). It is Git-based: editors sign in with their own
   fine-grained GitHub token (Contents: read/write on this repo), drafts stay in memory, and Publish makes one commit
   via the Git Data API. Never add passwords, client-side auth checks or `VITE_` secrets (the old site's admin leaked

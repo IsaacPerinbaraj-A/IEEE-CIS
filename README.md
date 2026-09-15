@@ -80,8 +80,8 @@ Copy an existing event block and change it. Order doesn't matter; the site sorts
 
 ```json
 {
-  "slug": "intro-to-neural-networks",
-  "title": "Intro to Neural Networks",
+  "slug": "intro-to-machine-learning",
+  "title": "Intro to Machine Learning",
   "type": "Workshop",
   "domain": "Machine Learning",
   "session": "2026-27",
@@ -91,13 +91,13 @@ Copy an existing event block and change it. Order doesn't matter; the site sorts
   "venue": "Seminar Hall 2",
   "summary": "One sentence shown on cards.",
   "description": "A longer paragraph shown on the event page.",
-  "poster": "/images/events/intro-to-neural-networks.webp",
+  "poster": "/images/events/intro-to-machine-learning.webp",
   "register": "https://forms.gle/...",
   "coordinator": ""
 }
 ```
 
-- `slug` becomes the page address (`/events/intro-to-neural-networks`). Lowercase letters, numbers and dashes only, and unique.
+- `slug` becomes the page address (`/events/intro-to-machine-learning`). Lowercase letters, numbers and dashes only, and unique.
 - `type` can be anything, such as Workshop, Talk, Webinar, Training, Competition or Hackathon. Filter buttons appear automatically.
 - `session` is the academic year, used to group past events.
 - `date` uses the format `YYYY-MM-DD`. Leave it empty if unknown and the event shows under its academic year.
@@ -167,8 +167,8 @@ The site runs a small custom 3D engine (`src/components/particles/`, written dir
 1. **Intro**: plays every time the home page is loaded or refreshed (not when you come back to it from another page
    of the site). A scattered cloud gathers into "IEEE CIS REC", holds with the society name underneath, then bursts
    into the hero globe. The cursor does not affect the particles during the intro. Visitors can press **Skip intro** or Esc.
-2. **Scroll story**: the particles morph through the four ideas of computational intelligence:
-   a neural network, fuzzy membership hills, a DNA helix (evolution) and a moving swarm.
+2. **Scroll story**: the particles change shape for each of the six "What We Do" items (Technical Learning through
+   Industry & Professional Development). The shapes are abstract decoration; the text comes from `src/data/home.json`.
 3. **Cursor**: particles swirl out of the way around the pointer like a vortex, and the shape tilts toward it.
    **Clicking** empty space sends a gold shockwave ring through the particles.
 
