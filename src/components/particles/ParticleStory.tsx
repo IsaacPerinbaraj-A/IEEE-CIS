@@ -18,12 +18,10 @@ const GLOW: [string, string][] = [
   ["#6D28D9", "#0E7490"], ["#B45309", "#BE185D"], ["#0E7490", "#6D28D9"], ["#BE185D", "#6D28D9"], ["#0891B2", "#6D28D9"], ["#0E7490", "#B45309"],
 ];
 const TEXT = 1, HERO = 2, STEPS = 6;
-const FORM = 1700, HOLD = 1300;
+/** The chapter name takes FORM ms to gather and then holds for HOLD ms: about 4.5 seconds on screen, on every load. */
+const FORM = 1500, HOLD = 3000;
 /** If the particles still aren't ready after this long, skip the intro and just show the page. */
 const INTRO_FAILSAFE = 6000;
-/** Remembers (for this browser tab session) that the intro has been seen, so later loads play a shorter version. */
-const INTRO_SEEN_KEY = "cis-intro-seen";
-const introSeen = () => { try { return sessionStorage.getItem(INTRO_SEEN_KEY) === "1"; } catch { return false; } };
 const ease = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
 const INTERACTIVE = "a,button,input,select,textarea,label,[role=button]";
 const textLinesFor = (mobile: boolean) => (mobile ? ["IEEE", "CIS", "REC"] : ["IEEE CIS", "REC"]);
@@ -144,9 +142,8 @@ export default function ParticleStory({ hero, steps }: { hero: ReactNode; steps:
       return HERO + Math.min(STEPS, s >= STEPS ? STEPS : k + sm);
     };
 
-    // Intro timeline (shorter when the intro was already seen earlier in this session)
-    const repeat = introSeen();
-    const form = repeat ? 1100 : FORM, hold = repeat ? 500 : HOLD, minLoading = repeat ? 250 : 700, releaseMs = repeat ? 1100 : 1500;
+    // Intro timeline
+    const form = FORM, hold = HOLD, minLoading = 700, releaseMs = 1500;
     let introStart = 0, releaseAt = 0, releaseFrom = TEXT, releaseDur = releaseMs, skipRequested = false;
     let introPhase: Phase = "off";
     const go = (p: Phase) => {
@@ -154,7 +151,7 @@ export default function ParticleStory({ hero, steps }: { hero: ReactNode; steps:
       document.body.dataset.intro = p === "off" ? "done" : p === "release" ? "leaving" : "on";
       lockPage(p === "loading" || p === "forming" || p === "hold");
     };
-    const markSeen = () => { introPlayedThisLoad = true; try { sessionStorage.setItem(INTRO_SEEN_KEY, "1"); } catch { /* storage blocked: the intro just stays full length */ } };
+    const markSeen = () => { introPlayedThisLoad = true; };
     // Mark as played only once it finishes, so a remount mid-intro (React dev mode) plays it again
     const finishIntro = () => { markSeen(); go("off"); field.follow = true; field.interactive = true; field.morphTarget = scrollTarget(); };
     const release = (dur: number) => {
