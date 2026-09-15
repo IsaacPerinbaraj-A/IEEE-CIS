@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+import { Trophy } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 import { achievements } from "../lib/data";
 import { useTitle } from "../lib/useTitle";
@@ -9,7 +11,20 @@ export default function Achievements() {
       <PageHeader title="Achievements" shape="fuzzy">Wins, papers and milestones from our members.</PageHeader>
       <div className="wrap mt-12">
         {achievements.length === 0
-          ? <p className="text-mute">Achievements are being added. Check back soon.</p>
+          ? (
+            <div role="status" className="relative overflow-hidden rounded-3xl border border-line bg-gradient-to-br from-violet-deep/40 via-panel to-ink p-8 sm:p-12">
+              <div aria-hidden className="absolute -right-20 -top-20 h-64 w-64 rounded-full border-[22px] border-gold/60 sm:h-80 sm:w-80" />
+              <div className="relative max-w-[56ch]">
+                <span className="grid h-12 w-12 place-items-center rounded-2xl bg-raised text-violet-soft"><Trophy size={22} aria-hidden /></span>
+                <h2 className="mt-6 text-2xl font-semibold sm:text-3xl">Nothing listed yet</h2>
+                <p className="mt-3 text-mute">Achievements are being added. Check back soon.</p>
+                <div className="mt-7 flex flex-wrap gap-3">
+                  <Link className="btn-ghost" to="/events?tab=past">See past events</Link>
+                  <Link className="btn-ghost" to="/team">Meet the team</Link>
+                </div>
+              </div>
+            </div>
+          )
           : <ol className="relative space-y-10 border-l border-line pl-8">
               {achievements.map(a => (
                 <li key={a.title} className="relative">
