@@ -19,7 +19,7 @@ export default function MemberCard({ m, large = false }: { m: Member; large?: bo
       <Tilt className="rounded-2xl" max={12}>
       <div className="relative aspect-square overflow-hidden rounded-2xl border border-line bg-panel shadow-[0_18px_40px_-22px_rgba(139,92,246,.6)]">
         {showPhoto
-          ? <img src={m.photo} alt="" loading="lazy" decoding="async" onError={() => setFailedSrc(m.photo)} className="h-full w-full object-cover grayscale-[25%] transition duration-300 group-hover:grayscale-0" />
+          ? <img src={m.photo} alt="" loading="lazy" decoding="async" onError={() => setFailedSrc(m.photo ?? null)} className="h-full w-full object-cover grayscale-[25%] transition duration-300 group-hover:grayscale-0" />
           : <div className="grid h-full w-full place-items-center bg-gradient-to-br from-violet-deep to-panel font-display text-4xl text-violet-soft">{initials(m.name)}</div>}
       </div>
       </Tilt>

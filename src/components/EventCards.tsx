@@ -8,7 +8,7 @@ import { Tilt } from "./Motion";
 export function Poster({ e, className = "" }: { e: ChapterEvent; className?: string }) {
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
   if (e.poster && failedSrc !== e.poster) {
-    return <img src={e.poster} alt={`${e.title} poster`} loading="lazy" decoding="async" onError={() => setFailedSrc(e.poster)} className={`h-full w-full object-cover ${className}`} />;
+    return <img src={e.poster} alt={`${e.title} poster`} loading="lazy" decoding="async" onError={() => setFailedSrc(e.poster ?? null)} className={`h-full w-full object-cover ${className}`} />;
   }
   return (
     <div className={`relative flex h-full w-full flex-col justify-between overflow-hidden bg-gradient-to-br from-violet-deep via-panel to-ink p-6 ${className}`}>
