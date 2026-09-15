@@ -22,6 +22,17 @@
   .h-section { @apply text-[clamp(1.6rem,3vw,2.35rem)] font-semibold; }
   .lede { @apply text-lg text-mute max-w-[58ch]; }
   .link { @apply text-violet-soft underline decoration-violet/50 underline-offset-4 transition-colors hover:text-cream hover:decoration-cream; }
+
+  /* Phones: a row you swipe sideways instead of a tall stack. Add sm: layout classes for bigger screens. */
+  @media (max-width: 639px) {
+    .snap-row { display: flex; flex-wrap: nowrap; gap: .5rem; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity;
+      margin-inline: -1.25rem; padding: 6px 1.25rem; scroll-padding-inline: 1.25rem; scrollbar-width: none; }
+    .snap-row::-webkit-scrollbar { display: none; }
+    .snap-row > * { flex: none; scroll-snap-align: start; }
+    .snap-row-cards { gap: 1rem; scroll-snap-type: x mandatory; }
+    .snap-row-cards > * { width: 78%; }
+    .snap-row-fade { mask-image: linear-gradient(90deg, transparent 0, #000 1.25rem, #000 calc(100% - 3rem), transparent); }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -72,7 +83,7 @@ body[data-intro="on"] .story-shade { opacity: 0; }
 .hero-stage { align-items: flex-start; }
 .hero-wrap { padding-top: 40svh; padding-bottom: 7.5rem; }
 .hero-title { font-size: clamp(2rem, min(8.4vw, 7.5svh), 3.6rem); }
-.story-step { min-height: 125svh; align-items: flex-end; padding-bottom: 2.5rem; }
+.story-step { min-height: 100svh; align-items: flex-end; padding-bottom: 2.5rem; }
 .step-card { max-width: 560px; }
 .story-shade { background: linear-gradient(180deg, rgba(15,10,28,0) 0%, rgba(15,10,28,0) 38%, rgba(15,10,28,.82) 60%); }
 .glow-a { right: -30%; top: 0; }
@@ -95,6 +106,11 @@ body[data-intro="on"] .story-shade { opacity: 0; }
   .step-card { padding: 1.25rem 1.5rem; }
   .step-card h2 { font-size: 1.5rem; }
   .step-card p { font-size: 0.95rem; }
+}
+/* Touch screens: the "move your cursor" hint doesn't apply, so drop it and the space kept for it */
+@media (pointer: coarse) {
+  .hero-cue { display: none; }
+  .hero-wrap { padding-bottom: 3.5rem; }
 }
 body[data-intro="on"] .glow-a { right: calc(50% - 30vh); top: calc(50% - 34vh); }
 body[data-intro="on"] .glow-b { right: calc(50% - 10vh); bottom: calc(50% - 40vh); }

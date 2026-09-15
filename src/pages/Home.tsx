@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import type { CSSProperties } from "react";
-import { CalendarDays, MapPin } from "lucide-react";
+import { ArrowRight, CalendarDays, MapPin } from "lucide-react";
 import ParticleStory from "../components/particles/ParticleStory";
 import { Reveal, Tilt, Marquee } from "../components/Motion";
 import { CisLogoTile } from "../components/Brand";
@@ -58,6 +58,17 @@ export default function Home() {
           <Link to="/join" className="btn-gold">Join the chapter</Link>
           <Link to="/events" className="btn-ghost bg-ink/40 backdrop-blur">See our events</Link>
         </div>
+        {/* The next (or latest) event, reachable from the first screen */}
+        {spotlight && (
+          <div className="intro-item mt-6" style={d(480)}>
+            <Link to={`/events/${spotlight.slug}`} className="group inline-flex max-w-full items-center gap-2.5 rounded-full border border-line bg-ink/50 py-2 pl-3.5 pr-4 text-[14px] text-mute backdrop-blur transition-colors hover:border-violet-soft hover:text-cream">
+              <span aria-hidden className={`h-2 w-2 shrink-0 rounded-full ${next ? "bg-gold" : "bg-violet-soft"}`} />
+              <span className="shrink-0">{next ? "Next event" : "Latest event"}</span>
+              <span className="truncate font-medium text-cream">{spotlight.title}</span>
+              <ArrowRight size={15} aria-hidden className="shrink-0 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+          </div>
+        )}
       </div>
       <div className="hero-cue intro-item absolute bottom-8 left-5 flex items-center gap-4 sm:left-8" style={d(700)}>
         <span aria-hidden className="scroll-cue block h-9 w-6 shrink-0 rounded-full border-2 border-mute/60" />
@@ -86,7 +97,7 @@ export default function Home() {
 
       {/* Next (or latest) event */}
       {spotlight && (
-        <Reveal className="wrap relative z-10 mt-20">
+        <Reveal className="wrap relative z-10 mt-14 sm:mt-20">
           <Link to={`/events/${spotlight.slug}`} className="group flex flex-col gap-5 rounded-2xl border border-line bg-panel p-5 transition-colors hover:border-violet-soft sm:flex-row sm:items-center sm:p-6">
             {spotlight.poster && <img src={spotlight.poster} alt="" className="h-20 w-20 shrink-0 rounded-xl object-cover" />}
             <div className="min-w-0 flex-1">
@@ -103,28 +114,31 @@ export default function Home() {
       )}
 
       {/* Event names, moving with your scroll */}
-      <div className="mt-24"><Marquee items={events.map(e => e.title.split(":")[0])} /></div>
+      <div className="mt-16 sm:mt-24"><Marquee items={events.map(e => e.title.split(":")[0])} /></div>
 
       {/* Domains */}
-      <section className="wrap mt-28 grid gap-12 lg:grid-cols-[minmax(0,380px)_1fr]">
+      <section className="wrap mt-20 grid gap-10 sm:mt-28 sm:gap-12 lg:grid-cols-[minmax(0,380px)_1fr]">
         <Reveal className="lg:sticky lg:top-28 lg:self-start">
           <h2 className="h-section">Nine teams, one chapter</h2>
           <p className="lede mt-4">Five technical domains do the learning and building. Four more keep the chapter running. Pick the one that fits you.</p>
           <Link to="/team" className="link mt-6 inline-block">Meet the {current.label} team</Link>
         </Reveal>
         <div>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
             {Object.keys(technical).map(k => groups.find(g => g.slug === k)).filter((g): g is NonNullable<typeof g> => !!g).map((g, i) => {
               const Icon = domainIcon[g.slug];
               const heads = g.members.filter(m => /head/i.test(m.role)).map(m => m.name);
               return (
                 <Reveal key={g.slug} delay={i * 90} className={i === 0 ? "sm:col-span-2" : ""}>
                   <Tilt className="h-full rounded-2xl" max={6}>
-                    <Link to={`/team?domain=${g.slug}`} className="group block h-full rounded-2xl border border-line bg-panel p-6 transition-colors hover:border-violet-soft hover:bg-raised">
-                      <Icon className="text-violet-soft" size={26} />
-                      <h3 className="mt-5 text-xl font-semibold">{g.domain}</h3>
-                      <p className="mt-2 text-mute">{technical[g.slug]}</p>
-                      <p className="mt-4 text-[14px] text-mute/90">{heads.length ? `Led by ${heads.join(" and ")}` : `${g.members.length} members`}</p>
+                    {/* Phones: icon beside the text in a compact row; larger screens: a tile */}
+                    <Link to={`/team?domain=${g.slug}`} className="group flex h-full items-start gap-4 rounded-2xl border border-line bg-panel p-5 transition-colors hover:border-violet-soft hover:bg-raised sm:block sm:p-6">
+                      <Icon className="mt-0.5 shrink-0 text-violet-soft" size={26} />
+                      <div className="min-w-0 sm:mt-5">
+                        <h3 className="text-lg font-semibold sm:text-xl">{g.domain}</h3>
+                        <p className="mt-1 text-[15px] text-mute sm:mt-2 sm:text-[17px]">{technical[g.slug]}</p>
+                        <p className="mt-2 text-[14px] text-mute/90 sm:mt-4">{heads.length ? `Led by ${heads.join(" and ")}` : `${g.members.length} members`}</p>
+                      </div>
                     </Link>
                   </Tilt>
                 </Reveal>
@@ -150,7 +164,7 @@ export default function Home() {
       </section>
 
       {/* Recent events */}
-      <section className="wrap mt-28">
+      <section className="wrap mt-20 sm:mt-28">
         <Reveal className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 className="h-section">Recent events</h2>
@@ -158,13 +172,14 @@ export default function Home() {
           </div>
           <Link to="/events?tab=past" className="btn-ghost">All events</Link>
         </Reveal>
-        <div className="mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Phones swipe through the posters sideways instead of scrolling past four tall cards */}
+        <div className="snap-row snap-row-cards mt-8 sm:mt-10 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-4">
           {recent.map((e, i) => <Reveal key={e.slug} delay={i * 110}><PosterCard e={e} /></Reveal>)}
         </div>
       </section>
 
       {/* About */}
-      <Reveal as="section" className="wrap mt-28 grid gap-10 border-t border-line pt-16 lg:grid-cols-2">
+      <Reveal as="section" className="wrap mt-20 grid gap-10 border-t border-line pt-12 sm:mt-28 sm:pt-16 lg:grid-cols-2">
         <h2 className="h-section max-w-[18ch]">Learn the ideas underneath the AI hype.</h2>
         <div className="space-y-5 text-lg text-mute">
           <p>Computational intelligence is the part of AI that borrows from nature: brains, human reasoning, evolution and flocks. It powers the tools you use every day.</p>
@@ -174,7 +189,7 @@ export default function Home() {
       </Reveal>
 
       {/* Join */}
-      <Reveal as="section" className="wrap mt-28">
+      <Reveal as="section" className="wrap mt-20 sm:mt-28">
         <div className="join-band relative overflow-hidden rounded-3xl border border-violet/40 p-8 sm:p-12">
           <div aria-hidden className="join-ring absolute -bottom-24 -right-16 h-72 w-72 rounded-full border-[28px] border-gold/80" />
           <div className="relative max-w-[640px]">
