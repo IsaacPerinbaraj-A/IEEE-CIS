@@ -39,10 +39,10 @@ void main() {
   vec2 ndc = clip.xy / clip.w;
   vec2 dm = (ndc - uMouse) * vec2(uAspect, 1.0);
   float dist = length(dm);
-  float push = uMouseOn * (1.0 - smoothstep(0.0, 0.34, dist));
+  float near = 1.0 - smoothstep(0.0, 0.45, dist);
+  float push = uMouseOn * near * near;                                             // soft, wide falloff: no hard edge
   vec2 dir = dist > 0.0001 ? dm / dist : vec2(0.0);
-  vec2 swirl = vec2(-dir.y, dir.x);                                               // vortex: push out and spin around the cursor
-  ndc += (dir * 0.09 + swirl * 0.075 * (0.6 + r)) * push * vec2(1.0 / uAspect, 1.0);
+  ndc += dir * 0.035 * push * vec2(1.0 / uAspect, 1.0);                             // gentle drift away from the cursor, no swirl
   float wave = 0.0;
   if (uShockT >= 0.0) {                                                          // click: an expanding ring pushes particles outwards
     vec2 ds = (ndc - uShockPos) * vec2(uAspect, 1.0);
@@ -54,11 +54,11 @@ void main() {
   clip.xy = ndc * clip.w;
   gl_Position = clip;
   float depth = max(-world.z, 0.6);
-  gl_PointSize = uSize * uSizeMul * uPR * (0.8 + r * 1.3) * (6.0 / depth) * (1.0 + push * 1.6 + wave * 1.8);
+  gl_PointSize = uSize * uSizeMul * uPR * (0.8 + r * 1.3) * (6.0 / depth) * (1.0 + push * 0.2 + wave * 1.8);
   float gf = clamp(aFrom.y * 0.3 + 0.5, 0.0, 1.0), gt = clamp(aTo.y * 0.3 + 0.5, 0.0, 1.0);
   vColor = mix(mix(uFromA, uFromB, gf), mix(uToA, uToB, gt), t);
   if (r > 0.965) vColor = vec3(0.95, 0.71, 0.27);                                  // gold sparks
-  vColor += push * 0.55 + wave * vec3(0.9, 0.75, 1.0);
+  vColor += push * 0.12 + wave * vec3(0.9, 0.75, 1.0);
   vColor = mix(vColor, vec3(1.0, 0.8, 0.45), wave * 0.8);                       // the wave glows gold
   vAlpha = (0.5 + r * 0.5) * smoothstep(13.0, 3.5, depth);
 }`;
