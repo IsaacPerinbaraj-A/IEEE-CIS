@@ -1,17 +1,12 @@
 import { Link } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
-import { AreaGlyph } from "../components/Icons";
+import { Lightbulb } from "lucide-react";
 import { CisLogoTile } from "../components/Brand";
-import { events, sessions } from "../lib/data";
+import { events, sessions, home } from "../lib/data";
 import { useTitle } from "../lib/useTitle";
+import { richText } from "../lib/richText";
+import { pillarIcon } from "../lib/icons";
 import { Reveal, RevealWords, Tilt, Marquee } from "../components/Motion";
-
-const areas = [
-  { kind: "neural", title: "Neural networks", text: "Layers of simple units that learn patterns from data. The foundation of deep learning and large language models." },
-  { kind: "fuzzy", title: "Fuzzy systems", text: "Reasoning with \"mostly\" and \"a little\" instead of strict true or false. Used in control systems and decision support." },
-  { kind: "evolution", title: "Evolutionary computation", text: "Algorithms that breed better solutions over generations, keeping the fittest. Good for problems too big to brute-force." },
-  { kind: "swarm", title: "Swarm intelligence", text: "Many simple agents following simple rules, finding answers together. The particles on our home page end as one." },
-] as const;
 
 export default function About() {
   useTitle("About", "IEEE CIS REC is the student chapter of the IEEE Computational Intelligence Society at Rajalakshmi Engineering College, Chennai.");
@@ -23,8 +18,11 @@ export default function About() {
 
       <section className="wrap mt-20 grid gap-12 lg:grid-cols-2">
         <Reveal>
-          <RevealWords text="Our mission" className="h-section" />
-          <p className="mt-5 text-lg text-mute">To help students push the boundaries of computational intelligence through hands-on learning and collaboration, in areas like machine learning, data science and IoT, while building leadership and professional skills along the way.</p>
+          <p className="text-[15px] font-medium text-violet-soft">{home.about.label}</p>
+          <RevealWords text={home.about.title} className="h-section mt-3" />
+          <div className="mt-5 space-y-4 text-lg text-mute">
+            {home.about.paragraphs.map((p, i) => <p key={i}>{richText(p)}</p>)}
+          </div>
         </Reveal>
         <Reveal delay={150}><Tilt className="rounded-3xl" max={5}><div className="rounded-3xl border border-line bg-panel p-8">
           <h3 className="text-xl font-semibold">What we've run so far</h3>
@@ -39,26 +37,33 @@ export default function About() {
       </section>
 
       <section className="wrap mt-28">
-        <RevealWords text="What computational intelligence covers" className="h-section max-w-[22ch]" />
-        <p className="lede mt-4">The four core areas of the IEEE Computational Intelligence Society. Gold in each drawing marks the best result: the output, the fittest, the goal.</p>
-        <div className="mt-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-          {areas.map((a, i) => (
-            <Reveal key={a.title} delay={i * 110} className="border-t border-line pt-8">
-              <AreaGlyph kind={a.kind} />
-              <h3 className="mt-6 text-lg font-semibold">{a.title}</h3>
-              <p className="mt-2 text-mute">{a.text}</p>
-            </Reveal>
-          ))}
+        <p className="text-[15px] font-medium text-violet-soft">{home.whatWeDo.label}</p>
+        <RevealWords text={home.whatWeDo.title} className="h-section mt-3" />
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {home.whatWeDo.items.map((item, i) => {
+            const Icon = pillarIcon[item.icon] ?? Lightbulb;
+            return (
+              <Reveal key={item.title} delay={(i % 3) * 110} className="h-full">
+                <Tilt className="h-full rounded-2xl" max={6}>
+                  <div className="h-full rounded-2xl border border-line bg-panel p-6 transition-colors hover:border-violet-soft">
+                    <span className="grid h-11 w-11 place-items-center rounded-xl bg-raised text-violet-soft"><Icon size={22} aria-hidden /></span>
+                    <h3 className="mt-5 font-sans text-lg font-semibold">{item.title}</h3>
+                    <p className="mt-2 text-mute">{item.text}</p>
+                  </div>
+                </Tilt>
+              </Reveal>
+            );
+          })}
         </div>
       </section>
 
-      <div className="mt-28"><Marquee items={sessions[0].groups.map(g => g.domain).concat(["Neural Networks", "Fuzzy Systems", "Evolutionary Computation", "Swarm Intelligence"])} /></div>
+      <div className="mt-28"><Marquee items={sessions[0].groups.map(g => g.domain).concat(home.whatWeDo.items.map(item => item.title))} /></div>
 
       <section className="wrap mt-28 grid items-start gap-10 rounded-3xl border border-line bg-panel p-8 sm:p-12 lg:grid-cols-[auto_1fr]">
         <CisLogoTile className="px-5 py-4" />
         <div>
           <RevealWords text="Part of IEEE CIS worldwide" className="h-section" />
-          <p className="mt-4 max-w-[62ch] text-lg text-mute">The IEEE Computational Intelligence Society is IEEE's professional society for neural networks, fuzzy systems, evolutionary computation and related fields. It runs international conferences and competitions and publishes leading journals. As a student chapter, we bring that community to REC.</p>
+          <p className="mt-4 max-w-[62ch] text-lg text-mute">The IEEE Computational Intelligence Society is IEEE's professional society for computational intelligence and related fields. It runs international conferences and competitions and publishes leading journals. As a student chapter, we bring that community to REC.</p>
           <a href="https://cis.ieee.org" target="_blank" rel="noopener" className="link mt-5 inline-block">Visit IEEE CIS</a>
         </div>
       </section>
