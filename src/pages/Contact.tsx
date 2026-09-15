@@ -34,7 +34,7 @@ export default function Contact() {
             <Reveal as="li" key={label} delay={i * 90}>
               <Tilt className="rounded-2xl" max={6}><a href={href} target={href.startsWith("mailto") ? undefined : "_blank"} rel="noopener" className="flex items-center gap-4 rounded-2xl border border-line bg-panel p-5 transition-colors hover:border-violet-soft hover:bg-raised">
                 <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-raised text-violet-soft"><Icon size={19} /></span>
-                <span className="min-w-0"><span className="block text-[14px] text-mute">{label}</span><span className="block truncate">{value}</span></span>
+                <span className="min-w-0"><span className="block text-[14px] text-mute">{label}</span><span className="block break-words [overflow-wrap:anywhere]">{value}</span></span>
               </a></Tilt>
             </Reveal>
           ))}

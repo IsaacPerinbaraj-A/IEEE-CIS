@@ -14,7 +14,8 @@ export default function MemberCard({ m, large = false }: { m: Member; large?: bo
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
   const showPhoto = m.photo && failedSrc !== m.photo;
   return (
-    <article className="group">
+    // Full-height column so the social icons sit on one line across a row even when a name wraps
+    <article className="group flex h-full flex-col">
       <Tilt className="rounded-2xl" max={12}>
       <div className="relative aspect-square overflow-hidden rounded-2xl border border-line bg-panel shadow-[0_18px_40px_-22px_rgba(139,92,246,.6)]">
         {showPhoto
@@ -25,10 +26,10 @@ export default function MemberCard({ m, large = false }: { m: Member; large?: bo
       <h3 className={`mt-4 font-sans font-semibold tracking-normal ${large ? "text-xl" : "text-lg"}`}>{m.name}</h3>
       <p className="text-[15px] text-mute">{m.role}</p>
       {socials.length > 0 && (
-        <div className="mt-3 flex gap-2">
+        <div className="mt-auto flex gap-1.5 pt-3 sm:gap-2">
           {socials.map(({ href, label, Icon }) => (
             <a key={label} href={href} target="_blank" rel="noopener" aria-label={`${m.name} on ${label}`}
-               className="grid h-10 w-10 place-items-center rounded-full border border-line text-mute transition-colors hover:border-violet-soft hover:text-cream">
+               className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-line text-mute transition-colors hover:border-violet-soft hover:text-cream">
               <Icon size={16} />
             </a>
           ))}

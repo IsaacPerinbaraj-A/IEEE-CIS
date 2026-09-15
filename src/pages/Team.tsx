@@ -71,7 +71,7 @@ export default function Team() {
                 <span className="text-mute">{g.members.length}</span>
               </div>
               <div className={`grid gap-x-6 gap-y-10 ${lead ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5" : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"}`}>
-                {g.members.map((m, i) => <Reveal key={m.name} delay={(i % 5) * 80}><MemberCard m={m} large={lead} /></Reveal>)}
+                {g.members.map((m, i) => <Reveal key={m.name} delay={(i % 5) * 80} className="h-full"><MemberCard m={m} large={lead} /></Reveal>)}
               </div>
             </section>
           );
