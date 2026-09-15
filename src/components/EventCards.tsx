@@ -5,9 +5,9 @@ import { Tilt } from "./Motion";
 
 /** Shows the poster, or a typographic stand-in for events that don't have one yet. */
 export function Poster({ e, className = "" }: { e: ChapterEvent; className?: string }) {
-  if (e.poster) return <img src={e.poster} alt={`${e.title} poster`} loading="lazy" className={`h-full w-full object-cover ${className}`} />;
+  if (e.poster) return <img src={e.poster} alt={`${e.title} poster`} loading="lazy" className={`img-wipe h-full w-full object-cover ${className}`} />;
   return (
-    <div className={`relative flex h-full w-full flex-col justify-between overflow-hidden bg-gradient-to-br from-violet-deep via-panel to-ink p-6 ${className}`}>
+    <div className={`img-wipe relative flex h-full w-full flex-col justify-between overflow-hidden bg-gradient-to-br from-violet-deep via-panel to-ink p-6 ${className}`}>
       <div aria-hidden className="absolute -right-12 top-[30%] h-40 w-40 rounded-full border-[18px] border-gold/70" />
       <span className="relative max-w-[60%] text-[14px] text-violet-soft">{e.series || e.type}</span>
       <span className="relative break-words font-display text-[clamp(1.2rem,2.3vw,1.7rem)] font-semibold leading-tight">{e.title}</span>
