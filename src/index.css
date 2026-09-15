@@ -50,12 +50,6 @@
 .words[data-shown="1"] .word > span { transform: none; }
 @media (prefers-reduced-motion: reduce) { .word > span { transform: none; transition: none !important; } }
 
-/* ---------- Image wipe: posters and portraits inside a Reveal are uncovered top to bottom as they appear ----------
-   The transition list keeps the hover zoom (transform) and greyscale fade (filter) these images already have. */
-.reveal .img-wipe { transition: clip-path 1.1s cubic-bezier(.65,0,.35,1) calc(var(--d, 0ms) + 120ms), transform .5s cubic-bezier(.2,.7,.2,1), filter .3s ease; }
-.reveal:not([data-shown="1"]) .img-wipe { clip-path: inset(0 0 100% 0); }
-.reveal[data-shown="1"] .img-wipe { clip-path: inset(0 0 0 0); }
-
 /* ---------- 3D tilt cards ---------- */
 .tilt { position: relative; transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transform-style: preserve-3d;
   transition: transform .5s cubic-bezier(.2,.7,.2,1); will-change: transform; }
