@@ -160,102 +160,41 @@ export function ScrollProgress() {
   return <div ref={ref} aria-hidden className="scroll-progress fixed inset-x-0 top-0 z-[60] h-[3px] origin-left scale-x-0 bg-gradient-to-r from-violet via-[#EC4899] to-gold" />;
 }
 
-type Spark = { x: number; y: number; vx: number; vy: number; life: number; max: number; size: number; color: string };
-const SPARK_COLORS = ["#C4B5FD", "#F472B6", "#F2B544", "#22D3EE", "#A78BFA"];
-const INTRO_COLORS = ["#F2B544", "#FDE68A", "#F4EFE4", "#C4B5FD"];
-
 /**
- * Custom cursor for mouse users: a gold dot, a ring that trails behind, and a stardust trail.
- * The ring grows over anything clickable, shows a label over elements with data-cursor="...",
- * and every click bursts into sparks. During the intro it becomes a golden halo with a longer tail.
+ * Custom cursor for mouse users: one small glowing violet dot exactly at the pointer (no trailing ring, no sparkles).
+ * It grows a little over anything clickable and shows a label over elements with data-cursor="..." (posters say "View").
+ * Text fields keep the normal text cursor. Touch screens and reduced motion keep the system cursor.
  */
 export function CursorAura() {
-  const ring = useRef<HTMLDivElement>(null), dot = useRef<HTMLDivElement>(null), label = useRef<HTMLElement>(null), trail = useRef<HTMLCanvasElement>(null);
+  const dot = useRef<HTMLDivElement>(null), label = useRef<HTMLElement>(null);
   useEffect(() => {
     if (reduced() || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
-    const r = ring.current!, d = dot.current!, c = trail.current!, ctx = c.getContext("2d")!, html = document.documentElement;
-    let x = -100, y = -100, rx = -100, ry = -100, lx = 0, ly = 0, raf = 0, visible = false, last = performance.now(), dpr = 1;
-    const sparks: Spark[] = [];
-    const intro = () => document.body.dataset.intro === "on";
-
-    const size = () => { dpr = Math.min(window.devicePixelRatio || 1, 2); c.width = innerWidth * dpr; c.height = innerHeight * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
-    const emit = (px: number, py: number, vx: number, vy: number, big = false) => {
-      const cols = intro() ? INTRO_COLORS : SPARK_COLORS, max = (big || intro() ? 1.1 : 0.65) + Math.random() * 0.6;
-      sparks.push({ x: px, y: py, vx, vy, life: max, max, size: (intro() ? 1.4 : 1) * (0.9 + Math.random() * 1.8), color: cols[Math.floor(Math.random() * cols.length)] });
-      if (sparks.length > 420) sparks.shift();
-    };
-
-    const loop = (now: number) => {
-      const dt = Math.min(0.05, (now - last) / 1000); last = now;
-      rx += (x - rx) * 0.2; ry += (y - ry) * 0.2;
-      r.style.transform = `translate3d(${rx}px, ${ry}px, 0)`; d.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-      ctx.clearRect(0, 0, innerWidth, innerHeight);
-      if (sparks.length) {
-        ctx.globalCompositeOperation = "lighter";
-        for (let i = sparks.length - 1; i >= 0; i--) {
-          const s = sparks[i];
-          s.life -= dt; if (s.life <= 0) { sparks.splice(i, 1); continue; }
-          s.vx *= 0.94; s.vy = s.vy * 0.94 - 0.015; s.x += s.vx; s.y += s.vy;
-          const a = s.life / s.max;
-          ctx.globalAlpha = a * 0.22; ctx.fillStyle = s.color;
-          ctx.beginPath(); ctx.arc(s.x, s.y, s.size * 3.2, 0, Math.PI * 2); ctx.fill();
-          ctx.globalAlpha = a; ctx.beginPath(); ctx.arc(s.x, s.y, s.size * a + 0.3, 0, Math.PI * 2); ctx.fill();
-        }
-        ctx.globalAlpha = 1; ctx.globalCompositeOperation = "source-over";
-      }
-      // Stop when nothing is moving (ring caught up, no sparks left); the next pointer move or click restarts it
-      if (!sparks.length && Math.abs(x - rx) + Math.abs(y - ry) < 0.3) { raf = 0; return; }
-      raf = requestAnimationFrame(loop);
-    };
-    const wake = () => { if (!raf) { last = performance.now(); raf = requestAnimationFrame(loop); } };
-
+    const d = dot.current!, html = document.documentElement;
+    let x = -100, y = -100, raf = 0;
+    const paint = () => { raf = 0; d.style.transform = `translate3d(${x}px, ${y}px, 0)`; };
     const move = (e: PointerEvent) => {
       if (e.pointerType !== "mouse") return;
-      x = e.clientX; y = e.clientY; wake();
-      if (!visible) { visible = true; rx = lx = x; ry = ly = y; html.dataset.aura = "on"; }
+      x = e.clientX; y = e.clientY;
+      if (html.dataset.aura !== "on") html.dataset.aura = "on";
       const t = e.target as HTMLElement, labelled = t.closest<HTMLElement>("[data-cursor]");
-      const hover = t.closest("input,textarea,[contenteditable]") ? "text" : labelled ? "label" : t.closest("a,button,select,[role=button],[role=tab],label,summary") ? "link" : "";
-      html.dataset.auraHover = hover;
+      html.dataset.auraHover = t.closest("input,textarea,[contenteditable]") ? "text" : labelled ? "label" : t.closest("a,button,select,[role=button],[role=tab],label,summary") ? "link" : "";
       if (label.current) label.current.textContent = labelled?.dataset.cursor || "";
-      // Stardust: one spark every few pixels of travel, more during the intro
-      const dist = Math.hypot(x - lx, y - ly), step = intro() ? 5 : 9;
-      if (hover !== "text" && dist > step) {
-        const n = Math.min(intro() ? 6 : 3, Math.floor(dist / step)), mx = (x - lx) / dist, my = (y - ly) / dist;
-        for (let i = 0; i < n; i++) {
-          const k = i / n;
-          emit(lx + (x - lx) * k, ly + (y - ly) * k, -mx * 0.6 + (Math.random() - 0.5) * 0.9, -my * 0.6 + (Math.random() - 0.5) * 0.9);
-        }
-        lx = x; ly = y;
-      }
+      if (!raf) raf = requestAnimationFrame(paint);
     };
-    const out = () => { visible = false; html.dataset.aura = ""; };
-    const down = (e: PointerEvent) => {
-      if (e.pointerType !== "mouse") return;
-      html.dataset.auraPress = "1"; wake();
-      for (let i = 0; i < 18; i++) { const a = (i / 18) * Math.PI * 2 + Math.random() * 0.3, v = 2 + Math.random() * 3.5; emit(e.clientX, e.clientY, Math.cos(a) * v, Math.sin(a) * v, true); }
-    };
+    const out = () => { html.dataset.aura = ""; };
+    const down = (e: PointerEvent) => { if (e.pointerType === "mouse") html.dataset.auraPress = "1"; };
     const up = () => { html.dataset.auraPress = ""; };
-
-    size();
-    raf = requestAnimationFrame(loop);
     window.addEventListener("pointermove", move, { passive: true });
     window.addEventListener("pointerdown", down, { passive: true });
     window.addEventListener("pointerup", up);
-    window.addEventListener("resize", size);
     document.addEventListener("pointerleave", out);
     return () => {
-      cancelAnimationFrame(raf); html.dataset.aura = ""; html.dataset.auraHover = "";
+      cancelAnimationFrame(raf); html.dataset.aura = ""; html.dataset.auraHover = ""; html.dataset.auraPress = "";
       window.removeEventListener("pointermove", move); window.removeEventListener("pointerdown", down); window.removeEventListener("pointerup", up);
-      window.removeEventListener("resize", size); document.removeEventListener("pointerleave", out);
+      document.removeEventListener("pointerleave", out);
     };
   }, []);
-  return (
-    <>
-      <canvas ref={trail} aria-hidden className="pointer-events-none fixed inset-0 z-[89] h-full w-full" />
-      <div ref={ring} aria-hidden className="cursor-ring pointer-events-none fixed left-0 top-0 z-[90]"><span /><b ref={label} /></div>
-      <div ref={dot} aria-hidden className="cursor-dot pointer-events-none fixed left-0 top-0 z-[90]"><span /></div>
-    </>
-  );
+  return <div ref={dot} aria-hidden className="cursor-dot pointer-events-none fixed left-0 top-0 z-[90]"><span /><b ref={label} /></div>;
 }
 
 /** Floating button that appears after scrolling, with a ring showing how far down you are. */
