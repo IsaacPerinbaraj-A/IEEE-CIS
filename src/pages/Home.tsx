@@ -93,10 +93,11 @@ export default function Home() {
 
   return (
     <>
-      <ParticleStory hero={hero} steps={steps} />
+      <ParticleStory hero={hero} steps={steps} labels={ideas.map(idea => idea.title)} skipTo={spotlight ? "home-next-event" : undefined} />
 
       {/* Next (or latest) event */}
       {spotlight && (
+        <div id="home-next-event" className="scroll-mt-28">
         <Reveal className="wrap relative z-10 mt-14 sm:mt-20">
           <Link to={`/events/${spotlight.slug}`} className="group flex flex-col gap-5 rounded-2xl border border-line bg-panel p-5 transition-colors hover:border-violet-soft sm:flex-row sm:items-center sm:p-6">
             {spotlight.poster && <img src={spotlight.poster} alt="" className="h-20 w-20 shrink-0 rounded-xl object-cover" />}
@@ -111,6 +112,7 @@ export default function Home() {
             <span className={next ? "btn-gold shrink-0" : "btn-ghost shrink-0"}>{next ? "Details and registration" : "See what happened"}</span>
           </Link>
         </Reveal>
+        </div>
       )}
 
       {/* Event names, moving with your scroll */}

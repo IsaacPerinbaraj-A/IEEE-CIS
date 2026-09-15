@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { ArrowDown } from "lucide-react";
 import { ParticleField, type ShapeSpec } from "./engine";
+import { prefersReducedMotion } from "../../lib/motion";
 import { chaos, sphere, neural, fuzzy, helix, swarm, textShape, yBounds } from "./shapes";
 import { BOUNDS, VIS_H, fitShape, isSideLayout, type Placement, type Region } from "./layout";
 
@@ -72,8 +74,13 @@ function layout(w: number, h: number, m: ReturnType<typeof measure>) {
 
 type Phase = "off" | "loading" | "forming" | "hold" | "release";
 
-export default function ParticleStory({ hero, steps }: { hero: ReactNode; steps: ReactNode[] }) {
+/**
+ * `labels` (one per step) adds a progress rail under the header while the four steps scroll by;
+ * `skipTo` is the id of the element its "Skip to events" button scrolls to.
+ */
+export default function ParticleStory({ hero, steps, labels, skipTo }: { hero: ReactNode; steps: ReactNode[]; labels?: string[]; skipTo?: string }) {
   const wrapRef = useRef<HTMLDivElement>(null);
+  const railRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ringRef = useRef<SVGCircleElement>(null);
@@ -118,13 +125,18 @@ export default function ParticleStory({ hero, steps }: { hero: ReactNode; steps:
       setCaptionTop(((L.visH / 2 - bottomWorld) / L.visH) * h + (L.mobile ? 26 : 34));
     };
 
-    const scrollTarget = () => {
-      // Interpolate between the tops of the hero and each step, so shapes line up with cards at any height
+    // How far down the story you are: 0 at the hero, k at the top of step k, STEPS at the last step and beyond
+    const storyPos = () => {
       const y = -wrap.getBoundingClientRect().top, els = Array.from(contentRef.current?.children || []) as HTMLElement[];
       const tops = els.map(e => e.offsetTop);
-      if (tops.length < 2) return HERO;
-      let s = STEPS;
-      for (let k = 0; k < tops.length - 1; k++) if (y < tops[k + 1]) { s = k + Math.max(0, (y - tops[k]) / (tops[k + 1] - tops[k])); break; }
+      if (tops.length < 2) return null;
+      for (let k = 0; k < tops.length - 1; k++) if (y < tops[k + 1]) return k + Math.max(0, (y - tops[k]) / (tops[k + 1] - tops[k]));
+      return STEPS;
+    };
+    const scrollTarget = () => {
+      // Interpolate between the tops of the hero and each step, so shapes line up with cards at any height
+      const s = storyPos();
+      if (s === null) return HERO;
       const k = Math.min(Math.floor(s), STEPS - 1), f = s - k;
       const x = Math.max(0, Math.min(1, (f - 0.3) / 0.4)), sm = x * x * (3 - 2 * x);
       return HERO + Math.min(STEPS, s >= STEPS ? STEPS : k + sm);
@@ -228,7 +240,24 @@ export default function ParticleStory({ hero, steps }: { hero: ReactNode; steps:
       if ((e.target as HTMLElement).closest(INTERACTIVE) || (e.target as HTMLElement).closest(".reveal")) return;
       const p = toNdc(e); if (p) field.shock(p[0], p[1]);
     };
-    const onScroll = () => { if (reduce) { field.morph = field.morphTarget = scrollTarget(); field.draw(); } };
+    // Progress rail: shown only while the four steps are on screen; each segment fills as its step arrives
+    let railRaf = 0;
+    const updateRail = () => {
+      const rail = railRef.current, s = storyPos();
+      if (!rail || s === null) return;
+      const show = s > 0.55 && wrap.getBoundingClientRect().bottom > window.innerHeight * 0.75;
+      const active = Math.max(0, Math.min(STEPS - 1, Math.round(s) - 1));
+      rail.dataset.show = show ? "1" : "0";
+      rail.querySelectorAll<HTMLElement>("[data-step]").forEach((li, i) => {
+        li.style.setProperty("--fill", Math.max(0, Math.min(1, s - i)).toFixed(3));
+        if (show && i === active) li.setAttribute("aria-current", "step"); else li.removeAttribute("aria-current");
+      });
+    };
+    const onScroll = () => {
+      cancelAnimationFrame(railRaf); railRaf = requestAnimationFrame(updateRail);
+      if (reduce) { field.morph = field.morphTarget = scrollTarget(); field.draw(); }
+    };
+    updateRail();
     let rt = 0;
     const onResize = () => {
       clearTimeout(rt);
@@ -240,7 +269,7 @@ export default function ParticleStory({ hero, steps }: { hero: ReactNode; steps:
           textPositions = await textShape(count, textLinesFor(L.mobile), L.textWidth);
           field.replaceShape(TEXT, textPositions);
         }
-        placeCaption(); field.resize();
+        placeCaption(); field.resize(); updateRail();
       }, 150);
     };
     if (!reduce) {
@@ -254,7 +283,7 @@ export default function ParticleStory({ hero, steps }: { hero: ReactNode; steps:
     window.addEventListener("keydown", onKey);
 
     return () => {
-      disposed = true; clearInterval(loadTimer); clearTimeout(failsafeTimer); io.disconnect(); field.dispose();
+      disposed = true; clearInterval(loadTimer); clearTimeout(failsafeTimer); cancelAnimationFrame(railRaf); io.disconnect(); field.dispose();
       document.removeEventListener("visibilitychange", onVis);
       window.removeEventListener("pointermove", onMove); window.removeEventListener("pointerdown", onDown); document.removeEventListener("pointerleave", onLeave);
       window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onResize); window.removeEventListener("keydown", onKey);
@@ -277,6 +306,30 @@ export default function ParticleStory({ hero, steps }: { hero: ReactNode; steps:
         <div className="hero-stage relative flex min-h-[100svh] pt-[68px]">{hero}</div>
         {steps.map((s, i) => <div key={i} className="story-step relative flex">{s}</div>)}
       </div>
+
+      {/* Progress rail (idea from the second version's intelligence stack spine). Sits above the content but only its button takes clicks. */}
+      {labels && labels.length === STEPS && (
+        <div className="pointer-events-none absolute inset-0 z-[5]">
+          <div ref={railRef} data-show="0" className="story-rail sticky top-[69px]">
+            <nav aria-label="Story progress" className="wrap flex items-start gap-4 pb-8 pt-3">
+              <ol className="flex flex-1 gap-2">
+                {labels.map((label, i) => (
+                  <li key={label} data-step={i} className="story-rail-step min-w-0 flex-1">
+                    <span aria-hidden className="block h-[3px] overflow-hidden rounded-full bg-line"><span className="story-rail-fill block h-full w-full bg-gradient-to-r from-violet to-gold" /></span>
+                    <span className="sr-only lg:not-sr-only lg:mt-2 lg:block lg:truncate lg:text-[13px]">{label}</span>
+                  </li>
+                ))}
+              </ol>
+              {skipTo && (
+                <button type="button" onClick={() => document.getElementById(skipTo)?.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "start" })}
+                  className="pointer-events-auto -mt-1.5 inline-flex shrink-0 items-center gap-1.5 rounded-full border border-line bg-ink/70 px-3.5 py-1.5 text-[14px] text-mute backdrop-blur transition-colors hover:border-violet-soft hover:text-cream">
+                  Skip to events <ArrowDown size={14} aria-hidden />
+                </button>
+              )}
+            </nav>
+          </div>
+        </div>
+      )}
 
       {introVisible && (
         // During the release fade the page is already coming back, so clicks pass through to it
