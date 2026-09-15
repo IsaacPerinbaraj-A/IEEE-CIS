@@ -15,6 +15,11 @@ const GLOW: [string, string][] = [
 ];
 const TEXT = 1, HERO = 2, STEPS = 4;
 const FORM = 1700, HOLD = 1300;
+/** If the particles still aren't ready after this long, skip the intro and just show the page. */
+const INTRO_FAILSAFE = 6000;
+/** Remembers (for this browser tab session) that the intro has been seen, so later loads play a shorter version. */
+const INTRO_SEEN_KEY = "cis-intro-seen";
+const introSeen = () => { try { return sessionStorage.getItem(INTRO_SEEN_KEY) === "1"; } catch { return false; } };
 const ease = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
 const INTERACTIVE = "a,button,input,select,textarea,label,[role=button]";
 const textLinesFor = (mobile: boolean) => (mobile ? ["IEEE", "CIS", "REC"] : ["IEEE CIS", "REC"]);
@@ -82,7 +87,12 @@ export default function ParticleStory({ hero, steps }: { hero: ReactNode; steps:
   useEffect(() => {
     const canvas = canvasRef.current!, wrap = wrapRef.current!;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const done = () => { document.body.dataset.intro = "done"; };
+    // While the name forms, the hidden page behind the intro can't be tabbed to, so "Skip intro" is the first stop
+    const lockPage = (lock: boolean) => {
+      [document.querySelector("header"), contentRef.current, document.querySelector("footer"), document.querySelector(".skip-link")]
+        .forEach(el => { if (lock) el?.setAttribute("inert", ""); else el?.removeAttribute("inert"); });
+    };
+    const done = () => { document.body.dataset.intro = "done"; lockPage(false); };
     if (!ParticleField.supported()) { setWebgl(false); done(); return; }
     const playIntro = !reduce && openedOnHome && !introPlayedThisLoad;
     if (playIntro) { if ("scrollRestoration" in history) history.scrollRestoration = "manual"; window.scrollTo(0, 0); }
@@ -120,26 +130,33 @@ export default function ParticleStory({ hero, steps }: { hero: ReactNode; steps:
       return HERO + Math.min(STEPS, s >= STEPS ? STEPS : k + sm);
     };
 
-    // Intro timeline
-    let introStart = 0, releaseAt = 0, releaseFrom = TEXT, releaseDur = 1500, skipRequested = false;
+    // Intro timeline (shorter when the intro was already seen earlier in this session)
+    const repeat = introSeen();
+    const form = repeat ? 1100 : FORM, hold = repeat ? 500 : HOLD, minLoading = repeat ? 250 : 700, releaseMs = repeat ? 1100 : 1500;
+    let introStart = 0, releaseAt = 0, releaseFrom = TEXT, releaseDur = releaseMs, skipRequested = false;
     let introPhase: Phase = "off";
-    const go = (p: Phase) => { introPhase = p; setPhase(p); document.body.dataset.intro = p === "off" ? "done" : p === "release" ? "leaving" : "on"; };
+    const go = (p: Phase) => {
+      introPhase = p; setPhase(p);
+      document.body.dataset.intro = p === "off" ? "done" : p === "release" ? "leaving" : "on";
+      lockPage(p === "loading" || p === "forming" || p === "hold");
+    };
+    const markSeen = () => { introPlayedThisLoad = true; try { sessionStorage.setItem(INTRO_SEEN_KEY, "1"); } catch { /* storage blocked: the intro just stays full length */ } };
     // Mark as played only once it finishes, so a remount mid-intro (React dev mode) plays it again
-    const finishIntro = () => { introPlayedThisLoad = true; go("off"); field.follow = true; field.interactive = true; field.morphTarget = scrollTarget(); };
+    const finishIntro = () => { markSeen(); go("off"); field.follow = true; field.interactive = true; field.morphTarget = scrollTarget(); };
     const release = (dur: number) => {
       if (introPhase === "release" || introPhase === "off") return;
       releaseFrom = field.morph; releaseAt = performance.now(); releaseDur = dur; go("release");
     };
     skipRef.current = () => { if (introPhase === "loading") { skipRequested = true; return; } release(700); };
-    const TOTAL = FORM + HOLD;
+    const TOTAL = form + hold;
 
     field.onFrame = () => {
       const now = performance.now();
       if (introPhase === "forming" || introPhase === "hold") {
         const e = now - introStart;
         if (ringRef.current) ringRef.current.style.strokeDashoffset = String(100 - Math.min(100, (e / TOTAL) * 100));
-        if (e < FORM) field.morph = ease(e / FORM) * TEXT;
-        else { field.morph = TEXT; if (introPhase === "forming") go("hold"); if (e > TOTAL) release(1500); }
+        if (e < form) field.morph = ease(e / form) * TEXT;
+        else { field.morph = TEXT; if (introPhase === "forming") go("hold"); if (e > TOTAL) release(releaseMs); }
       } else if (introPhase === "release") {
         const e = Math.min(1, (now - releaseAt) / releaseDur);
         field.morph = releaseFrom + (HERO - releaseFrom) * ease(e);
@@ -160,22 +177,31 @@ export default function ParticleStory({ hero, steps }: { hero: ReactNode; steps:
       }));
     };
 
-    let loadTimer = 0;
+    let loadTimer = 0, failsafeTimer = 0;
     if (playIntro) {
       go("loading");
       const t0 = performance.now();
       loadTimer = window.setInterval(() => setLoaded(v => Math.min(92, v + Math.max(1, Math.round((92 - v) * 0.12)))), 40);
       field.follow = false; field.morph = 0;
+      // Failsafe: if building the shapes hangs or fails, drop the intro and show the page instead of a locked screen
+      const abortIntro = () => {
+        if (disposed || introPhase !== "loading") return;
+        clearInterval(loadTimer); markSeen(); go("off");
+        field.follow = true; field.interactive = true; field.morph = field.morphTarget = scrollTarget();
+      };
+      failsafeTimer = window.setTimeout(abortIntro, INTRO_FAILSAFE);
       build().then(specs => {
         if (disposed) return;
         field.setShapes(specs); field.resize(); field.start();
+        if (introPhase === "off") { field.morph = field.morphTarget = scrollTarget(); return; } // the failsafe already showed the page
+        clearTimeout(failsafeTimer);
         window.setTimeout(() => {
-          if (disposed) return;
+          if (disposed || introPhase !== "loading") return;
           clearInterval(loadTimer); setLoaded(100); introStart = performance.now();
           go("forming");
           if (skipRequested) release(900);
-        }, skipRequested ? 0 : Math.max(0, 700 - (performance.now() - t0)));
-      });
+        }, skipRequested ? 0 : Math.max(0, minLoading - (performance.now() - t0)));
+      }).catch(abortIntro);
     } else {
       done();
       build().then(specs => {
@@ -228,7 +254,7 @@ export default function ParticleStory({ hero, steps }: { hero: ReactNode; steps:
     window.addEventListener("keydown", onKey);
 
     return () => {
-      disposed = true; clearInterval(loadTimer); io.disconnect(); field.dispose();
+      disposed = true; clearInterval(loadTimer); clearTimeout(failsafeTimer); io.disconnect(); field.dispose();
       document.removeEventListener("visibilitychange", onVis);
       window.removeEventListener("pointermove", onMove); window.removeEventListener("pointerdown", onDown); document.removeEventListener("pointerleave", onLeave);
       window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onResize); window.removeEventListener("keydown", onKey);
@@ -253,7 +279,8 @@ export default function ParticleStory({ hero, steps }: { hero: ReactNode; steps:
       </div>
 
       {introVisible && (
-        <div className="intro-overlay fixed inset-0 z-[80]">
+        // During the release fade the page is already coming back, so clicks pass through to it
+        <div className={`intro-overlay fixed inset-0 z-[80] ${phase === "release" ? "pointer-events-none" : ""}`}>
           <div className={`absolute inset-x-0 px-6 text-center transition-all duration-700 ${phase === "hold" ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"}`}
                style={{ top: captionTop ?? "72%" }}>
             <p className="font-display text-[clamp(0.95rem,1.8vw,1.3rem)] font-medium text-cream">Computational Intelligence Society</p>
