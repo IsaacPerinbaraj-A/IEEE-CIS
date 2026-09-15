@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import type { CSSProperties } from "react";
-import { ArrowRight, CalendarDays, MapPin } from "lucide-react";
+import { ArrowRight, CalendarDays, Lightbulb, MapPin } from "lucide-react";
 import ParticleStory from "../components/particles/ParticleStory";
 import { Reveal, RevealWords, Tilt, Marquee, Magnetic, RollLabel, PlayWhenVisible } from "../components/Motion";
 import { CisLogoTile } from "../components/Brand";
 import { PosterCard } from "../components/EventCards";
-import { domainIcon } from "../lib/icons";
+import { domainIcon, pillarIcon } from "../lib/icons";
 import { upcomingEvents, pastEvents, events, sessions, formatDate, formatTime, home } from "../lib/data";
 import { useTitle } from "../lib/useTitle";
 import { richText } from "../lib/richText";
@@ -70,18 +70,23 @@ export default function Home() {
   // "What We Do": one scroll step per item, each arriving with its own particle formation
   // The particle story has six formations (ParticleStory STEPS), so it shows the first six items
   const items = home.whatWeDo.items.slice(0, 6);
+  // Cards alternate sides on wide screens (step-card-right); the particles sit on the other side
   const steps = items.map((item, i) => {
     const color = STEP_COLORS[i % STEP_COLORS.length];
+    const Icon = pillarIcon[item.icon] ?? Lightbulb;
     return (
       <div key={item.title} className="wrap w-full">
-        <Reveal className="step-card rounded-3xl border border-line/80 bg-ink/60 p-7 backdrop-blur-md sm:p-9">
-          <p className="flex items-center gap-3 text-[15px] text-mute">
-            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color, boxShadow: `0 0 16px ${color}` }} />
-            {home.whatWeDo.label} · {i + 1} of {items.length}
-          </p>
-          {i === 0 && <p className="mt-3 font-display text-lg font-medium text-violet-soft">{home.whatWeDo.title}</p>}
-          <h2 className="h-section mt-4">{item.title}</h2>
-          <p className="mt-4 text-lg text-cream/85">{item.text}</p>
+        <Reveal className={`step-card relative overflow-hidden rounded-3xl border border-line/80 bg-ink/60 p-7 backdrop-blur-md sm:p-10 ${i % 2 ? "step-card-right" : ""}`}>
+          <span aria-hidden className="step-number pointer-events-none absolute -right-1 -top-5 font-display text-[clamp(6rem,11vw,9.5rem)] font-semibold leading-none">{String(i + 1).padStart(2, "0")}</span>
+          <div className="relative">
+            <p className="flex items-center gap-3 text-[15px] text-mute">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-raised" style={{ color }}><Icon size={20} aria-hidden /></span>
+              {home.whatWeDo.label} · {i + 1} of {items.length}
+            </p>
+            {i === 0 && <p className="mt-4 font-display text-lg font-medium text-violet-soft">{home.whatWeDo.title}</p>}
+            <h2 className="mt-4 text-[clamp(1.8rem,3.3vw,2.8rem)] font-semibold">{item.title}</h2>
+            <p className="mt-4 text-lg text-cream/85 sm:text-xl">{item.text}</p>
+          </div>
         </Reveal>
       </div>
     );
@@ -89,11 +94,10 @@ export default function Home() {
 
   return (
     <>
-      <ParticleStory hero={hero} steps={steps} labels={items.map(item => item.title)} skipTo={spotlight ? "home-next-event" : undefined} />
+      <ParticleStory hero={hero} steps={steps} />
 
       {/* Next (or latest) event */}
       {spotlight && (
-        <div id="home-next-event" className="scroll-mt-28">
         <Reveal className="wrap relative z-10 mt-14 sm:mt-20">
           <Link to={`/events/${spotlight.slug}`} className="group flex flex-col gap-5 rounded-2xl border border-line bg-panel p-5 transition-colors hover:border-violet-soft sm:flex-row sm:items-center sm:p-6">
             {spotlight.poster && <img src={spotlight.poster} alt="" onError={ev => { ev.currentTarget.hidden = true; }} className="h-20 w-20 shrink-0 rounded-xl object-cover" />}
@@ -108,7 +112,6 @@ export default function Home() {
             <span className={next ? "btn-gold shrink-0" : "btn-ghost shrink-0"}>{next ? "Details and registration" : "See what happened"}</span>
           </Link>
         </Reveal>
-        </div>
       )}
 
       {/* Event names, moving with your scroll */}

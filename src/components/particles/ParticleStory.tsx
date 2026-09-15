@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ArrowDown } from "lucide-react";
 import { ParticleField, type ShapeSpec } from "./engine";
-import { prefersReducedMotion } from "../../lib/motion";
 import { deviceTier } from "../../lib/device";
 import { chaos, sphere, neural, fuzzy, helix, swarm, constellation, ripple, textShape, yBounds } from "./shapes";
 import { BOUNDS, VIS_H, fitShape, isSideLayout, type Placement, type Region } from "./layout";
@@ -42,14 +40,16 @@ const STORY_BOUNDS = [BOUNDS.neural, BOUNDS.helix, BOUNDS.fuzzy, BOUNDS.constell
 function measure(canvas: HTMLCanvasElement, content: HTMLElement | null) {
   const c = canvas.getBoundingClientRect(), top = content?.getBoundingClientRect().top ?? c.top;
   const wrapEl = content?.querySelector<HTMLElement>(".hero-wrap"), copyEl = content?.querySelector<HTMLElement>(".hero-copy");
-  const cardEl = content?.querySelector<HTMLElement>(".step-card");
+  // Steps alternate: the first card sits on the left, the second on the right, and so on
+  const cards = content?.querySelectorAll<HTMLElement>(".step-card");
   const pad = wrapEl ? parseFloat(getComputedStyle(wrapEl).paddingLeft) || 20 : 20, wr = wrapEl?.getBoundingClientRect();
   const cL = wr ? wr.left - c.left + pad : 20, cR = wr ? wr.right - c.left - pad : c.width - 20;
+  const cardR = cards?.[0] ? cards[0].getBoundingClientRect().right - c.left : cL + 600;
   return {
-    cL, cR,
+    cL, cR, cardR,
     copyR: copyEl ? copyEl.getBoundingClientRect().right - c.left : cL + (cR - cL) * 0.54,
     copyTop: copyEl ? copyEl.getBoundingClientRect().top - top : c.height * 0.45,
-    cardR: cardEl ? cardEl.getBoundingClientRect().right - c.left : cL + 470,
+    cardLeftOfRightCard: cards?.[1] ? cards[1].getBoundingClientRect().left - c.left : cR - (cardR - cL),
   };
 }
 
@@ -57,11 +57,13 @@ function layout(w: number, h: number, m: ReturnType<typeof measure>) {
   const visH = VIS_H, visW = visH * (w / h), mobile = w < 760, side = isSideLayout();
   // On wide screens the shape may use part of the empty margin, but never runs to the screen edge
   const right = Math.min(w - 24, m.cR + Math.max(0, w - m.cR) * 0.6);
+  const left = Math.max(24, m.cL * 0.4);
   const hero: Region = side
     ? { x0: m.copyR + 24, x1: right, y0: NAV_H + 20, y1: h - 28 }
     : { x0: 16, x1: w - 16, y0: NAV_H + 8, y1: Math.max(NAV_H + 120, m.copyTop - 16) };
-  const story: Region = side
-    ? { x0: m.cardR + 40, x1: right, y0: NAV_H + 20, y1: h - 28 }
+  // Wide screens: the shape sits opposite the card, so it glides across the screen as it changes. Phones: above the card.
+  const story = (k: number): Region => side
+    ? (k % 2 === 0 ? { x0: m.cardR + 40, x1: right, y0: NAV_H + 20, y1: h - 28 } : { x0: left, x1: m.cardLeftOfRightCard - 40, y0: NAV_H + 20, y1: h - 28 })
     : { x0: 16, x1: w - 16, y0: NAV_H + 8, y1: h * 0.46 };
   // Keep the name inside the screen both ways, leaving room for the caption underneath
   const textWidth = mobile ? visW * 0.8 : Math.min(visW * 0.66, visH * 1.25, 6.2);
@@ -71,20 +73,15 @@ function layout(w: number, h: number, m: ReturnType<typeof measure>) {
       { offset: [0, 0, 0], scale: mobile ? 0.6 : 1 },
       { offset: [0, mobile ? visH * 0.1 : visH * 0.07, 0], scale: 1 },
       fitShape(BOUNDS.sphere, hero, w, h),
-      ...STORY_BOUNDS.map(b => fitShape(b, story, w, h)),
+      ...STORY_BOUNDS.map((b, k) => fitShape(b, story(k), w, h)),
     ] as Placement[],
   };
 }
 
 type Phase = "off" | "loading" | "forming" | "hold" | "release";
 
-/**
- * `labels` (one per step) adds a progress rail under the header while the four steps scroll by;
- * `skipTo` is the id of the element its "Skip to events" button scrolls to.
- */
-export default function ParticleStory({ hero, steps, labels, skipTo }: { hero: ReactNode; steps: ReactNode[]; labels?: string[]; skipTo?: string }) {
+export default function ParticleStory({ hero, steps }: { hero: ReactNode; steps: ReactNode[] }) {
   const wrapRef = useRef<HTMLDivElement>(null);
-  const railRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ringRef = useRef<SVGCircleElement>(null);
@@ -247,24 +244,20 @@ export default function ParticleStory({ hero, steps, labels, skipTo }: { hero: R
       if ((e.target as HTMLElement).closest(INTERACTIVE) || (e.target as HTMLElement).closest(".reveal")) return;
       const p = toNdc(e); if (p) field.shock(p[0], p[1]);
     };
-    // Progress rail: shown only while the four steps are on screen; each segment fills as its step arrives
-    let railRaf = 0;
-    const updateRail = () => {
-      const rail = railRef.current, s = storyPos();
-      if (!rail || s === null) return;
-      const show = s > 0.55 && wrap.getBoundingClientRect().bottom > window.innerHeight * 0.75;
-      const active = Math.max(0, Math.min(STEPS - 1, Math.round(s) - 1));
-      rail.dataset.show = show ? "1" : "0";
-      rail.querySelectorAll<HTMLElement>("[data-step]").forEach((li, i) => {
-        li.style.setProperty("--fill", Math.max(0, Math.min(1, s - i)).toFixed(3));
-        if (show && i === active) li.setAttribute("aria-current", "step"); else li.removeAttribute("aria-current");
-      });
+    // Which side the current step's card is on, so the reading shade (index.css) follows it: steps 1, 3, 5 left; 2, 4, 6 right
+    let sideRaf = 0, side = "";
+    const updateSide = () => {
+      const s = storyPos();
+      if (s === null) return;
+      const k = Math.round(s) - 1;
+      const next = k >= 0 && k % 2 === 1 ? "right" : "left";
+      if (next !== side) { side = next; wrap.dataset.side = next; }
     };
     const onScroll = () => {
-      cancelAnimationFrame(railRaf); railRaf = requestAnimationFrame(updateRail);
+      cancelAnimationFrame(sideRaf); sideRaf = requestAnimationFrame(updateSide);
       if (reduce) { field.morph = field.morphTarget = scrollTarget(); field.draw(); }
     };
-    updateRail();
+    updateSide();
     let rt = 0;
     const onResize = () => {
       clearTimeout(rt);
@@ -276,7 +269,7 @@ export default function ParticleStory({ hero, steps, labels, skipTo }: { hero: R
           textPositions = await textShape(count, textLinesFor(L.mobile), L.textWidth);
           field.replaceShape(TEXT, textPositions);
         }
-        placeCaption(); field.resize(); updateRail();
+        placeCaption(); field.resize(); updateSide();
       }, 150);
     };
     if (!reduce) {
@@ -290,7 +283,7 @@ export default function ParticleStory({ hero, steps, labels, skipTo }: { hero: R
     window.addEventListener("keydown", onKey);
 
     return () => {
-      disposed = true; clearInterval(loadTimer); clearTimeout(failsafeTimer); cancelAnimationFrame(railRaf); io.disconnect(); field.dispose();
+      disposed = true; clearInterval(loadTimer); clearTimeout(failsafeTimer); cancelAnimationFrame(sideRaf); io.disconnect(); field.dispose();
       document.removeEventListener("visibilitychange", onVis);
       window.removeEventListener("pointermove", onMove); window.removeEventListener("pointerdown", onDown); document.removeEventListener("pointerleave", onLeave);
       window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onResize); window.removeEventListener("keydown", onKey);
@@ -307,36 +300,13 @@ export default function ParticleStory({ hero, steps, labels, skipTo }: { hero: R
         <div ref={glowB} className="glow-b absolute h-[50vh] w-[50vh] rounded-full opacity-30 blur-[120px] transition-[background-color,right,bottom] duration-1000" style={{ backgroundColor: GLOW[2][1] }} />
         {webgl && <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />}
         <div className="story-shade pointer-events-none absolute inset-0 transition-opacity duration-1000" />
+        <div className="story-shade story-shade-right pointer-events-none absolute inset-0 transition-opacity duration-1000" />
       </div>
 
       <div ref={contentRef} className="relative -mt-[100svh]">
         <div className="hero-stage relative flex min-h-[100svh] pt-[68px]">{hero}</div>
         {steps.map((s, i) => <div key={i} className="story-step relative flex">{s}</div>)}
       </div>
-
-      {/* Progress rail (idea from the second version's intelligence stack spine). Sits above the content but only its button takes clicks. */}
-      {labels && labels.length === STEPS && (
-        <div className="pointer-events-none absolute inset-0 z-[5]">
-          <div ref={railRef} data-show="0" className="story-rail sticky top-[69px]">
-            <nav aria-label="Story progress" className="wrap flex items-start gap-4 pb-8 pt-3">
-              <ol className="flex flex-1 gap-2">
-                {labels.map((label, i) => (
-                  <li key={label} data-step={i} className="story-rail-step min-w-0 flex-1">
-                    <span aria-hidden className="block h-[3px] overflow-hidden rounded-full bg-line"><span className="story-rail-fill block h-full w-full bg-gradient-to-r from-violet to-gold" /></span>
-                    <span className="sr-only lg:not-sr-only lg:mt-2 lg:block lg:truncate lg:text-[13px]">{label}</span>
-                  </li>
-                ))}
-              </ol>
-              {skipTo && (
-                <button type="button" onClick={() => document.getElementById(skipTo)?.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "start" })}
-                  className="pointer-events-auto -mt-1.5 inline-flex shrink-0 items-center gap-1.5 rounded-full border border-line bg-ink/70 px-3.5 py-1.5 text-[14px] text-mute backdrop-blur transition-colors hover:border-violet-soft hover:text-cream">
-                  Skip to events <ArrowDown size={14} aria-hidden />
-                </button>
-              )}
-            </nav>
-          </div>
-        </div>
-      )}
 
       {introVisible && (
         // During the release fade the page is already coming back, so clicks pass through to it

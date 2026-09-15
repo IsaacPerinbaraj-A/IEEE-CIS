@@ -117,6 +117,9 @@ body[data-intro="on"] .story-shade { opacity: 0; }
 .hero-title { font-size: clamp(2rem, min(8.4vw, 7.5svh), 3.6rem); }
 .story-step { min-height: 100svh; align-items: flex-end; padding-bottom: 2.5rem; }
 .step-card { max-width: 560px; }
+.story-shade-right { display: none; }
+/* Big outlined step number behind each What We Do card */
+.step-number { color: transparent; -webkit-text-stroke: 1.5px rgba(196,181,253,.22); }
 .story-shade { background: linear-gradient(180deg, rgba(15,10,28,0) 0%, rgba(15,10,28,0) 38%, rgba(15,10,28,.82) 60%); }
 .glow-a { right: -30%; top: 0; }
 .glow-b { right: 20%; bottom: -10%; }
@@ -125,9 +128,14 @@ body[data-intro="on"] .story-shade { opacity: 0; }
   .hero-wrap { padding-top: 1.5rem; padding-bottom: 8rem; }
   .hero-copy { max-width: 54%; }
   .hero-title { font-size: clamp(2rem, min(4.8vw, 8.2svh), 4.5rem); }
-  .story-step { min-height: 100svh; align-items: center; padding-bottom: 0; }
-  .step-card { max-width: min(470px, 46%); }
+  /* What We Do steps alternate sides; shorter steps keep the gap between cards small */
+  .story-step { min-height: 85svh; align-items: center; padding-bottom: 0; }
+  .step-card { max-width: min(600px, 48%); }
+  .step-card-right { margin-left: auto; }
   .story-shade { background: linear-gradient(90deg, rgba(15,10,28,.9) 0%, rgba(15,10,28,.55) 38%, rgba(15,10,28,0) 58%); }
+  .story-shade-right { display: block; opacity: 0; background: linear-gradient(270deg, rgba(15,10,28,.9) 0%, rgba(15,10,28,.55) 38%, rgba(15,10,28,0) 58%); }
+  [data-side="right"] .story-shade { opacity: 0; }
+  [data-side="right"] .story-shade-right { opacity: 1; }
   .glow-a { right: -10%; top: 10%; }
 }
 /* Short screens (landscape phones, small laptops): tighter spacing, no scroll hint */
@@ -144,14 +152,6 @@ body[data-intro="on"] .story-shade { opacity: 0; }
   .hero-cue { display: none; }
   .hero-wrap { padding-bottom: 3.5rem; }
 }
-/* Story progress rail under the header (ParticleStory): segments fill with scroll, the current step's name brightens */
-.story-rail { background: linear-gradient(180deg, rgba(15,10,28,.8), rgba(15,10,28,0)); opacity: 0; visibility: hidden; transform: translateY(-8px);
-  transition: opacity .4s, transform .4s cubic-bezier(.2,.7,.2,1), visibility 0s linear .4s; }
-.story-rail[data-show="1"] { opacity: 1; visibility: visible; transform: none; transition: opacity .4s, transform .4s cubic-bezier(.2,.7,.2,1), visibility 0s; }
-.story-rail-fill { transform-origin: left; transform: scaleX(var(--fill, 0)); }
-.story-rail-step { color: #B3A8C8; transition: color .3s; }
-.story-rail-step[aria-current] { color: #F4EFE4; }
-body[data-intro="on"] .story-rail { visibility: hidden; }
 body[data-intro="on"] .glow-a { right: calc(50% - 30vh); top: calc(50% - 34vh); }
 body[data-intro="on"] .glow-b { right: calc(50% - 10vh); bottom: calc(50% - 40vh); }
 
