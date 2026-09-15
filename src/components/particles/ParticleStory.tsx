@@ -3,20 +3,23 @@ import { ArrowDown } from "lucide-react";
 import { ParticleField, type ShapeSpec } from "./engine";
 import { prefersReducedMotion } from "../../lib/motion";
 import { deviceTier } from "../../lib/device";
-import { chaos, sphere, neural, fuzzy, helix, swarm, textShape, yBounds } from "./shapes";
+import { chaos, sphere, neural, fuzzy, helix, swarm, constellation, ripple, textShape, yBounds } from "./shapes";
 import { BOUNDS, VIS_H, fitShape, isSideLayout, type Placement, type Region } from "./layout";
 
-/** Formation order: 0 intro cloud, 1 chapter name, 2 hero globe, 3-6 the four ideas of computational intelligence. */
+/**
+ * Formation order: 0 intro cloud, 1 chapter name, 2 hero globe, 3-8 one abstract shape per "What We Do" step
+ * (network, helix, landscape, constellation, ripple, swarm). The shapes are decoration only.
+ */
 const COLORS: [string, string][] = [
   ["#8B5CF6", "#EC4899"], ["#C4B5FD", "#F4EFE4"], ["#22D3EE", "#A855F7"],
-  ["#8B5CF6", "#22D3EE"], ["#F472B6", "#A78BFA"], ["#F2B544", "#EC4899"], ["#22D3EE", "#F2B544"],
+  ["#8B5CF6", "#22D3EE"], ["#F2B544", "#EC4899"], ["#22D3EE", "#A78BFA"], ["#F472B6", "#A78BFA"], ["#22D3EE", "#8B5CF6"], ["#22D3EE", "#F2B544"],
 ];
 /** Colours of the soft glow behind each formation. */
 const GLOW: [string, string][] = [
   ["#6D28D9", "#DB2777"], ["#6D28D9", "#4C1D95"], ["#7C3AED", "#0891B2"],
-  ["#6D28D9", "#0E7490"], ["#BE185D", "#6D28D9"], ["#B45309", "#BE185D"], ["#0E7490", "#B45309"],
+  ["#6D28D9", "#0E7490"], ["#B45309", "#BE185D"], ["#0E7490", "#6D28D9"], ["#BE185D", "#6D28D9"], ["#0891B2", "#6D28D9"], ["#0E7490", "#B45309"],
 ];
-const TEXT = 1, HERO = 2, STEPS = 4;
+const TEXT = 1, HERO = 2, STEPS = 6;
 const FORM = 1700, HOLD = 1300;
 /** If the particles still aren't ready after this long, skip the intro and just show the page. */
 const INTRO_FAILSAFE = 6000;
@@ -33,7 +36,7 @@ let introPlayedThisLoad = false;
 const openedOnHome = typeof window !== "undefined" && window.location.pathname === "/";
 
 const NAV_H = 68;
-const STORY_BOUNDS = [BOUNDS.neural, BOUNDS.fuzzy, BOUNDS.helix, BOUNDS.swarm];
+const STORY_BOUNDS = [BOUNDS.neural, BOUNDS.helix, BOUNDS.fuzzy, BOUNDS.constellation, BOUNDS.ripple, BOUNDS.swarm];
 
 /** Where the page content actually is, in pixels from the canvas's top-left (independent of scroll). */
 function measure(canvas: HTMLCanvasElement, content: HTMLElement | null) {
@@ -183,11 +186,11 @@ export default function ParticleStory({ hero, steps, labels, skipTo }: { hero: R
       const L = layout(canvas.clientWidth, canvas.clientHeight, measure(canvas, contentRef.current));
       textPositions = await textShape(count, textLinesFor(L.mobile), L.textWidth);
       placeCaption();
-      const gens = [chaos, null, sphere, neural, fuzzy, helix, swarm];
+      const gens = [chaos, null, sphere, neural, helix, fuzzy, (n: number) => constellation(n, [5, 4, 4, 3, 3, 3]), ripple, swarm];
       return gens.map((g, i): ShapeSpec => ({
         positions: i === TEXT ? textPositions! : g!(count), colors: COLORS[i], offset: L.items[i].offset, scale: L.items[i].scale,
-        spin: [0.3, 0, 1, 0, 1, 1, 1][i], sway: [0, 0, 0, 1, 0, 0, 0][i],
-        flutter: i === 6 ? 1 : i === 0 ? 0.5 : 0, size: [1.5, 1.75, 1, 1.15, 1.05, 1.15, 1.25][i],
+        spin: [0.3, 0, 1, 0, 1, 1, 0.6, 0, 1][i], sway: [0, 0, 0, 1, 0, 0, 0.5, 0.8, 0][i],
+        flutter: i === 8 ? 1 : i === 0 ? 0.5 : 0, size: [1.5, 1.75, 1, 1.15, 1.15, 1.05, 1.15, 1.15, 1.25][i],
       }));
     };
 

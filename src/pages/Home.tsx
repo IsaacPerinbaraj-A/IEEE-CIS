@@ -11,7 +11,7 @@ import { useTitle } from "../lib/useTitle";
 import { richText } from "../lib/richText";
 
 const technical: Record<string, string> = {
-  "machine-learning": "Models that learn from data, from classic algorithms to neural networks and LLMs.",
+  "machine-learning": "Models that learn from data, from classic algorithms to deep learning and LLMs.",
   "data-science": "Cleaning, analysing and visualising data to answer real questions.",
   "computer-vision": "Teaching machines to understand images and video.",
   iot: "Sensors, microcontrollers and connected devices you can build and hold.",
@@ -22,20 +22,8 @@ const support: Record<string, string> = {
   "event-management": "Plans and runs every event", "public-relations": "Outreach and social media",
 };
 
-const ideas = [
-  { title: "Neural networks", color: "#22D3EE",
-    text: "Layers of simple units that learn patterns from data. Stack enough of them and you get image recognition and large language models.",
-    where: <>We covered them in the <Link className="link" to="/events/llm-tuned">LLM Tuned</Link> workshop.</> },
-  { title: "Fuzzy systems", color: "#F472B6",
-    text: "Reasoning with \"mostly\" and \"a little\" instead of strict true or false. Each hill is a membership function, and one value can belong to several at once.",
-    where: <>Used in control systems, home appliances and decision support.</> },
-  { title: "Evolutionary computation", color: "#F2B544",
-    text: "Algorithms that breed better solutions over many generations, keeping the fittest and mutating the rest. The helix is a nod to the DNA idea behind them.",
-    where: <>Used for scheduling, design and optimisation problems too big to brute-force.</> },
-  { title: "Swarm intelligence", color: "#22D3EE",
-    text: "Many simple agents following simple rules, finding answers together, like a flock of birds. Every particle here is now moving on its own.",
-    where: <>Used in routing, robotics and search.</> },
-];
+/** Dot colour for each "What We Do" step, matching the particle formation that arrives with it (ParticleStory COLORS). */
+const STEP_COLORS = ["#22D3EE", "#F2B544", "#A78BFA", "#F472B6", "#22D3EE", "#F2B544"];
 const d = (ms: number) => ({ "--d": `${ms}ms` }) as CSSProperties;
 
 export default function Home() {
@@ -74,28 +62,34 @@ export default function Home() {
       </div>
       <div className="hero-cue intro-item absolute bottom-8 left-5 flex items-center gap-4 sm:left-8" style={d(700)}>
         <span aria-hidden className="scroll-cue block h-9 w-6 shrink-0 rounded-full border-2 border-mute/60" />
-        <p className="max-w-[34ch] text-[14px] leading-snug text-mute">Move your cursor through the particles, then scroll to watch them become the four ideas of computational intelligence.</p>
+        <p className="max-w-[34ch] text-[14px] leading-snug text-mute">Move your cursor through the particles, then scroll to see what we do.</p>
       </div>
     </div>
   );
 
-  const steps = ideas.map((idea, i) => (
-    <div key={idea.title} className="wrap w-full">
-      <Reveal className="step-card rounded-3xl border border-line/80 bg-ink/60 p-7 backdrop-blur-md sm:p-9">
-        <p className="flex items-center gap-3 text-[15px] text-mute">
-          <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: idea.color, boxShadow: `0 0 16px ${idea.color}` }} />
-          {i + 1} of 4
-        </p>
-        <h2 className="h-section mt-4">{idea.title}</h2>
-        <p className="mt-4 text-lg text-cream/85">{idea.text}</p>
-        <p className="mt-6 border-t border-line pt-4 text-[15px] text-mute">{idea.where}</p>
-      </Reveal>
-    </div>
-  ));
+  // "What We Do": one scroll step per item, each arriving with its own particle formation
+  // The particle story has six formations (ParticleStory STEPS), so it shows the first six items
+  const items = home.whatWeDo.items.slice(0, 6);
+  const steps = items.map((item, i) => {
+    const color = STEP_COLORS[i % STEP_COLORS.length];
+    return (
+      <div key={item.title} className="wrap w-full">
+        <Reveal className="step-card rounded-3xl border border-line/80 bg-ink/60 p-7 backdrop-blur-md sm:p-9">
+          <p className="flex items-center gap-3 text-[15px] text-mute">
+            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color, boxShadow: `0 0 16px ${color}` }} />
+            {home.whatWeDo.label} · {i + 1} of {items.length}
+          </p>
+          {i === 0 && <p className="mt-3 font-display text-lg font-medium text-violet-soft">{home.whatWeDo.title}</p>}
+          <h2 className="h-section mt-4">{item.title}</h2>
+          <p className="mt-4 text-lg text-cream/85">{item.text}</p>
+        </Reveal>
+      </div>
+    );
+  });
 
   return (
     <>
-      <ParticleStory hero={hero} steps={steps} labels={ideas.map(idea => idea.title)} skipTo={spotlight ? "home-next-event" : undefined} />
+      <ParticleStory hero={hero} steps={steps} labels={items.map(item => item.title)} skipTo={spotlight ? "home-next-event" : undefined} />
 
       {/* Next (or latest) event */}
       {spotlight && (
