@@ -4,7 +4,7 @@ import { AreaGlyph } from "../components/Icons";
 import { CisLogoTile } from "../components/Brand";
 import { events, sessions } from "../lib/data";
 import { useTitle } from "../lib/useTitle";
-import { Reveal, Tilt, Marquee } from "../components/Motion";
+import { Reveal, RevealWords, Tilt, Marquee } from "../components/Motion";
 
 const areas = [
   { kind: "neural", title: "Neural networks", text: "Layers of simple units that learn patterns from data. The foundation of deep learning and large language models." },
@@ -23,7 +23,7 @@ export default function About() {
 
       <section className="wrap mt-20 grid gap-12 lg:grid-cols-2">
         <Reveal>
-          <h2 className="h-section">Our mission</h2>
+          <RevealWords text="Our mission" className="h-section" />
           <p className="mt-5 text-lg text-mute">To help students push the boundaries of computational intelligence through hands-on learning and collaboration, in areas like machine learning, data science and IoT, while building leadership and professional skills along the way.</p>
         </Reveal>
         <Reveal delay={150}><Tilt className="rounded-3xl" max={5}><div className="rounded-3xl border border-line bg-panel p-8">
@@ -39,7 +39,7 @@ export default function About() {
       </section>
 
       <section className="wrap mt-28">
-        <h2 className="h-section max-w-[22ch]">What computational intelligence covers</h2>
+        <RevealWords text="What computational intelligence covers" className="h-section max-w-[22ch]" />
         <p className="lede mt-4">The four core areas of the IEEE Computational Intelligence Society. Gold in each drawing marks the best result: the output, the fittest, the goal.</p>
         <div className="mt-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {areas.map((a, i) => (
@@ -57,7 +57,7 @@ export default function About() {
       <section className="wrap mt-28 grid items-start gap-10 rounded-3xl border border-line bg-panel p-8 sm:p-12 lg:grid-cols-[auto_1fr]">
         <CisLogoTile className="px-5 py-4" />
         <div>
-          <h2 className="h-section">Part of IEEE CIS worldwide</h2>
+          <RevealWords text="Part of IEEE CIS worldwide" className="h-section" />
           <p className="mt-4 max-w-[62ch] text-lg text-mute">The IEEE Computational Intelligence Society is IEEE's professional society for neural networks, fuzzy systems, evolutionary computation and related fields. It runs international conferences and competitions and publishes leading journals. As a student chapter, we bring that community to REC.</p>
           <a href="https://cis.ieee.org" target="_blank" rel="noopener" className="link mt-5 inline-block">Visit IEEE CIS</a>
         </div>
@@ -65,7 +65,7 @@ export default function About() {
 
       <section className="wrap mt-28 flex flex-col items-start justify-between gap-6 border-t border-line pt-14 md:flex-row md:items-center">
         <div>
-          <h2 className="h-section">The people behind it</h2>
+          <RevealWords text="The people behind it" className="h-section" />
           <p className="lede mt-3">{sessions[0].groups.reduce((n, g) => n + g.members.length, 0)} students across {sessions[0].groups.length} teams in {sessions[0].label}.</p>
         </div>
         <div className="flex gap-3"><Link to="/team" className="btn-ghost">Meet the team</Link><Link to="/join" className="btn-gold">Join the chapter</Link></div>

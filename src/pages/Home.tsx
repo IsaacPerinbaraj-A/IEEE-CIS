@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import type { CSSProperties } from "react";
 import { ArrowRight, CalendarDays, MapPin } from "lucide-react";
 import ParticleStory from "../components/particles/ParticleStory";
-import { Reveal, Tilt, Marquee } from "../components/Motion";
+import { Reveal, RevealWords, Tilt, Marquee } from "../components/Motion";
 import { CisLogoTile } from "../components/Brand";
 import { PosterCard } from "../components/EventCards";
 import { domainIcon } from "../lib/icons";
@@ -119,7 +119,7 @@ export default function Home() {
       {/* Domains */}
       <section className="wrap mt-20 grid gap-10 sm:mt-28 sm:gap-12 lg:grid-cols-[minmax(0,380px)_1fr]">
         <Reveal className="lg:sticky lg:top-28 lg:self-start">
-          <h2 className="h-section">Nine teams, one chapter</h2>
+          <RevealWords text="Nine teams, one chapter" className="h-section" />
           <p className="lede mt-4">Five technical domains do the learning and building. Four more keep the chapter running. Pick the one that fits you.</p>
           <Link to="/team" className="link mt-6 inline-block">Meet the {current.label} team</Link>
         </Reveal>
@@ -167,7 +167,7 @@ export default function Home() {
       <section className="wrap mt-20 sm:mt-28">
         <Reveal className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 className="h-section">Recent events</h2>
+            <RevealWords text="Recent events" className="h-section" />
             <p className="lede mt-3">From Power BI and AWS to LLMs and IoT hardware.</p>
           </div>
           <Link to="/events?tab=past" className="btn-ghost">All events</Link>
@@ -180,7 +180,7 @@ export default function Home() {
 
       {/* About */}
       <Reveal as="section" className="wrap mt-20 grid gap-10 border-t border-line pt-12 sm:mt-28 sm:pt-16 lg:grid-cols-2">
-        <h2 className="h-section max-w-[18ch]">Learn the ideas underneath the AI hype.</h2>
+        <RevealWords text="Learn the ideas underneath the AI hype." className="h-section max-w-[18ch]" />
         <div className="space-y-5 text-lg text-mute">
           <p>Computational intelligence is the part of AI that borrows from nature: brains, human reasoning, evolution and flocks. It powers the tools you use every day.</p>
           <p>We're the REC chapter of the IEEE Computational Intelligence Society. We help students learn these ideas properly, build with them, and get ready for placements.</p>
@@ -193,7 +193,7 @@ export default function Home() {
         <div className="join-band relative overflow-hidden rounded-3xl border border-violet/40 p-8 sm:p-12">
           <div aria-hidden className="join-ring absolute -bottom-24 -right-16 h-72 w-72 rounded-full border-[28px] border-gold/80" />
           <div className="relative max-w-[640px]">
-            <h2 className="h-section">Join IEEE CIS REC</h2>
+            <RevealWords text="Join IEEE CIS REC" className="h-section" />
             <p className="mt-4 text-lg text-cream/85">Become an IEEE student member, add the Computational Intelligence Society, and tell us you've joined. All three steps happen online.</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/join" className="btn-gold">How to join</Link>

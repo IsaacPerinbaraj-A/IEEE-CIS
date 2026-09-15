@@ -44,6 +44,12 @@
   transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1), filter .9s ease; transition-delay: var(--d, 0ms); }
 .reveal[data-shown="1"] { opacity: 1; transform: none; filter: none; }
 
+/* ---------- Word-by-word heading reveal (RevealWords): each word rises out of its own mask ---------- */
+.word { display: inline-block; overflow: hidden; vertical-align: top; padding: .06em .05em .16em; margin: -.06em -.05em -.16em; }
+.word > span { display: inline-block; transform: translateY(115%); transition: transform .85s cubic-bezier(.2,.7,.2,1); transition-delay: calc(var(--d, 0ms) + var(--w, 0) * 65ms); }
+.words[data-shown="1"] .word > span { transform: none; }
+@media (prefers-reduced-motion: reduce) { .word > span { transform: none; transition: none !important; } }
+
 /* ---------- 3D tilt cards ---------- */
 .tilt { position: relative; transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transform-style: preserve-3d;
   transition: transform .5s cubic-bezier(.2,.7,.2,1); will-change: transform; }
@@ -151,7 +157,7 @@ html[data-page-transition] .page-curtain { display: block; position: fixed; inse
 @keyframes pageIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 .page-enter { animation: pageIn .6s cubic-bezier(.2,.7,.2,1) both; }
 @keyframes titleIn { from { opacity: 0; transform: translateY(24px); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
-.page-title > * { animation: titleIn .9s cubic-bezier(.2,.7,.2,1) both; }
+.page-title > *:not(.words) { animation: titleIn .9s cubic-bezier(.2,.7,.2,1) both; }
 .page-title > *:nth-child(2) { animation-delay: .12s; }
 
 /* ---------- Custom cursor (mouse only; added by JS so the normal cursor returns if scripts fail) ---------- */

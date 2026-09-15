@@ -5,7 +5,7 @@ import { Poster, PosterCard } from "../components/EventCards";
 import { events, isUpcoming, formatDate, formatTime, calendarFile, pastEvents } from "../lib/data";
 import { useTitle } from "../lib/useTitle";
 import NotFound from "./NotFound";
-import { Reveal, Tilt } from "../components/Motion";
+import { Reveal, RevealWords, Tilt } from "../components/Motion";
 
 export default function EventDetail() {
   const { slug } = useParams();
@@ -43,7 +43,7 @@ export default function EventDetail() {
         </div>
         <div>
           <p className="text-[15px] text-gold">{[e.series, e.type, e.domain && `${e.domain} domain`].filter(Boolean).join(", ")}</p>
-          <h1 className="h-page mt-3">{e.title}</h1>
+          <RevealWords as="h1" text={e.title} className="h-page mt-3" />
           <p className="mt-5 text-xl text-cream/90">{e.summary}</p>
           <dl className="mt-8 grid gap-4 rounded-2xl border border-line bg-panel p-6 sm:grid-cols-2">
             {facts.map(({ Icon, label, value }) => (
@@ -64,7 +64,7 @@ export default function EventDetail() {
       </article>
       {more.length > 0 && (
         <section className="wrap mt-24 border-t border-line pt-14">
-          <h2 className="h-section">More events</h2>
+          <RevealWords text="More events" className="h-section" />
           <div className="mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">{more.map((x, i) => <Reveal key={x.slug} delay={i * 100}><PosterCard e={x} /></Reveal>)}</div>
         </section>
       )}

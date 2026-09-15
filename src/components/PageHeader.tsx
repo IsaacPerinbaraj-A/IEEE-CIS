@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import HeaderParticles, { type HeaderShape } from "./particles/HeaderParticles";
+import { RevealWords } from "./Motion";
 
 export default function PageHeader({ title, children, aside, below, shape = "sphere" }: { title: string; children?: ReactNode; aside?: ReactNode; below?: ReactNode; shape?: HeaderShape }) {
   return (
@@ -10,7 +11,7 @@ export default function PageHeader({ title, children, aside, below, shape = "sph
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(15,10,28,.92)_0%,rgba(15,10,28,.6)_45%,rgba(15,10,28,0)_70%)] max-md:bg-[linear-gradient(90deg,rgba(15,10,28,.85)_0%,rgba(15,10,28,.35)_100%)]" />
       <div className="wrap relative flex min-h-[330px] flex-col justify-end gap-8 py-16 md:min-h-[380px] md:flex-row md:items-end md:justify-between md:py-20">
         <div className="page-title">
-          <h1 className="h-page">{title}</h1>
+          <RevealWords as="h1" text={title} className="h-page" />
           {children && <div className="lede mt-4">{children}</div>}
           {below && <div className="mt-6">{below}</div>}
         </div>

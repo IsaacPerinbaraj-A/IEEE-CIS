@@ -1,18 +1,43 @@
-import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
+import { Fragment, useEffect, useRef, type CSSProperties, type ReactNode, type RefObject } from "react";
 
 const reduced = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/** Fades, lifts and un-blurs its content when it scrolls into view. */
-export function Reveal({ children, delay = 0, className = "", as: Tag = "div" }: { children: ReactNode; delay?: number; className?: string; as?: "div" | "section" | "li" }) {
-  const ref = useRef<HTMLElement>(null);
+/** Sets data-shown="1" on the element once it scrolls into view (straight away for reduced motion). */
+function useShowOnScroll(ref: RefObject<HTMLElement | null>) {
   useEffect(() => {
     const el = ref.current!;
     if (reduced()) { el.dataset.shown = "1"; return; }
     const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { el.dataset.shown = "1"; io.disconnect(); } }, { rootMargin: "0px 0px -12% 0px" });
     io.observe(el);
     return () => io.disconnect();
-  }, []);
+  }, [ref]);
+}
+
+/** Fades, lifts and un-blurs its content when it scrolls into view. */
+export function Reveal({ children, delay = 0, className = "", as: Tag = "div" }: { children: ReactNode; delay?: number; className?: string; as?: "div" | "section" | "li" }) {
+  const ref = useRef<HTMLElement>(null);
+  useShowOnScroll(ref);
   return <Tag ref={ref as never} className={`reveal ${className}`} style={{ "--d": `${delay}ms` } as CSSProperties}>{children}</Tag>;
+}
+
+/**
+ * A heading whose words rise one after another out of a mask when it scrolls into view
+ * (idea from the second version's word reveal). Screen readers get the plain text once.
+ */
+export function RevealWords({ text, as: Tag = "h2", className = "", delay = 0 }: { text: string; as?: "h1" | "h2"; className?: string; delay?: number }) {
+  const ref = useRef<HTMLHeadingElement>(null);
+  useShowOnScroll(ref);
+  const words = text.split(/\s+/).filter(Boolean);
+  return (
+    <Tag ref={ref} className={`words ${className}`} style={{ "--d": `${delay}ms` } as CSSProperties}>
+      <span className="sr-only">{text}</span>
+      <span aria-hidden>
+        {words.map((w, i) => (
+          <Fragment key={i}>{i > 0 && " "}<span className="word"><span style={{ "--w": i } as CSSProperties}>{w}</span></span></Fragment>
+        ))}
+      </span>
+    </Tag>
+  );
 }
 
 /** Tilts toward the pointer in 3D with a moving highlight. Only on devices with a precise pointer. */
