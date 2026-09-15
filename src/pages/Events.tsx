@@ -38,7 +38,11 @@ export default function Events() {
         </div>
         {list.length > 1 && types.length > 2 && (
           <div className="snap-row snap-row-fade mt-6 flex gap-2 sm:flex-wrap" role="group" aria-label="Filter by type">
-            {types.map(t => <button key={t} aria-pressed={type === t} onClick={e => { set({ type: t === "All" ? "" : t }); revealChip(e.currentTarget); }} className={`chip ${type === t ? "chip-on" : ""}`}>{t}</button>)}
+            {types.map(t => (
+              <button key={t} aria-pressed={type === t} onClick={e => { set({ type: t === "All" ? "" : t }); revealChip(e.currentTarget); }} className={`chip gap-1.5 ${type === t ? "chip-on" : ""}`}>
+                {t} <span className="tabular-nums opacity-70">({t === "All" ? list.length : list.filter(x => x.type === t).length})</span>
+              </button>
+            ))}
           </div>
         )}
 

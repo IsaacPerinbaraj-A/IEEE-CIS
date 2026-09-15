@@ -40,9 +40,13 @@ export default function Team() {
         {session.groups.length > 1 && (
           // One sideways-scrolling row on phones so member photos start on the first screen; wraps from sm up
           <div className="snap-row snap-row-fade flex gap-2 sm:flex-wrap" role="group" aria-label="Filter by team">
-            <button aria-pressed={domain === "all"} className={`chip ${domain === "all" ? "chip-on" : ""}`} onClick={e => { set("domain", ""); revealChip(e.currentTarget); }}>Everyone</button>
+            <button aria-pressed={domain === "all"} className={`chip gap-1.5 ${domain === "all" ? "chip-on" : ""}`} onClick={e => { set("domain", ""); revealChip(e.currentTarget); }}>
+              Everyone <span className="tabular-nums opacity-70">({count})</span>
+            </button>
             {session.groups.map(g => (
-              <button key={g.slug} aria-pressed={domain === g.slug} className={`chip ${domain === g.slug ? "chip-on" : ""}`} onClick={e => { set("domain", g.slug); revealChip(e.currentTarget); }}>{g.domain}</button>
+              <button key={g.slug} aria-pressed={domain === g.slug} className={`chip gap-1.5 ${domain === g.slug ? "chip-on" : ""}`} onClick={e => { set("domain", g.slug); revealChip(e.currentTarget); }}>
+                {g.domain} <span className="tabular-nums opacity-70">({g.members.length})</span>
+              </button>
             ))}
           </div>
         )}
