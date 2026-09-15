@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import type { CSSProperties } from "react";
 import { ArrowRight, CalendarDays, MapPin } from "lucide-react";
 import ParticleStory from "../components/particles/ParticleStory";
-import { Reveal, RevealWords, Tilt, Marquee, Magnetic, RollLabel } from "../components/Motion";
+import { Reveal, RevealWords, Tilt, Marquee, Magnetic, RollLabel, PlayWhenVisible } from "../components/Motion";
 import { CisLogoTile } from "../components/Brand";
 import { PosterCard } from "../components/EventCards";
 import { domainIcon } from "../lib/icons";
@@ -192,7 +192,7 @@ export default function Home() {
 
       {/* Join */}
       <Reveal as="section" className="wrap mt-20 sm:mt-28">
-        <div className="join-band relative overflow-hidden rounded-3xl border border-violet/40 p-8 sm:p-12">
+        <PlayWhenVisible className="join-band relative overflow-hidden rounded-3xl border border-violet/40 p-8 sm:p-12">
           <div aria-hidden className="join-ring absolute -bottom-24 -right-16 h-72 w-72 rounded-full border-[28px] border-gold/80" />
           <div className="relative max-w-[640px]">
             <RevealWords text="Join IEEE CIS REC" className="h-section" />
@@ -202,7 +202,7 @@ export default function Home() {
               <Link to="/contact" className="btn-ghost">Ask us a question</Link>
             </div>
           </div>
-        </div>
+        </PlayWhenVisible>
       </Reveal>
     </>
   );

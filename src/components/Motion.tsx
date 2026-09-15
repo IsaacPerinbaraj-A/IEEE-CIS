@@ -108,9 +108,14 @@ export function Marquee({ items }: { items: string[] }) {
       if (dy !== 0) dir = dy > 0 ? 1 : -1;
       target = dir * Math.min(9, 1 + Math.abs(dy) * 0.35);
     };
-    raf = requestAnimationFrame(loop);
+    // Only move (and run the speed loop) while the band is on screen
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { anim.play(); if (!raf) raf = requestAnimationFrame(loop); }
+      else { anim.pause(); cancelAnimationFrame(raf); raf = 0; }
+    });
+    io.observe(el);
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => { anim.cancel(); cancelAnimationFrame(raf); window.removeEventListener("scroll", onScroll); };
+    return () => { io.disconnect(); anim.cancel(); cancelAnimationFrame(raf); window.removeEventListener("scroll", onScroll); };
   }, []);
   const row = items.flatMap((t, i) => [
     <span key={`t${i}`} className={i % 2 ? "marquee-outline" : "marquee-fill"}>{t}</span>,
@@ -124,6 +129,18 @@ export function Marquee({ items }: { items: string[] }) {
       </div>
     </div>
   );
+}
+
+/** Sets data-play="1" only while on screen, so looping CSS animations on it (and inside it) can pause when scrolled away. */
+export function PlayWhenVisible({ children, className = "" }: { children: ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current!;
+    const io = new IntersectionObserver(([e]) => { el.dataset.play = e.isIntersecting ? "1" : "0"; });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return <div ref={ref} className={className}>{children}</div>;
 }
 
 /** Thin gradient bar along the top showing how far down the page you are. */
@@ -186,12 +203,15 @@ export function CursorAura() {
         }
         ctx.globalAlpha = 1; ctx.globalCompositeOperation = "source-over";
       }
+      // Stop when nothing is moving (ring caught up, no sparks left); the next pointer move or click restarts it
+      if (!sparks.length && Math.abs(x - rx) + Math.abs(y - ry) < 0.3) { raf = 0; return; }
       raf = requestAnimationFrame(loop);
     };
+    const wake = () => { if (!raf) { last = performance.now(); raf = requestAnimationFrame(loop); } };
 
     const move = (e: PointerEvent) => {
       if (e.pointerType !== "mouse") return;
-      x = e.clientX; y = e.clientY;
+      x = e.clientX; y = e.clientY; wake();
       if (!visible) { visible = true; rx = lx = x; ry = ly = y; html.dataset.aura = "on"; }
       const t = e.target as HTMLElement, labelled = t.closest<HTMLElement>("[data-cursor]");
       const hover = t.closest("input,textarea,[contenteditable]") ? "text" : labelled ? "label" : t.closest("a,button,select,[role=button],[role=tab],label,summary") ? "link" : "";
@@ -211,7 +231,7 @@ export function CursorAura() {
     const out = () => { visible = false; html.dataset.aura = ""; };
     const down = (e: PointerEvent) => {
       if (e.pointerType !== "mouse") return;
-      html.dataset.auraPress = "1";
+      html.dataset.auraPress = "1"; wake();
       for (let i = 0; i < 18; i++) { const a = (i / 18) * Math.PI * 2 + Math.random() * 0.3, v = 2 + Math.random() * 3.5; emit(e.clientX, e.clientY, Math.cos(a) * v, Math.sin(a) * v, true); }
     };
     const up = () => { html.dataset.auraPress = ""; };

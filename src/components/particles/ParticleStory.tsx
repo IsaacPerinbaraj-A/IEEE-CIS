@@ -226,9 +226,11 @@ export default function ParticleStory({ hero, steps, labels, skipTo }: { hero: R
     }
 
     // Pause when the story is off screen or the tab is hidden
-    const io = new IntersectionObserver(([e]) => { if (reduce) { field.draw(); return; } if (e.isIntersecting) field.start(); else if (introPhase === "off") field.stop(); });
+    let inView = true;
+    const io = new IntersectionObserver(([e]) => { inView = e.isIntersecting; if (reduce) { field.draw(); return; } if (e.isIntersecting) field.start(); else if (introPhase === "off") field.stop(); });
     io.observe(wrap);
-    const onVis = () => { if (document.hidden) field.stop(); else if (!reduce) field.start(); };
+    // Coming back to the tab only restarts the particles if the story is on screen (or the intro is still playing)
+    const onVis = () => { if (document.hidden) field.stop(); else if (!reduce && (inView || introPhase !== "off")) field.start(); };
     document.addEventListener("visibilitychange", onVis);
 
     const toNdc = (e: PointerEvent) => {

@@ -54,7 +54,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  /* Loops run once and nothing waits on a delay, so reduced motion never flickers or shows content late */
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
+    animation-delay: 0s !important; transition-delay: 0s !important; scroll-behavior: auto !important; }
 }
 
 /* ---------- Low-power devices (html[data-tier="low"], set from src/lib/device.ts): cheaper blur layers ---------- */
@@ -104,6 +106,7 @@ body[data-intro="leaving"] .intro-item { transition-delay: calc(var(--d, 0ms) + 
 @keyframes ring { to { transform: rotate(360deg); } }
 .join-band { background: linear-gradient(120deg, rgba(91,59,168,.75), #181128 35%, rgba(190,24,93,.35) 70%, #181128); background-size: 220% 220%; animation: band 14s ease-in-out infinite; }
 .join-ring { border-top-color: #EC4899; border-left-color: #8B5CF6; animation: ring 18s linear infinite; }
+.join-band[data-play="0"], .join-band[data-play="0"] .join-ring { animation-play-state: paused; }
 body[data-intro="on"] .story-shade { opacity: 0; }
 
 /* Story glows: centred behind the name during the intro, then drifting right to sit behind the globe */

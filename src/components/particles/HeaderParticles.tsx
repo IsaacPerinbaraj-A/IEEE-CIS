@@ -56,7 +56,8 @@ export default function HeaderParticles({ shape }: { shape: HeaderShape }) {
     field.onFrame = () => { if (field.morph < 1) { const e = Math.min(1, (performance.now() - t0) / DUR); field.morph = 1 - Math.pow(1 - e, 3); } };
     if (reduce) field.draw(); else field.start();
 
-    const io = new IntersectionObserver(([e]) => { if (reduce) return; if (e.isIntersecting) field.start(); else field.stop(); });
+    let inView = true;
+    const io = new IntersectionObserver(([e]) => { inView = e.isIntersecting; if (reduce) return; if (e.isIntersecting) field.start(); else field.stop(); });
     io.observe(host);
     const toNdc = (e: PointerEvent) => {
       const r = canvas.getBoundingClientRect();
@@ -67,7 +68,8 @@ export default function HeaderParticles({ shape }: { shape: HeaderShape }) {
     const onDown = (e: PointerEvent) => { if ((e.target as HTMLElement).closest(INTERACTIVE)) return; const p = toNdc(e); if (p) field.shock(p[0], p[1]); };
     let rt = 0;
     const onResize = () => { clearTimeout(rt); rt = window.setTimeout(() => { const l = layout(); field.setLayout([{ offset: [0, 0, 0], scale: l.mobile ? 0.7 : 1.4 }, l]); field.resize(); }, 150); };
-    const onVis = () => { if (document.hidden) field.stop(); else if (!reduce) field.start(); };
+    // Coming back to the tab only restarts the particles if the header is actually on screen
+    const onVis = () => { if (document.hidden) field.stop(); else if (!reduce && inView) field.start(); };
     if (!reduce) { window.addEventListener("pointermove", onMove, { passive: true }); window.addEventListener("pointerdown", onDown, { passive: true }); }
     window.addEventListener("resize", onResize); document.addEventListener("visibilitychange", onVis);
     return () => {
