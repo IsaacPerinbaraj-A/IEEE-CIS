@@ -27,7 +27,7 @@ function Navbar() {
   // or when the window grows wide enough for the desktop nav
   useEffect(() => {
     if (!open) return;
-    const behind = document.querySelectorAll("#main, footer, .back-to-top");
+    const behind = document.querySelectorAll("#main, footer, .back-to-top, .skip-link");
     behind.forEach(el => el.setAttribute("inert", ""));
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
@@ -50,13 +50,17 @@ function Navbar() {
   const linkCls = ({ isActive }: { isActive: boolean }) =>
     `rounded-full px-3 py-2 text-[15px] transition-colors ${isActive ? "text-cream bg-raised" : "text-mute hover:text-cream"}`;
   const menuItems = [{ to: "/", label: "Home" }, ...nav];
-  const close = () => setOpen(false);
+  // Links close the menu. If the link is the page you're already on, nothing navigates, so put focus back on the toggle
+  const closeFor = (to: string) => () => {
+    if (open && to === pathname) toggle.current?.focus();
+    setOpen(false);
+  };
 
   return (
     <>
       <header className="sticky top-0 z-50 border-b border-line/70 bg-ink/85 backdrop-blur-md">
         <div className="wrap flex h-[68px] items-center justify-between gap-3">
-          <Link to="/" onClick={close} className="flex min-w-0 items-center gap-3" aria-label={`${site.name} home`}>
+          <Link to="/" onClick={closeFor("/")} className="flex min-w-0 items-center gap-3" aria-label={`${site.name} home`}>
             <RecMark />
             {/* Narrow phones get a one-line subtitle so the brand never wraps into three lines */}
             <span className="min-w-0 leading-tight">
@@ -70,7 +74,7 @@ function Navbar() {
             <Link to="/join" className="btn-gold ml-3 min-h-[40px] px-5 text-[15px]">Join the chapter</Link>
           </nav>
           <div className="flex shrink-0 items-center gap-2 lg:hidden">
-            <Link to="/join" onClick={close} className="btn-gold hidden min-h-[44px] px-5 text-[15px] sm:inline-flex">Join the chapter</Link>
+            <Link to="/join" onClick={closeFor("/join")} className="btn-gold hidden min-h-[44px] px-5 text-[15px] sm:inline-flex">Join the chapter</Link>
             <button ref={toggle} type="button" className="btn-ghost min-h-[44px] px-4" aria-expanded={open} aria-controls="mobile-nav" onClick={() => setOpen(o => !o)}>
               {open ? <X size={18} aria-hidden /> : <Menu size={18} aria-hidden />} {open ? "Close" : "Menu"}
             </button>
@@ -81,17 +85,17 @@ function Navbar() {
       {/* Full-screen mobile menu. It sits outside <header> on purpose: the header's backdrop blur would
           otherwise become the containing block of this fixed panel and squash it to the header's height. */}
       <nav id="mobile-nav" aria-label="Main" data-open={open ? "1" : undefined}
-        className="mnav fixed inset-0 z-[45] flex flex-col overflow-y-auto bg-ink pt-[68px] lg:hidden">
+        className="mnav fixed inset-0 z-[45] flex flex-col overflow-y-auto scroll-pt-[80px] bg-ink pt-[68px] lg:hidden">
         <div className="wrap my-auto pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-6">
           <ul>
             {menuItems.map((n, i) => (
               <li key={n.to} className="border-b border-line/70" style={{ "--i": i } as CSSProperties}>
-                <NavLink to={n.to} end={n.to === "/"} onClick={close}
+                <NavLink to={n.to} end={n.to === "/"} onClick={closeFor(n.to)}
                   className={({ isActive }) => `group flex items-center py-1 transition-colors ${isActive ? "text-cream" : "text-mute hover:text-cream"}`}>
                   {({ isActive }) => (
                     <span className="flex flex-1 overflow-hidden py-2">
                       <span className="mnav-rise flex flex-1 items-center gap-4">
-                        <span className={`w-7 text-[14px] tabular-nums ${isActive ? "text-gold" : "text-violet-soft"}`}>{String(i + 1).padStart(2, "0")}</span>
+                        <span aria-hidden className={`w-7 text-[14px] tabular-nums ${isActive ? "text-gold" : "text-violet-soft"}`}>{String(i + 1).padStart(2, "0")}</span>
                         <span className="flex-1 font-display text-[clamp(1.6rem,min(8vw,5.2svh),2.6rem)] font-semibold leading-tight">{n.label}</span>
                         <ArrowRight size={20} aria-hidden className={`transition-transform duration-300 group-hover:translate-x-1 ${isActive ? "opacity-100" : "opacity-40"}`} />
                       </span>
@@ -101,7 +105,7 @@ function Navbar() {
               </li>
             ))}
           </ul>
-          <Link to="/join" onClick={close} className="mnav-fade btn-gold mt-8 w-full sm:hidden" style={{ "--i": menuItems.length } as CSSProperties}>Join the chapter</Link>
+          <Link to="/join" onClick={closeFor("/join")} className="mnav-fade btn-gold mt-8 w-full sm:hidden" style={{ "--i": menuItems.length } as CSSProperties}>Join the chapter</Link>
           <ul className="mnav-fade mt-8 flex flex-wrap gap-x-6 border-t border-line pt-4 text-[15px]" style={{ "--i": menuItems.length + 1 } as CSSProperties}>
             <li><a className="inline-flex min-h-[44px] items-center gap-2 text-mute hover:text-cream" href={`mailto:${site.email}`}><Mail size={18} aria-hidden /> Email</a></li>
             <li><a className="inline-flex min-h-[44px] items-center gap-2 text-mute hover:text-cream" href={site.linkedin} target="_blank" rel="noopener"><Linkedin size={18} aria-hidden /> LinkedIn<span className="sr-only"> (opens in a new tab)</span></a></li>
@@ -156,7 +160,7 @@ export default function Layout() {
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return (
     <div className="flex min-h-screen flex-col">
-      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[60] focus:rounded-lg focus:bg-gold focus:px-4 focus:py-2 focus:text-ink">Skip to content</a>
+      <a href="#main" className="skip-link sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[60] focus:rounded-lg focus:bg-gold focus:px-4 focus:py-2 focus:text-ink">Skip to content</a>
       <ScrollProgress />
       <Navbar />
       <main id="main" className="flex-1">

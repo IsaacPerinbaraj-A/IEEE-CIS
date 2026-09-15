@@ -60,7 +60,7 @@
 header, .scroll-progress, .intro-item { transition: opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1); }
 .intro-item { transition-delay: var(--d, 0ms); }
 body[data-intro="on"] { overflow: hidden; }
-body[data-intro="on"] header { opacity: 0; transform: translateY(-100%); pointer-events: none; }
+body[data-intro="on"] header { opacity: 0; transform: translateY(-100%); pointer-events: none; visibility: hidden; }
 body[data-intro="on"] .scroll-progress { opacity: 0; }
 body[data-intro="on"] .intro-item { opacity: 0; transform: translateY(28px); }
 body[data-intro="leaving"] header { transition-delay: .5s; }
