@@ -100,7 +100,7 @@ export default function Home() {
         <div id="home-next-event" className="scroll-mt-28">
         <Reveal className="wrap relative z-10 mt-14 sm:mt-20">
           <Link to={`/events/${spotlight.slug}`} className="group flex flex-col gap-5 rounded-2xl border border-line bg-panel p-5 transition-colors hover:border-violet-soft sm:flex-row sm:items-center sm:p-6">
-            {spotlight.poster && <img src={spotlight.poster} alt="" className="h-20 w-20 shrink-0 rounded-xl object-cover" />}
+            {spotlight.poster && <img src={spotlight.poster} alt="" onError={ev => { ev.currentTarget.hidden = true; }} className="h-20 w-20 shrink-0 rounded-xl object-cover" />}
             <div className="min-w-0 flex-1">
               <p className={`text-[14px] ${next ? "text-gold" : "text-mute"}`}>{next ? "Next event" : "Most recent event"}</p>
               <p className="mt-1 font-display text-xl font-semibold group-hover:text-violet-soft">{spotlight.title}</p>

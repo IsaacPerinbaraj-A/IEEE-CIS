@@ -1,11 +1,15 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { CalendarDays, MapPin } from "lucide-react";
 import { type ChapterEvent, formatDate } from "../lib/data";
 import { Tilt } from "./Motion";
 
-/** Shows the poster, or a typographic stand-in for events that don't have one yet. */
+/** Shows the poster, or a typographic stand-in for events that don't have one yet (or whose poster file fails to load). */
 export function Poster({ e, className = "" }: { e: ChapterEvent; className?: string }) {
-  if (e.poster) return <img src={e.poster} alt={`${e.title} poster`} loading="lazy" className={`h-full w-full object-cover ${className}`} />;
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  if (e.poster && failedSrc !== e.poster) {
+    return <img src={e.poster} alt={`${e.title} poster`} loading="lazy" decoding="async" onError={() => setFailedSrc(e.poster)} className={`h-full w-full object-cover ${className}`} />;
+  }
   return (
     <div className={`relative flex h-full w-full flex-col justify-between overflow-hidden bg-gradient-to-br from-violet-deep via-panel to-ink p-6 ${className}`}>
       <div aria-hidden className="absolute -right-12 top-[30%] h-40 w-40 rounded-full border-[18px] border-gold/70" />

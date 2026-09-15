@@ -12,6 +12,7 @@ export default function EventDetail() {
   const e = events.find(x => x.slug === slug);
   useTitle(e?.title || "Event not found");
   const [copied, setCopied] = useState(false);
+  const [posterFailed, setPosterFailed] = useState(false);
   if (!e) return <NotFound />;
   const upcoming = isUpcoming(e);
   const more = pastEvents().filter(x => x.slug !== e.slug).slice(0, 4);
@@ -37,8 +38,8 @@ export default function EventDetail() {
       </div>
       <article className="wrap mt-8 grid gap-10 lg:grid-cols-[minmax(0,440px)_1fr] lg:gap-16">
         <div className="lg:sticky lg:top-24 lg:self-start">
-          {e.poster
-            ? <Tilt className="rounded-3xl" max={8}><img src={e.poster} alt={`${e.title} poster`} className="w-full rounded-3xl border border-line shadow-[0_30px_80px_-30px_rgba(139,92,246,.7)]" /></Tilt>
+          {e.poster && !posterFailed
+            ? <Tilt className="rounded-3xl" max={8}><img src={e.poster} alt={`${e.title} poster`} onError={() => setPosterFailed(true)} className="w-full rounded-3xl border border-line shadow-[0_30px_80px_-30px_rgba(139,92,246,.7)]" /></Tilt>
             : <div className="aspect-[4/5] overflow-hidden rounded-3xl border border-line"><Poster e={e} /></div>}
         </div>
         <div>

@@ -6,6 +6,7 @@ import { Linkedin, Instagram } from "../lib/icons";
 import { site, achievements } from "../lib/data";
 import { ScrollProgress, CursorAura, BackToTop, Magnetic, RollLabel } from "./Motion";
 import { usePageTransitions } from "../lib/pageTransitions";
+import ErrorBoundary from "./ErrorBoundary";
 
 const nav = [
   { to: "/events", label: "Events" },
@@ -157,6 +158,22 @@ function FooterCol({ title, links, external }: { title: string; links: [string, 
   );
 }
 
+/** Shown in place of a page that crashed; the header and footer stay usable. */
+function PageError({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="wrap py-24 sm:py-32" role="alert">
+      <p className="text-[15px] text-gold">Something went wrong</p>
+      <h1 className="h-page mt-3 max-w-[20ch]">This page didn't load properly</h1>
+      <p className="lede mt-4">Try again or reload the page. If it keeps happening, tell us through the contact page.</p>
+      <div className="mt-8 flex flex-wrap gap-3">
+        <button className="btn-gold" onClick={() => window.location.reload()}>Reload the page</button>
+        <button className="btn-ghost" onClick={onRetry}>Try again</button>
+        <Link className="btn-ghost" to="/">Go to the home page</Link>
+      </div>
+    </div>
+  );
+}
+
 export default function Layout() {
   const { pathname } = useLocation();
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
@@ -168,7 +185,10 @@ export default function Layout() {
       <Navbar />
       <main id="main" className="flex-1">
         {/* Each page (except the landing page, which has its own intro) rises in when opened */}
-        <div key={pathname} className={pathname === "/" ? "" : "page-enter"}><Outlet /></div>
+        <div key={pathname} className={pathname === "/" ? "" : "page-enter"}>
+          {/* Keyed by page, so moving to another page clears a previous crash */}
+          <ErrorBoundary fallback={retry => <PageError onRetry={retry} />}><Outlet /></ErrorBoundary>
+        </div>
       </main>
       <Footer />
       <BackToTop />

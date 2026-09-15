@@ -33,7 +33,7 @@ export default function Achievements() {
                   <h2 className="mt-1 text-xl font-semibold">{a.title}</h2>
                   {a.people && <p className="mt-1 text-[15px] text-violet-soft">{a.people}</p>}
                   <p className="mt-2 max-w-[62ch] text-mute">{a.description}</p>
-                  {a.image && <img src={a.image} alt="" loading="lazy" className="mt-4 max-h-72 rounded-2xl border border-line object-cover" />}
+                  {a.image && <img src={a.image} alt="" loading="lazy" onError={ev => { ev.currentTarget.hidden = true; }} className="mt-4 max-h-72 rounded-2xl border border-line object-cover" />}
                   {a.link && <a className="link mt-2 inline-block" href={a.link} target="_blank" rel="noopener">Read more</a>}
                 </li>
               ))}

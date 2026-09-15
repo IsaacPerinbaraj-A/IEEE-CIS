@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Member } from "../lib/data";
 import { initials } from "../lib/data";
 import { Linkedin, Github, Instagram } from "../lib/icons";
@@ -9,12 +10,15 @@ export default function MemberCard({ m, large = false }: { m: Member; large?: bo
     { href: m.github, label: "GitHub", Icon: Github },
     { href: m.instagram, label: "Instagram", Icon: Instagram },
   ].filter(s => s.href);
+  // Fall back to initials if the photo file is missing or fails to load
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const showPhoto = m.photo && failedSrc !== m.photo;
   return (
     <article className="group">
       <Tilt className="rounded-2xl" max={12}>
       <div className="relative aspect-square overflow-hidden rounded-2xl border border-line bg-panel shadow-[0_18px_40px_-22px_rgba(139,92,246,.6)]">
-        {m.photo
-          ? <img src={m.photo} alt="" loading="lazy" className="h-full w-full object-cover grayscale-[25%] transition duration-300 group-hover:grayscale-0" />
+        {showPhoto
+          ? <img src={m.photo} alt="" loading="lazy" decoding="async" onError={() => setFailedSrc(m.photo)} className="h-full w-full object-cover grayscale-[25%] transition duration-300 group-hover:grayscale-0" />
           : <div className="grid h-full w-full place-items-center bg-gradient-to-br from-violet-deep to-panel font-display text-4xl text-violet-soft">{initials(m.name)}</div>}
       </div>
       </Tilt>
