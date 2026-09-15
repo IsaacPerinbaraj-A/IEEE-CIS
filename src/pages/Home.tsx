@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import type { CSSProperties } from "react";
 import { ArrowRight, CalendarDays, MapPin } from "lucide-react";
 import ParticleStory from "../components/particles/ParticleStory";
-import { Reveal, RevealWords, Tilt, Marquee } from "../components/Motion";
+import { Reveal, RevealWords, Tilt, Marquee, Magnetic, RollLabel } from "../components/Motion";
 import { CisLogoTile } from "../components/Brand";
 import { PosterCard } from "../components/EventCards";
 import { domainIcon } from "../lib/icons";
@@ -55,7 +55,7 @@ export default function Home() {
         <h1 className="hero-title intro-item mt-8 font-semibold leading-[1.04] tracking-[-0.03em]" style={d(120)}>Where REC learns how machines learn.</h1>
         <p className="hero-lede intro-item mt-6 max-w-[44ch] text-lg text-cream/80" style={d(240)}>Workshops, talks, trainings and competitions in machine learning, data science, computer vision and IoT, run by students for students.</p>
         <div className="intro-item mt-9 flex flex-wrap gap-3" style={d(360)}>
-          <Link to="/join" className="btn-gold">Join the chapter</Link>
+          <Magnetic><Link to="/join" className="btn-gold"><RollLabel>Join the chapter</RollLabel></Link></Magnetic>
           <Link to="/events" className="btn-ghost bg-ink/40 backdrop-blur">See our events</Link>
         </div>
         {/* The next (or latest) event, reachable from the first screen */}
@@ -198,7 +198,7 @@ export default function Home() {
             <RevealWords text="Join IEEE CIS REC" className="h-section" />
             <p className="mt-4 text-lg text-cream/85">Become an IEEE student member, add the Computational Intelligence Society, and tell us you've joined. All three steps happen online.</p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/join" className="btn-gold">How to join</Link>
+              <Magnetic><Link to="/join" className="btn-gold"><RollLabel>How to join</RollLabel></Link></Magnetic>
               <Link to="/contact" className="btn-ghost">Ask us a question</Link>
             </div>
           </div>

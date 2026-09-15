@@ -40,6 +40,35 @@ export function RevealWords({ text, as: Tag = "h2", className = "", delay = 0 }:
   );
 }
 
+/**
+ * Pulls a button a few pixels toward the pointer while it's hovered (idea from the second version's
+ * magnetic buttons). Mouse and trackpad only; still for touch screens and reduced motion.
+ */
+export function Magnetic({ children, className = "", strength = 6 }: { children: ReactNode; className?: string; strength?: number }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const el = ref.current!;
+    if (reduced() || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    let raf = 0;
+    const move = (e: PointerEvent) => {
+      const r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        el.style.setProperty("--mx", `${(x * strength * 2).toFixed(2)}px`); el.style.setProperty("--my", `${(y * strength * 2).toFixed(2)}px`); el.dataset.active = "1";
+      });
+    };
+    const leave = () => { cancelAnimationFrame(raf); el.style.setProperty("--mx", "0px"); el.style.setProperty("--my", "0px"); el.dataset.active = "0"; };
+    el.addEventListener("pointermove", move); el.addEventListener("pointerleave", leave);
+    return () => { el.removeEventListener("pointermove", move); el.removeEventListener("pointerleave", leave); cancelAnimationFrame(raf); };
+  }, [strength]);
+  return <span ref={ref} className={`magnetic ${className}`}>{children}</span>;
+}
+
+/** Button text that rolls up and is replaced by a copy rolling in from below when the button is hovered or focused. */
+export function RollLabel({ children }: { children: string }) {
+  return <span className="roll"><span className="roll-a">{children}</span><span className="roll-b" aria-hidden>{children}</span></span>;
+}
+
 /** Tilts toward the pointer in 3D with a moving highlight. Only on devices with a precise pointer. */
 export function Tilt({ children, className = "", max = 9 }: { children: ReactNode; className?: string; max?: number }) {
   const ref = useRef<HTMLDivElement>(null);

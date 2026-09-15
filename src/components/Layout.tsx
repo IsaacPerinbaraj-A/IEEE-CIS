@@ -4,7 +4,7 @@ import { Menu, X, Mail, ArrowRight } from "lucide-react";
 import { RecMark } from "./Brand";
 import { Linkedin, Instagram } from "../lib/icons";
 import { site, achievements } from "../lib/data";
-import { ScrollProgress, CursorAura, BackToTop } from "./Motion";
+import { ScrollProgress, CursorAura, BackToTop, Magnetic, RollLabel } from "./Motion";
 import { usePageTransitions } from "../lib/pageTransitions";
 
 const nav = [
@@ -72,10 +72,10 @@ function Navbar() {
           </Link>
           <nav aria-label="Main" className="hidden items-center gap-1 lg:flex">
             {nav.map(n => <NavLink key={n.to} to={n.to} className={linkCls}>{n.label}</NavLink>)}
-            <Link to="/join" className="btn-gold ml-3 min-h-[40px] px-5 text-[15px]">Join the chapter</Link>
+            <Magnetic className="ml-3"><Link to="/join" className="btn-gold min-h-[40px] px-5 text-[15px]"><RollLabel>Join the chapter</RollLabel></Link></Magnetic>
           </nav>
           <div className="flex shrink-0 items-center gap-2 lg:hidden">
-            <Link to="/join" onClick={closeFor("/join")} className="btn-gold hidden min-h-[44px] px-5 text-[15px] sm:inline-flex">Join the chapter</Link>
+            <Magnetic className="hidden sm:inline-flex"><Link to="/join" onClick={closeFor("/join")} className="btn-gold min-h-[44px] px-5 text-[15px]"><RollLabel>Join the chapter</RollLabel></Link></Magnetic>
             <button ref={toggle} type="button" className="btn-ghost min-h-[44px] px-4" aria-expanded={open} aria-controls="mobile-nav" onClick={() => setOpen(o => !o)}>
               {open ? <X size={18} aria-hidden /> : <Menu size={18} aria-hidden />} {open ? "Close" : "Menu"}
             </button>

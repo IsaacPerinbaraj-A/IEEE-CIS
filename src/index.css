@@ -23,6 +23,24 @@
   .lede { @apply text-lg text-mute max-w-[58ch]; }
   .link { @apply text-violet-soft underline decoration-violet/50 underline-offset-4 transition-colors hover:text-cream hover:decoration-cream; }
 
+  /* Magnetic primary buttons and rolling labels (Magnetic, RollLabel in Motion.tsx). In this layer so utilities like `hidden` still win. */
+  .magnetic { display: inline-flex; transform: translate3d(var(--mx, 0px), var(--my, 0px), 0); transition: transform .45s cubic-bezier(.2,.7,.2,1); }
+  .magnetic[data-active="1"] { transition: transform .12s linear; }
+  .roll { position: relative; display: inline-block; overflow: hidden; vertical-align: top; }
+  .roll-a, .roll-b { display: block; transition: transform .45s cubic-bezier(.65,0,.35,1); }
+  .roll-b { position: absolute; inset: 0; transform: translateY(110%); }
+  a:focus-visible > .roll .roll-a { transform: translateY(-110%); }
+  a:focus-visible > .roll .roll-b { transform: none; }
+  @media (hover: hover) and (pointer: fine) {
+    a:hover > .roll .roll-a { transform: translateY(-110%); }
+    a:hover > .roll .roll-b { transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .magnetic { transform: none; }
+    .roll-b { display: none; }
+    .roll .roll-a { transform: none !important; }
+  }
+
   /* Phones: a row you swipe sideways instead of a tall stack. Add sm: layout classes for bigger screens. */
   @media (max-width: 639px) {
     .snap-row { display: flex; flex-wrap: nowrap; gap: .5rem; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity;
