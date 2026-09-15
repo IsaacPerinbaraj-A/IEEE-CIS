@@ -2,6 +2,15 @@ import eventsJson from "../data/events.json";
 import teamJson from "../data/team.json";
 import siteJson from "../data/site.json";
 import achievementsJson from "../data/achievements.json";
+import homeJson from "../data/home.json";
+
+/** Home and About page copy (hero, About the Society, What We Do), edited in src/data/home.json. `**text**` marks bold. */
+export type HomeContent = {
+  hero: { eyebrow: string; title: string; tagline: string; intro: string; primaryLabel: string; primaryLink: string; secondaryLabel: string; secondaryLink: string };
+  about: { label: string; title: string; paragraphs: string[] };
+  whatWeDo: { label: string; title: string; items: { icon: string; title: string; text: string }[] };
+};
+export const home = homeJson as HomeContent;
 
 export type ChapterEvent = {
   slug: string; title: string; type: string; domain?: string; series?: string;

@@ -1,0 +1,34 @@
+{
+  "hero": {
+    "eyebrow": "Student chapter at Rajalakshmi Engineering College, Chennai",
+    "title": "Advancing Computing. Enabling Innovation.",
+    "tagline": "Explore. Engineer. Innovate.",
+    "intro": "The IEEE Computational Intelligence Society at Rajalakshmi Engineering College is a student-led technical community committed to advancing knowledge and practice in computing and emerging technologies. We provide a structured platform for students to develop technical expertise, engage with current advancements, collaborate on meaningful initiatives, and cultivate professional and leadership capabilities.",
+    "primaryLabel": "Explore the Society",
+    "primaryLink": "/about",
+    "secondaryLabel": "Become a Member",
+    "secondaryLink": "/join"
+  },
+  "about": {
+    "label": "About the Society",
+    "title": "Advancing Technical Excellence Through Community",
+    "paragraphs": [
+      "The IEEE Computational Intelligence Society brings together students with a shared interest in computing, technology, research, and innovation.",
+      "Our initiatives extend beyond conventional academic learning through **technical workshops, expert sessions, project-based activities, research discussions, competitions, industry interactions, and collaborative programs**. These activities are designed to provide students with meaningful exposure to both the theoretical foundations and practical applications of computing.",
+      "Through an environment that encourages **technical excellence, interdisciplinary collaboration, continuous learning, and responsible innovation**, the society aims to prepare students to contribute effectively to the evolving field of computing.",
+      "We believe that a strong technical community is built not only through knowledge, but through the **exchange of ideas, collaborative problem-solving, and the disciplined pursuit of innovation**."
+    ]
+  },
+  "whatWeDo": {
+    "label": "What We Do",
+    "title": "Learn. Build. Connect.",
+    "items": [
+      { "icon": "learning", "title": "Technical Learning", "text": "Technical workshops, seminars, and hands-on sessions that develop knowledge across core and emerging areas of computing." },
+      { "icon": "innovation", "title": "Innovation & Development", "text": "Project-based initiatives that transform ideas into practical prototypes, applications, and technology-driven solutions." },
+      { "icon": "research", "title": "Research & Exploration", "text": "Opportunities to explore emerging technologies, engage in research, and examine developments shaping the field of computing." },
+      { "icon": "collaboration", "title": "Collaboration", "text": "Interdisciplinary collaboration that encourages knowledge exchange, teamwork, and collective problem-solving." },
+      { "icon": "events", "title": "Events & Discussions", "text": "Technical events, panel discussions, expert sessions, competitions, and forums that facilitate meaningful exchange of ideas." },
+      { "icon": "industry", "title": "Industry & Professional Development", "text": "Industry interactions and professional initiatives that provide exposure to current practices, career pathways, and evolving technology roles." }
+    ]
+  }
+}
