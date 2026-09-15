@@ -6,8 +6,9 @@ import { Reveal, RevealWords, Tilt, Marquee, Magnetic, RollLabel, PlayWhenVisibl
 import { CisLogoTile } from "../components/Brand";
 import { PosterCard } from "../components/EventCards";
 import { domainIcon } from "../lib/icons";
-import { upcomingEvents, pastEvents, events, sessions, formatDate, formatTime } from "../lib/data";
+import { upcomingEvents, pastEvents, events, sessions, formatDate, formatTime, home } from "../lib/data";
 import { useTitle } from "../lib/useTitle";
+import { richText } from "../lib/richText";
 
 const technical: Record<string, string> = {
   "machine-learning": "Models that learn from data, from classic algorithms to neural networks and LLMs.",
@@ -50,13 +51,14 @@ export default function Home() {
       <div className="hero-copy">
         <div className="intro-item flex flex-wrap items-center gap-4" style={d(0)}>
           <CisLogoTile />
-          <p className="max-w-[30ch] text-[15px] leading-snug text-mute">Student chapter at Rajalakshmi Engineering College, Chennai</p>
+          <p className="max-w-[30ch] text-[15px] leading-snug text-mute">{home.hero.eyebrow}</p>
         </div>
-        <h1 className="hero-title intro-item mt-8 font-semibold leading-[1.04] tracking-[-0.03em]" style={d(120)}>Where REC learns how machines learn.</h1>
-        <p className="hero-lede intro-item mt-6 max-w-[44ch] text-lg text-cream/80" style={d(240)}>Workshops, talks, trainings and competitions in machine learning, data science, computer vision and IoT, run by students for students.</p>
-        <div className="intro-item mt-9 flex flex-wrap gap-3" style={d(360)}>
-          <Magnetic><Link to="/join" className="btn-gold"><RollLabel>Join the chapter</RollLabel></Link></Magnetic>
-          <Link to="/events" className="btn-ghost bg-ink/40 backdrop-blur">See our events</Link>
+        <h1 className="hero-title intro-item mt-8 font-semibold leading-[1.04] tracking-[-0.03em]" style={d(120)}>{home.hero.title}</h1>
+        <p className="intro-item mt-4 font-display text-[clamp(1rem,1.7vw,1.3rem)] font-medium tracking-tight text-violet-soft" style={d(200)}>{home.hero.tagline}</p>
+        <p className="hero-lede intro-item mt-5 max-w-[56ch] text-[17px] text-cream/80 sm:text-lg" style={d(280)}>{home.hero.intro}</p>
+        <div className="intro-item mt-8 flex flex-wrap gap-3" style={d(360)}>
+          <Magnetic><Link to={home.hero.primaryLink} className="btn-gold"><RollLabel>{home.hero.primaryLabel}</RollLabel></Link></Magnetic>
+          <Link to={home.hero.secondaryLink} className="btn-ghost bg-ink/40 backdrop-blur">{home.hero.secondaryLabel}</Link>
         </div>
         {/* The next (or latest) event, reachable from the first screen */}
         {spotlight && (
@@ -182,11 +184,13 @@ export default function Home() {
 
       {/* About */}
       <Reveal as="section" className="wrap mt-20 grid gap-10 border-t border-line pt-12 sm:mt-28 sm:pt-16 lg:grid-cols-2">
-        <RevealWords text="Learn the ideas underneath the AI hype." className="h-section max-w-[18ch]" />
+        <div>
+          <p className="text-[15px] font-medium text-violet-soft">{home.about.label}</p>
+          <RevealWords text={home.about.title} className="h-section mt-3 max-w-[20ch]" />
+        </div>
         <div className="space-y-5 text-lg text-mute">
-          <p>Computational intelligence is the part of AI that borrows from nature: brains, human reasoning, evolution and flocks. It powers the tools you use every day.</p>
-          <p>We're the REC chapter of the IEEE Computational Intelligence Society. We help students learn these ideas properly, build with them, and get ready for placements.</p>
-          <Link to="/about" className="link inline-block text-base">More about the chapter</Link>
+          {home.about.paragraphs.slice(0, 2).map((p, i) => <p key={i}>{richText(p)}</p>)}
+          <Link to="/about" className="link inline-block text-base">More about the society</Link>
         </div>
       </Reveal>
 
