@@ -99,6 +99,20 @@ body[data-intro="on"] .story-shade { opacity: 0; }
 body[data-intro="on"] .glow-a { right: calc(50% - 30vh); top: calc(50% - 34vh); }
 body[data-intro="on"] .glow-b { right: calc(50% - 10vh); bottom: calc(50% - 40vh); }
 
+/* ---------- Mobile menu: the panel wipes down from the header, then each link rises out of its row ---------- */
+.mnav { clip-path: inset(0 0 100% 0); visibility: hidden; transition: clip-path .4s cubic-bezier(.65,0,.35,1), visibility 0s linear .4s; }
+.mnav[data-open="1"] { clip-path: inset(0 0 0 0); visibility: visible; transition: clip-path .55s cubic-bezier(.65,0,.35,1), visibility 0s; }
+.mnav-rise, .mnav-fade { transition: transform .25s ease-in, opacity .25s ease-in, background-color .2s; }
+.mnav-rise { transform: translateY(110%); }
+.mnav-fade { opacity: 0; transform: translateY(14px); }
+.mnav[data-open="1"] .mnav-rise, .mnav[data-open="1"] .mnav-fade { opacity: 1; transform: none;
+  transition: transform .6s cubic-bezier(.2,.7,.2,1), opacity .6s cubic-bezier(.2,.7,.2,1), background-color .2s;
+  transition-delay: calc(180ms + var(--i, 0) * 45ms), calc(180ms + var(--i, 0) * 45ms), 0s; }
+@media (prefers-reduced-motion: reduce) {
+  .mnav, .mnav[data-open="1"], .mnav .mnav-rise, .mnav .mnav-fade { clip-path: none; transition: none !important; }
+  .mnav .mnav-rise, .mnav .mnav-fade { opacity: 1; transform: none; }
+}
+
 /* ---------- Page transition ---------- */
 @keyframes pageIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 .page-enter { animation: pageIn .6s cubic-bezier(.2,.7,.2,1) both; }
