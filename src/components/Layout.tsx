@@ -120,9 +120,10 @@ function Navbar() {
 function Footer() {
   return (
     <footer className="mt-24 border-t border-line bg-panel">
-      <div className="wrap grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
-        <div>
-          <div className="flex items-center gap-3"><RecMark className="h-10 w-10" /><span className="font-display font-semibold">IEEE CIS REC</span></div>
+      {/* Two link columns side by side on phones so the footer isn't four stacked blocks */}
+      <div className="wrap grid grid-cols-2 gap-x-6 gap-y-10 py-12 md:grid-cols-[1.4fr_1fr_1fr_1fr] md:py-14">
+        <div className="col-span-2 md:col-span-1">
+          <div className="flex items-center gap-3"><RecMark className="h-10 w-10" /><span className="font-display font-semibold">{site.name}</span></div>
           <p className="mt-4 max-w-[34ch] text-[15px] text-mute">{site.fullName}, {site.college}, {site.city}.</p>
         </div>
         <FooterCol title="Explore" links={[["Events", "/events"], ["Team", "/team"], ["About", "/about"], ["Resources", "/resources"]]} />
@@ -137,7 +138,7 @@ function Footer() {
         <FooterCol title="IEEE" external links={[["IEEE", "https://www.ieee.org"], ["IEEE CIS", "https://cis.ieee.org"], ["IEEE Xplore", "https://ieeexplore.ieee.org"]]} />
       </div>
       <div className="border-t border-line">
-        <p className="wrap py-5 text-[13.5px] text-mute">© {new Date().getFullYear()} IEEE CIS Student Chapter, Rajalakshmi Engineering College.</p>
+        <p className="wrap py-5 text-[13.5px] text-mute">© {new Date().getFullYear()} {site.fullName}, {site.college}.</p>
       </div>
     </footer>
   );
