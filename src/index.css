@@ -207,6 +207,10 @@ html[data-page-transition] .page-curtain { display: block; position: fixed; inse
 @keyframes vt-old { 0% { opacity: 1; transform: none; } 50% { opacity: .5; transform: translateY(-2.5%) scale(.97); } 50.1%, 100% { opacity: 0; } }
 @keyframes vt-new { 0%, 49.9% { opacity: 0; transform: translateY(3%); } 50% { opacity: 1; transform: translateY(3%); } 100% { opacity: 1; transform: none; } }
 @keyframes vt-curtain { from { transform: translateY(100%); } to { transform: translateY(-100%); } }
+/* Phones: the same curtain, a little quicker */
+@media (max-width: 639px) {
+  ::view-transition-old(root), ::view-transition-new(root), ::view-transition-new(page-curtain) { animation-duration: .45s; }
+}
 
 /* ---------- Page transition ---------- */
 @keyframes pageIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }

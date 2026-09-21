@@ -6,6 +6,7 @@ import { Linkedin, Instagram } from "../lib/icons";
 import { site, achievements } from "../lib/data";
 import { ScrollProgress, CursorAura, BackToTop, Magnetic, RollLabel } from "./Motion";
 import { usePageTransitions } from "../lib/pageTransitions";
+import { useScrollMemory } from "../lib/scrollMemory";
 import ErrorBoundary from "./ErrorBoundary";
 
 const nav = [
@@ -214,7 +215,7 @@ function PageError({ onRetry }: { onRetry: () => void }) {
 
 export default function Layout() {
   const { pathname } = useLocation();
-  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  useScrollMemory();
   usePageTransitions();
   return (
     <div className="flex min-h-screen flex-col">
