@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import type { CSSProperties } from "react";
 import { ArrowRight, CalendarDays, Lightbulb, MapPin } from "lucide-react";
 import ParticleStory from "../components/particles/ParticleStory";
+import WhatWeDoDeck from "../components/WhatWeDoDeck";
 import { Reveal, RevealWords, Tilt, Marquee, Magnetic, RollLabel, PlayWhenVisible } from "../components/Motion";
 import { CisLogoTile } from "../components/Brand";
 import { PosterCard } from "../components/EventCards";
@@ -95,7 +96,8 @@ export default function Home() {
 
   return (
     <>
-      <ParticleStory hero={hero} steps={steps} />
+      <ParticleStory hero={hero} steps={steps}
+        deck={<WhatWeDoDeck label={home.whatWeDo.label} title={home.whatWeDo.title} items={items} colors={STEP_COLORS} />} />
 
       {/* Next (or latest) event */}
       {spotlight && (

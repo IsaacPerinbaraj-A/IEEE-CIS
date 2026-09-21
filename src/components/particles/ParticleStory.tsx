@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ParticleField, type ShapeSpec } from "./engine";
 import { deviceTier } from "../../lib/device";
+import { useMediaQuery, PHONE } from "../../lib/useMediaQuery";
 import { chaos, sphere, neural, fuzzy, helix, swarm, constellation, ripple, textShape, yBounds } from "./shapes";
 import { BOUNDS, VIS_H, fitShape, isSideLayout, type Placement, type Region } from "./layout";
 
@@ -78,7 +79,12 @@ function layout(w: number, h: number, m: ReturnType<typeof measure>) {
 
 type Phase = "off" | "loading" | "forming" | "hold" | "release";
 
-export default function ParticleStory({ hero, steps }: { hero: ReactNode; steps: ReactNode[] }) {
+/**
+ * `steps` are the vertical story on tablets and desktop. On phones, `deck` (if given) replaces them with one
+ * swipeable section, and the formation follows the deck's horizontal position instead of the page scroll.
+ */
+export default function ParticleStory({ hero, steps, deck }: { hero: ReactNode; steps: ReactNode[]; deck?: ReactNode }) {
+  const phone = useMediaQuery(PHONE);
   const wrapRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -133,10 +139,23 @@ export default function ParticleStory({ hero, steps }: { hero: ReactNode; steps:
       for (let k = 0; k < tops.length - 1; k++) if (y < tops[k + 1]) return k + Math.max(0, (y - tops[k]) / (tops[k + 1] - tops[k]));
       return STEPS;
     };
+    // Phones: how far along the What We Do deck you have swiped, from 0 (first card) to STEPS - 1 (last card)
+    const deckProgress = () => {
+      const d = contentRef.current?.querySelector<HTMLElement>("[data-deck-track]");
+      if (!d) return null;
+      const max = d.scrollWidth - d.clientWidth;
+      return max > 0 ? (d.scrollLeft / max) * (STEPS - 1) : 0;
+    };
     const scrollTarget = () => {
       // Interpolate between the tops of the hero and each step, so shapes line up with cards at any height
       const s = storyPos();
       if (s === null) return HERO;
+      const dp = deckProgress();
+      if (dp !== null) {
+        // Globe -> first formation as the deck section scrolls up, then the swipe picks the formation
+        const x = Math.max(0, Math.min(1, (Math.min(1, s) - 0.3) / 0.4)), sm = x * x * (3 - 2 * x);
+        return HERO + sm * (1 + dp);
+      }
       const k = Math.min(Math.floor(s), STEPS - 1), f = s - k;
       const x = Math.max(0, Math.min(1, (f - 0.3) / 0.4)), sm = x * x * (3 - 2 * x);
       return HERO + Math.min(STEPS, s >= STEPS ? STEPS : k + sm);
@@ -274,7 +293,8 @@ export default function ParticleStory({ hero, steps }: { hero: ReactNode; steps:
       window.addEventListener("pointerdown", onDown, { passive: true });
       document.addEventListener("pointerleave", onLeave);
     }
-    window.addEventListener("scroll", onScroll, { passive: true });
+    // Capture on the document so the deck's sideways scroll is heard too (element scroll events don't bubble)
+    document.addEventListener("scroll", onScroll, { passive: true, capture: true });
     window.addEventListener("resize", onResize);
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") skipRef.current(); };
     window.addEventListener("keydown", onKey);
@@ -283,7 +303,7 @@ export default function ParticleStory({ hero, steps }: { hero: ReactNode; steps:
       disposed = true; clearInterval(loadTimer); clearTimeout(failsafeTimer); cancelAnimationFrame(sideRaf); io.disconnect(); field.dispose();
       document.removeEventListener("visibilitychange", onVis);
       window.removeEventListener("pointermove", onMove); window.removeEventListener("pointerdown", onDown); document.removeEventListener("pointerleave", onLeave);
-      window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onResize); window.removeEventListener("keydown", onKey);
+      document.removeEventListener("scroll", onScroll, { capture: true }); window.removeEventListener("resize", onResize); window.removeEventListener("keydown", onKey);
       done();
     };
   }, []);
@@ -302,7 +322,9 @@ export default function ParticleStory({ hero, steps }: { hero: ReactNode; steps:
 
       <div ref={contentRef} className="relative -mt-[100svh]">
         <div className="hero-stage relative flex min-h-[100svh] pt-[68px]">{hero}</div>
-        {steps.map((s, i) => <div key={i} className="story-step relative flex">{s}</div>)}
+        {phone && deck
+          ? <div className="story-step story-deck relative flex">{deck}</div>
+          : steps.map((s, i) => <div key={i} className="story-step relative flex">{s}</div>)}
       </div>
 
       {introVisible && (
