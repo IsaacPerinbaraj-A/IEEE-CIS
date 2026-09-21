@@ -20,7 +20,8 @@
   .chip-on { @apply border-violet bg-violet text-white hover:text-white; }
   .h-page { @apply text-[clamp(2.1rem,4.6vw,3.5rem)] font-semibold; }
   .h-section { @apply text-[clamp(1.6rem,3vw,2.35rem)] font-semibold; }
-  .lede { @apply text-lg text-mute max-w-[58ch]; }
+  /* On phones the intro text is body size, so it never reads larger than the text under it */
+  .lede { @apply text-[17px] text-mute max-w-[58ch] sm:text-lg; }
   .link { @apply text-violet-soft underline decoration-violet/50 underline-offset-4 transition-colors hover:text-cream hover:decoration-cream; }
 
   /* Magnetic primary buttons and rolling labels (Magnetic, RollLabel in Motion.tsx). In this layer so utilities like `hidden` still win. */

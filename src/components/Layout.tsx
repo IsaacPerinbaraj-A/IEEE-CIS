@@ -67,8 +67,8 @@ function Navbar() {
             {/* Narrow phones get a one-line subtitle so the brand never wraps into three lines */}
             <span className="min-w-0 leading-tight">
               <span className="block font-display text-[15px] font-semibold tracking-tight">{site.name}</span>
-              <span className="block text-[12.5px] text-mute min-[420px]:hidden">{site.city}</span>
-              <span className="hidden text-[12.5px] text-mute min-[420px]:block">{site.college}</span>
+              <span className="block text-[14px] text-mute min-[420px]:hidden">{site.city}</span>
+              <span className="hidden text-[13px] text-mute min-[420px]:block sm:text-[12.5px]">{site.college}</span>
             </span>
           </Link>
           <nav aria-label="Main" className="hidden items-center gap-1 lg:flex">
