@@ -153,6 +153,8 @@ body[data-intro="on"] .story-shade { opacity: 0; }
   .step-card h2 { font-size: 1.5rem; }
   .step-card p { font-size: 0.95rem; }
 }
+/* Phones: a smaller globe above the copy, so the title, both buttons and the event link fit on the first screen */
+@media (max-width: 639px) { .hero-wrap { padding-top: 30svh; } }
 /* Touch screens: the "move your cursor" hint doesn't apply, so drop it and the space kept for it */
 @media (pointer: coarse) {
   .hero-cue { display: none; }
