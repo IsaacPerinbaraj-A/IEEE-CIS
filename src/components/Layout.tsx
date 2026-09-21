@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
-import { Menu, X, Mail, ArrowRight } from "lucide-react";
+import { Menu, X, Mail, ArrowRight, ChevronDown } from "lucide-react";
 import { RecMark } from "./Brand";
 import { Linkedin, Instagram } from "../lib/icons";
 import { site, achievements } from "../lib/data";
@@ -132,17 +132,42 @@ function Navbar() {
   );
 }
 
+const IEEE_LINKS: [string, string][] = [["IEEE", "https://www.ieee.org"], ["IEEE CIS", "https://cis.ieee.org"], ["IEEE Xplore", "https://ieeexplore.ieee.org"]];
+
 function Footer() {
+  // Phones: every page as a two-column list of 44px rows (the header nav plus Join)
+  const explore: [string, string][] = [...nav.map(n => [n.label, n.to] as [string, string]), ["Join", "/join"]];
+  const iconBtn = "press grid h-12 w-12 place-items-center rounded-full border border-line text-mute hover:border-violet-soft hover:text-cream";
   return (
-    <footer className="mt-24 border-t border-line bg-panel">
-      {/* Two link columns side by side on phones so the footer isn't four stacked blocks */}
-      <div className="wrap grid grid-cols-2 gap-x-6 gap-y-10 py-12 md:grid-cols-[1.4fr_1fr_1fr_1fr] md:py-14">
+    <footer className="mt-16 border-t border-line bg-panel sm:mt-24">
+      <div className="wrap grid grid-cols-2 gap-x-6 gap-y-8 py-10 md:grid-cols-[1.4fr_1fr_1fr_1fr] md:gap-y-10 md:py-14">
         <div className="col-span-2 md:col-span-1">
           <div className="flex items-center gap-3"><RecMark className="h-10 w-10" /><span className="font-display font-semibold">{site.name}</span></div>
           <p className="mt-4 max-w-[34ch] text-[15px] text-mute">{site.fullName}, {site.college}, {site.city}.</p>
+          {/* Phones: the three contact channels as round buttons */}
+          <div className="mt-5 flex gap-3 md:hidden">
+            <a className={iconBtn} href={`mailto:${site.email}`} aria-label="Email"><Mail size={19} aria-hidden /></a>
+            <a className={iconBtn} href={site.linkedin} target="_blank" rel="noopener" aria-label="LinkedIn (opens in a new tab)"><Linkedin size={19} aria-hidden /></a>
+            <a className={iconBtn} href={site.instagram} target="_blank" rel="noopener" aria-label="Instagram (opens in a new tab)"><Instagram size={19} aria-hidden /></a>
+          </div>
         </div>
-        <FooterCol title="Explore" links={[["Events", "/events"], ["Team", "/team"], ["About", "/about"], ["Resources", "/resources"]]} />
-        <div>
+        <nav aria-label="Footer" className="col-span-2 md:hidden">
+          <h2 className="font-sans text-[15px] font-semibold">Explore</h2>
+          <ul className="mt-2 grid grid-cols-2 gap-x-4">
+            {explore.map(([l, h]) => <li key={h}><Link className="press flex min-h-[44px] items-center text-[15px] text-mute hover:text-cream" to={h}>{l}</Link></li>)}
+          </ul>
+        </nav>
+        {/* Phones: the IEEE links fold away */}
+        <details className="group col-span-2 border-t border-line pt-2 md:hidden">
+          <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between font-sans text-[15px] font-semibold [&::-webkit-details-marker]:hidden">
+            IEEE links <ChevronDown size={18} aria-hidden className="text-mute transition-transform group-open:rotate-180" />
+          </summary>
+          <ul className="pb-2">
+            {IEEE_LINKS.map(([l, h]) => <li key={h}><a className="flex min-h-[44px] items-center text-[15px] text-mute hover:text-cream" href={h} target="_blank" rel="noopener">{l}<span className="sr-only"> (opens in a new tab)</span></a></li>)}
+          </ul>
+        </details>
+        <FooterCol className="max-md:hidden" title="Explore" links={[["Events", "/events"], ["Team", "/team"], ["About", "/about"], ["Resources", "/resources"]]} />
+        <div className="max-md:hidden">
           <h2 className="font-sans text-[15px] font-semibold">Connect</h2>
           <ul className="mt-4 space-y-3 text-[15px]">
             <li><a className="inline-flex items-center gap-2 text-mute hover:text-cream" href={`mailto:${site.email}`}><Mail size={16} /> Email</a></li>
@@ -150,17 +175,17 @@ function Footer() {
             <li><a className="inline-flex items-center gap-2 text-mute hover:text-cream" href={site.instagram} target="_blank" rel="noopener"><Instagram size={16} /> Instagram</a></li>
           </ul>
         </div>
-        <FooterCol title="IEEE" external links={[["IEEE", "https://www.ieee.org"], ["IEEE CIS", "https://cis.ieee.org"], ["IEEE Xplore", "https://ieeexplore.ieee.org"]]} />
+        <FooterCol className="max-md:hidden" title="IEEE" external links={IEEE_LINKS} />
       </div>
       <div className="border-t border-line">
-        <p className="wrap py-5 text-[13.5px] text-mute">© {new Date().getFullYear()} {site.fullName}, {site.college}.</p>
+        <p className="wrap pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-5 text-[14px] text-mute sm:text-[13.5px]">© {new Date().getFullYear()} {site.fullName}, {site.college}.</p>
       </div>
     </footer>
   );
 }
-function FooterCol({ title, links, external }: { title: string; links: [string, string][]; external?: boolean }) {
+function FooterCol({ title, links, external, className = "" }: { title: string; links: [string, string][]; external?: boolean; className?: string }) {
   return (
-    <div>
+    <div className={className}>
       <h2 className="font-sans text-[15px] font-semibold">{title}</h2>
       <ul className="mt-4 space-y-3 text-[15px]">
         {links.map(([l, h]) => <li key={h}>{external

@@ -201,20 +201,28 @@ export function CursorAura() {
 export function BackToTop() {
   const btn = useRef<HTMLButtonElement>(null), ring = useRef<SVGCircleElement>(null);
   useEffect(() => {
-    let raf = 0;
+    let raf = 0, lastY = window.scrollY, goingUp = false, footerOn = false;
     const update = () => {
-      const h = document.documentElement.scrollHeight - window.innerHeight, p = h > 0 ? window.scrollY / h : 0;
+      raf = 0;
+      const y = window.scrollY, h = document.documentElement.scrollHeight - window.innerHeight, p = h > 0 ? y / h : 0;
+      if (y < lastY) goingUp = true; else if (y > lastY) goingUp = false;
+      lastY = y;
       if (ring.current) ring.current.style.strokeDashoffset = String(100 - p * 100);
-      if (btn.current) btn.current.dataset.show = window.scrollY > 600 ? "1" : "0";
+      // Phones: only while scrolling back up, well down the page, and never over the footer. Larger screens: after 600px.
+      const show = window.innerWidth < 640 ? goingUp && y > window.innerHeight * 1.5 && !footerOn : y > 600;
+      if (btn.current) btn.current.dataset.show = show ? "1" : "0";
     };
-    const onScroll = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(update); };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    const footer = document.querySelector("footer");
+    const io = footer ? new IntersectionObserver(([e]) => { footerOn = e.isIntersecting; onScroll(); }) : null;
+    if (footer) io?.observe(footer);
     update();
     window.addEventListener("scroll", onScroll, { passive: true }); window.addEventListener("resize", onScroll);
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); };
+    return () => { cancelAnimationFrame(raf); io?.disconnect(); window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); };
   }, []);
   return (
     <button ref={btn} data-show="0" aria-label="Back to top" onClick={() => window.scrollTo({ top: 0, behavior: reduced() ? "auto" : "smooth" })}
-      className="back-to-top group fixed bottom-5 right-5 z-40 grid h-14 w-14 place-items-center rounded-full border border-line bg-panel/80 text-cream shadow-[0_10px_40px_-10px_rgba(139,92,246,.7)] backdrop-blur-md sm:bottom-7 sm:right-7">
+      className="back-to-top group fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-4 z-40 grid h-11 w-11 place-items-center rounded-full border border-line bg-panel/80 text-cream shadow-[0_10px_40px_-10px_rgba(139,92,246,.7)] backdrop-blur-md sm:bottom-7 sm:right-7 sm:h-14 sm:w-14">
       <svg viewBox="0 0 36 36" className="absolute inset-0 h-full w-full -rotate-90" aria-hidden>
         <defs><linearGradient id="btt" x1="0" x2="1"><stop offset="0" stopColor="#8B5CF6" /><stop offset=".55" stopColor="#EC4899" /><stop offset="1" stopColor="#F2B544" /></linearGradient></defs>
         <circle cx="18" cy="18" r="16.5" fill="none" stroke="url(#btt)" strokeWidth="2" strokeLinecap="round" pathLength={100} strokeDasharray="100" ref={ring} />
