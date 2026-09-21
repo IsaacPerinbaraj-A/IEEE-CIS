@@ -21,7 +21,7 @@ export function Poster({ e, className = "" }: { e: ChapterEvent; className?: str
 
 export function PosterCard({ e }: { e: ChapterEvent }) {
   return (
-    <Link to={`/events/${e.slug}`} className="group block" data-cursor="View">
+    <Link to={`/events/${e.slug}`} className="press group block" data-cursor="View">
       <Tilt className="rounded-2xl">
         <div className="aspect-[4/5] overflow-hidden rounded-2xl border border-line bg-panel shadow-[0_20px_50px_-20px_rgba(139,92,246,.45)] transition-colors duration-200 group-hover:border-violet-soft">
           <Poster e={e} className="transition-transform duration-500 group-hover:scale-[1.04]" />

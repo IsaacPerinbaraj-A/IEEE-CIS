@@ -93,7 +93,7 @@ function Navbar() {
             {menuItems.map((n, i) => (
               <li key={n.to} className="border-b border-line/70" style={{ "--i": i } as CSSProperties}>
                 <NavLink to={n.to} end={n.to === "/"} onClick={closeFor(n.to)}
-                  className={({ isActive }) => `group flex items-center py-1 transition-colors ${isActive ? "text-cream" : "text-mute hover:text-cream"}`}>
+                  className={({ isActive }) => `group flex items-center rounded-xl py-1 transition-colors active:bg-raised/60 ${isActive ? "text-cream" : "text-mute hover:text-cream"}`}>
                   {({ isActive }) => (
                     <span className="flex flex-1 overflow-hidden py-2">
                       <span className="mnav-rise flex flex-1 items-center gap-4">

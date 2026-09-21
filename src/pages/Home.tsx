@@ -99,7 +99,7 @@ export default function Home() {
       {/* Next (or latest) event */}
       {spotlight && (
         <Reveal className="wrap relative z-10 mt-14 sm:mt-20">
-          <Link to={`/events/${spotlight.slug}`} className="group flex flex-col gap-5 rounded-2xl border border-line bg-panel p-5 transition-colors hover:border-violet-soft sm:flex-row sm:items-center sm:p-6">
+          <Link to={`/events/${spotlight.slug}`} className="press group flex flex-col gap-5 rounded-2xl border border-line bg-panel p-5 transition-colors hover:border-violet-soft sm:flex-row sm:items-center sm:p-6">
             {spotlight.poster && <img src={spotlight.poster} alt="" onError={ev => { ev.currentTarget.hidden = true; }} className="h-20 w-20 shrink-0 rounded-xl object-cover" />}
             <div className="min-w-0 flex-1">
               <p className={`text-[14px] ${next ? "text-gold" : "text-mute"}`}>{next ? "Next event" : "Most recent event"}</p>
@@ -133,7 +133,7 @@ export default function Home() {
                 <Reveal key={g.slug} delay={i * 90} className={i === 0 ? "sm:col-span-2" : ""}>
                   <Tilt className="h-full rounded-2xl" max={6}>
                     {/* Phones: icon beside the text in a compact row; larger screens: a tile */}
-                    <Link to={`/team?domain=${g.slug}`} className="group flex h-full items-start gap-4 rounded-2xl border border-line bg-panel p-5 transition-colors hover:border-violet-soft hover:bg-raised sm:block sm:p-6">
+                    <Link to={`/team?domain=${g.slug}`} className="press group flex h-full items-start gap-4 rounded-2xl border border-line bg-panel p-5 transition-colors hover:border-violet-soft hover:bg-raised sm:block sm:p-6">
                       <Icon className="mt-0.5 shrink-0 text-violet-soft" size={26} />
                       <div className="min-w-0 sm:mt-5">
                         <h3 className="text-lg font-semibold sm:text-xl">{g.domain}</h3>
@@ -152,7 +152,7 @@ export default function Home() {
                 const Icon = domainIcon[g.slug];
                 return (
                   <li key={g.slug} className="bg-ink">
-                    <Link to={`/team?domain=${g.slug}`} className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-panel">
+                    <Link to={`/team?domain=${g.slug}`} className="press flex items-center gap-4 px-5 py-4 transition-colors hover:bg-panel active:bg-panel">
                       <Icon size={20} className="shrink-0 text-mute" />
                       <span><span className="block font-medium">{g.domain}</span><span className="block text-[14px] text-mute">{support[g.slug]}</span></span>
                     </Link>

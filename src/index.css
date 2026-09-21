@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 @layer base {
-  html { background: #0F0A1C; color-scheme: dark; }
+  html { background: #0F0A1C; color-scheme: dark; -webkit-tap-highlight-color: transparent; }
   body { @apply bg-ink text-cream font-sans antialiased; font-size: 17px; line-height: 1.6; }
   h1, h2, h3 { @apply font-display; letter-spacing: -0.02em; line-height: 1.12; }
   ::selection { background: #8B5CF6; color: #fff; }
@@ -13,10 +13,10 @@
 
 @layer components {
   .wrap { @apply mx-auto w-full max-w-page px-5 sm:px-8; }
-  .btn { @apply inline-flex min-h-[46px] items-center justify-center gap-2 rounded-full px-6 font-medium transition-colors duration-200; }
+  .btn { @apply inline-flex min-h-[46px] items-center justify-center gap-2 rounded-full px-6 font-medium transition-[color,background-color,border-color,transform] duration-200 active:scale-[.97]; }
   .btn-gold { @apply btn bg-gold text-ink hover:bg-[#F7C766]; }
   .btn-ghost { @apply btn border border-line text-cream hover:border-violet-soft hover:bg-raised; }
-  .chip { @apply inline-flex min-h-[40px] items-center rounded-full border border-line px-4 text-[15px] text-mute transition-colors duration-200 hover:border-violet-soft hover:text-cream; }
+  .chip { @apply inline-flex min-h-[40px] items-center rounded-full border border-line px-4 text-[15px] text-mute transition-[color,background-color,border-color,transform] duration-200 hover:border-violet-soft hover:text-cream active:scale-[.97]; }
   .chip-on { @apply border-violet bg-violet text-white hover:text-white; }
   .h-page { @apply text-[clamp(2.1rem,4.6vw,3.5rem)] font-semibold; }
   .h-section { @apply text-[clamp(1.6rem,3vw,2.35rem)] font-semibold; }
@@ -63,6 +63,10 @@
 html[data-tier="low"] .blur-\[120px\] { filter: blur(48px); }
 html[data-tier="low"] .backdrop-blur, html[data-tier="low"] .backdrop-blur-md { -webkit-backdrop-filter: none; backdrop-filter: none; }
 html[data-tier="low"] .step-card { background-color: rgba(15,10,28,.9); }
+
+/* ---------- Tap feedback: cards and rows press in slightly. The short delay keeps a scroll flick from flashing them. ---------- */
+.press { transition: transform .25s cubic-bezier(.2,.7,.2,1), background-color .2s, border-color .2s, color .2s; }
+.press:active { transform: scale(.985); transition-duration: .09s; transition-delay: .04s; }
 
 /* ---------- Scroll reveal ---------- */
 .reveal { opacity: 0; transform: translateY(34px) scale(.985); filter: blur(6px);
