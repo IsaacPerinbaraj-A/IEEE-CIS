@@ -87,6 +87,7 @@ html[data-tier="low"] .step-card { background-color: rgba(15,10,28,.9); }
 .tilt-glare { pointer-events: none; position: absolute; inset: 0; border-radius: inherit; opacity: 0; transition: opacity .3s;
   background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,.28), rgba(196,181,253,.08) 35%, transparent 60%); mix-blend-mode: soft-light; }
 .tilt[data-active="1"] .tilt-glare { opacity: 1; }
+.tilt[data-touch="1"] .tilt-glare { opacity: .5; }
 
 /* ---------- Marquee ---------- */
 .marquee-fill { background: linear-gradient(90deg, #C4B5FD, #F472B6 45%, #F2B544); -webkit-background-clip: text; background-clip: text; color: transparent; }

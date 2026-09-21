@@ -69,24 +69,38 @@ export function RollLabel({ children }: { children: string }) {
   return <span className="roll"><span className="roll-a">{children}</span><span className="roll-b" aria-hidden>{children}</span></span>;
 }
 
-/** Tilts toward the pointer in 3D with a moving highlight. Only on devices with a precise pointer. */
+/**
+ * Tilts toward the pointer in 3D with a moving highlight. With a mouse it follows the pointer; on touch screens,
+ * holding the card leans it slightly toward the finger (at most 3°) and lifting or scrolling resets it.
+ */
 export function Tilt({ children, className = "", max = 9 }: { children: ReactNode; className?: string; max?: number }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = ref.current!;
-    if (reduced() || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    if (reduced()) return;
     let raf = 0;
-    const move = (e: PointerEvent) => {
+    const tiltTo = (e: PointerEvent, m: number) => {
       const r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
-        el.style.setProperty("--rx", `${(0.5 - y) * max}deg`); el.style.setProperty("--ry", `${(x - 0.5) * max * 1.2}deg`);
+        el.style.setProperty("--rx", `${(0.5 - y) * m}deg`); el.style.setProperty("--ry", `${(x - 0.5) * m * 1.2}deg`);
         el.style.setProperty("--gx", `${x * 100}%`); el.style.setProperty("--gy", `${y * 100}%`); el.dataset.active = "1";
       });
     };
-    const leave = () => { cancelAnimationFrame(raf); el.style.setProperty("--rx", "0deg"); el.style.setProperty("--ry", "0deg"); el.dataset.active = "0"; };
-    el.addEventListener("pointermove", move); el.addEventListener("pointerleave", leave);
-    return () => { el.removeEventListener("pointermove", move); el.removeEventListener("pointerleave", leave); cancelAnimationFrame(raf); };
+    const reset = () => { cancelAnimationFrame(raf); el.style.setProperty("--rx", "0deg"); el.style.setProperty("--ry", "0deg"); el.dataset.active = "0"; el.dataset.touch = "0"; };
+    if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      const move = (e: PointerEvent) => tiltTo(e, max);
+      el.addEventListener("pointermove", move); el.addEventListener("pointerleave", reset);
+      return () => { el.removeEventListener("pointermove", move); el.removeEventListener("pointerleave", reset); cancelAnimationFrame(raf); };
+    }
+    // Touch: pointercancel fires as soon as the finger starts a scroll, so a scroll never leaves a card tilted
+    const down = (e: PointerEvent) => { if (e.pointerType === "mouse") return; el.dataset.touch = "1"; tiltTo(e, Math.min(3, max)); };
+    el.addEventListener("pointerdown", down, { passive: true });
+    el.addEventListener("pointerup", reset); el.addEventListener("pointercancel", reset); el.addEventListener("pointerleave", reset);
+    return () => {
+      el.removeEventListener("pointerdown", down); el.removeEventListener("pointerup", reset);
+      el.removeEventListener("pointercancel", reset); el.removeEventListener("pointerleave", reset); cancelAnimationFrame(raf);
+    };
   }, [max]);
   return <div ref={ref} className={`tilt ${className}`}>{children}<span aria-hidden className="tilt-glare" /></div>;
 }
