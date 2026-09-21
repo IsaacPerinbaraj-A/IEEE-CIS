@@ -215,24 +215,18 @@ export function CursorAura() {
 export function BackToTop() {
   const btn = useRef<HTMLButtonElement>(null), ring = useRef<SVGCircleElement>(null);
   useEffect(() => {
-    let raf = 0, lastY = window.scrollY, goingUp = false, footerOn = false;
+    let raf = 0;
     const update = () => {
       raf = 0;
       const y = window.scrollY, h = document.documentElement.scrollHeight - window.innerHeight, p = h > 0 ? y / h : 0;
-      if (y < lastY) goingUp = true; else if (y > lastY) goingUp = false;
-      lastY = y;
       if (ring.current) ring.current.style.strokeDashoffset = String(100 - p * 100);
-      // Phones: only while scrolling back up, well down the page, and never over the footer. Larger screens: after 600px.
-      const show = window.innerWidth < 640 ? goingUp && y > window.innerHeight * 1.5 && !footerOn : y > 600;
-      if (btn.current) btn.current.dataset.show = show ? "1" : "0";
+      // Shows once you have scrolled down a little, on phones and larger screens alike
+      if (btn.current) btn.current.dataset.show = y > 600 ? "1" : "0";
     };
     const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
-    const footer = document.querySelector("footer");
-    const io = footer ? new IntersectionObserver(([e]) => { footerOn = e.isIntersecting; onScroll(); }) : null;
-    if (footer) io?.observe(footer);
     update();
     window.addEventListener("scroll", onScroll, { passive: true }); window.addEventListener("resize", onScroll);
-    return () => { cancelAnimationFrame(raf); io?.disconnect(); window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); };
+    return () => { cancelAnimationFrame(raf); window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); };
   }, []);
   return (
     <button ref={btn} data-show="0" aria-label="Back to top" onClick={() => window.scrollTo({ top: 0, behavior: reduced() ? "auto" : "smooth" })}
