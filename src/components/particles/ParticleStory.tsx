@@ -254,10 +254,34 @@ export default function ParticleStory({ hero, steps, deck }: { hero: ReactNode; 
       if (e.clientY < r.top || e.clientY > r.bottom) return null;
       return [((e.clientX - r.left) / r.width) * 2 - 1, -(((e.clientY - r.top) / r.height) * 2 - 1)] as const;
     };
-    const onMove = (e: PointerEvent) => { const p = e.pointerType === "mouse" ? toNdc(e) : null; if (p) field.pointer(p[0], p[1]); else field.pointer(null); };
+    // Touch: drag sideways on the globe (the space above the hero text) to spin it; it coasts when you let go.
+    // Vertical drags still scroll the page (the hero has touch-action: pan-y).
+    let drag: { id: number; x: number; t: number; v: number } | null = null;
+    const startDrag = (e: PointerEvent) => {
+      if (introPhase !== "off" || !(e.target as HTMLElement).closest(".hero-stage")) return false;
+      const copy = contentRef.current?.querySelector(".hero-copy");
+      if (copy && e.clientY >= copy.getBoundingClientRect().top) return false;
+      drag = { id: e.pointerId, x: e.clientX, t: e.timeStamp, v: 0 }; field.fling(0);
+      return true;
+    };
+    const onMove = (e: PointerEvent) => {
+      if (drag && e.pointerId === drag.id) {
+        const dx = e.clientX - drag.x, turn = dx * 0.009, dt = Math.max(8, e.timeStamp - drag.t) / 1000;
+        field.spinBy(turn);
+        drag.v = drag.v * 0.5 + (turn / dt) * 0.5; drag.x = e.clientX; drag.t = e.timeStamp;
+      }
+      const p = e.pointerType === "mouse" ? toNdc(e) : null; if (p) field.pointer(p[0], p[1]); else field.pointer(null);
+    };
+    const onUp = (e: PointerEvent) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      // Only fling if the finger was still moving when it lifted; a cancelled touch (page scroll took over) just stops
+      if (e.type === "pointerup" && e.timeStamp - drag.t < 90) field.fling(drag.v);
+      drag = null;
+    };
     const onLeave = () => field.pointer(null);
     const onDown = (e: PointerEvent) => {
       if ((e.target as HTMLElement).closest(INTERACTIVE) || (e.target as HTMLElement).closest(".reveal")) return;
+      if (e.pointerType !== "mouse" && startDrag(e)) return;
       const p = toNdc(e); if (p) field.shock(p[0], p[1]);
     };
     // Which side the current step's card is on, so the reading shade (index.css) follows it: steps 1, 3, 5 left; 2, 4, 6 right
@@ -291,6 +315,7 @@ export default function ParticleStory({ hero, steps, deck }: { hero: ReactNode; 
     if (!reduce) {
       window.addEventListener("pointermove", onMove, { passive: true });
       window.addEventListener("pointerdown", onDown, { passive: true });
+      window.addEventListener("pointerup", onUp); window.addEventListener("pointercancel", onUp);
       document.addEventListener("pointerleave", onLeave);
     }
     // Capture on the document so the deck's sideways scroll is heard too (element scroll events don't bubble)
@@ -303,6 +328,7 @@ export default function ParticleStory({ hero, steps, deck }: { hero: ReactNode; 
       disposed = true; clearInterval(loadTimer); clearTimeout(failsafeTimer); cancelAnimationFrame(sideRaf); io.disconnect(); field.dispose();
       document.removeEventListener("visibilitychange", onVis);
       window.removeEventListener("pointermove", onMove); window.removeEventListener("pointerdown", onDown); document.removeEventListener("pointerleave", onLeave);
+      window.removeEventListener("pointerup", onUp); window.removeEventListener("pointercancel", onUp);
       document.removeEventListener("scroll", onScroll, { capture: true }); window.removeEventListener("resize", onResize); window.removeEventListener("keydown", onKey);
       done();
     };
@@ -321,7 +347,7 @@ export default function ParticleStory({ hero, steps, deck }: { hero: ReactNode; 
       </div>
 
       <div ref={contentRef} className="relative -mt-[100svh]">
-        <div className="hero-stage relative flex min-h-[100svh] pt-[68px]">{hero}</div>
+        <div className="hero-stage relative flex min-h-[100svh] touch-pan-y touch-pinch-zoom pt-[68px]">{hero}</div>
         {phone && deck
           ? <div className="story-step story-deck relative flex">{deck}</div>
           : steps.map((s, i) => <div key={i} className="story-step relative flex">{s}</div>)}

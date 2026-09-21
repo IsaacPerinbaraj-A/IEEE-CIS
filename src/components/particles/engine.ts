@@ -97,6 +97,7 @@ export class ParticleField {
   private last = 0;
   private time = 0;
   private angleY = 0;
+  private spinVel = 0;   // extra turn speed after a touch fling, in radians per second
   private tilt = { x: 0, y: 0 };
   private tiltTarget = { x: 0, y: 0 };
   private mouse = { x: 0, y: 0, on: 0, target: 0 };
@@ -164,6 +165,17 @@ export class ParticleField {
     this.tiltTarget = { x: -ny * 0.35, y: nx * 0.5 };
   }
 
+  /** Turns the current shape by `radians` (touch drag) and stops any coasting. */
+  spinBy(radians: number) {
+    if (!this.interactive || !this.motion) return;
+    this.angleY += radians; this.spinVel = 0;
+  }
+  /** Lets go of a drag: the shape keeps turning at `velocity` (radians per second) and slows back to its normal spin. */
+  fling(velocity: number) {
+    if (!this.interactive || !this.motion) return;
+    this.spinVel = Math.max(-6, Math.min(6, velocity));
+  }
+
   /** Sends a shockwave ring out from a point (normalised device coordinates). */
   shock(nx: number, ny: number) {
     if (!this.interactive || !this.motion) return;
@@ -198,8 +210,10 @@ export class ParticleField {
     const A = this.shapes[from], B = this.shapes[to];
     const spin = A.spin + (B.spin - A.spin) * t, flutter = A.flutter + (B.flutter - A.flutter) * t, sway = A.sway + (B.sway - A.sway) * t;
 
-    this.angleY += dt * 0.16 * spin * this.motion;
-    if (this.angleY > Math.PI) this.angleY -= Math.PI * 2;   // keep within one turn so shapes never unwind several times
+    this.angleY += (dt * 0.16 * spin + this.spinVel * dt) * this.motion;
+    this.spinVel *= Math.exp(-2.2 * dt);
+    // Keep within one turn so shapes never unwind several times
+    if (this.angleY > Math.PI) this.angleY -= Math.PI * 2; else if (this.angleY < -Math.PI) this.angleY += Math.PI * 2;
     const k = Math.min(1, dt * 3);
     this.tilt.x += (this.tiltTarget.x * (0.3 + spin * 0.7) - this.tilt.x) * k;
     this.tilt.y += (this.tiltTarget.y * (0.3 + spin * 0.7) - this.tilt.y) * k;
