@@ -37,7 +37,9 @@ export default function HeaderParticles({ shape }: { shape: HeaderShape }) {
       const pad = wrapEl ? parseFloat(getComputedStyle(wrapEl).paddingLeft) || 20 : 20, wr = wrapEl?.getBoundingClientRect();
       const cR = wr ? wr.right - c.left - pad : w - 20, titleR = titleEl ? titleEl.getBoundingClientRect().right - c.left : w * 0.55;
       const side = w >= 1024 && cR - titleR > 260;
-      const region: Region = side ? { x0: titleR + 48, x1: Math.min(w - 24, cR + Math.max(0, w - cR) * 0.5), y0: 18, y1: h - 18 } : { x0: w * 0.5, x1: w - 10, y0: 10, y1: h * 0.58 };
+      // Phones: the compact header is short, so the shape uses the full height of its right side (behind the fade)
+      const region: Region = side ? { x0: titleR + 48, x1: Math.min(w - 24, cR + Math.max(0, w - cR) * 0.5), y0: 18, y1: h - 18 }
+        : w < 640 ? { x0: w * 0.45, x1: w - 8, y0: 8, y1: h - 8 } : { x0: w * 0.5, x1: w - 10, y0: 10, y1: h * 0.58 };
       const place = fitShape(BOUNDS[shape] ?? BOUNDS.sphere, region, w, h, 0.95);
       return { offset: place.offset, scale: place.scale, mobile };
     };
