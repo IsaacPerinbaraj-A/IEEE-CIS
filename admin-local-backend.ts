@@ -17,6 +17,10 @@ export default function adminLocalBackend(): Plugin {
       const root = server.config.root;
       server.middlewares.use("/__admin", async (req, res) => {
         const send = (code: number, body: unknown) => { res.statusCode = code; res.setHeader("Content-Type", "application/json"); res.end(JSON.stringify(body)); };
+        // Only the computer running `npm run dev` may read or write files here. When the dev server is opened to the
+        // Wi-Fi (vite --host) so a phone can preview the site, other devices must not be able to edit the content.
+        const ip = req.socket.remoteAddress || "";
+        if (!["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(ip)) return send(403, { error: "The local admin only works on the computer running npm run dev" });
         try {
           const url = new URL(req.url || "/", "http://localhost");
           if (req.method === "GET" && url.pathname === "/ping") return send(200, { ok: true, root: path.basename(root) });
