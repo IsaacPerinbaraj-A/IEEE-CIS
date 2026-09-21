@@ -112,18 +112,26 @@ export function Marquee({ items }: { items: string[] }) {
     const el = track.current!;
     if (reduced()) return;
     const anim = el.animate([{ transform: "translateX(0)" }, { transform: "translateX(-50%)" }], { duration: 38000, iterations: Infinity });
-    let lastY = window.scrollY, rate = 1, target = 1, raf = 0, dir = 1;
+    // Touch screens fling the page hard, so the boost is capped lower there and tiny scroll jitters are ignored
+    const coarse = window.matchMedia("(pointer: coarse)").matches, cap = coarse ? 2.5 : 9;
+    let lastY = window.scrollY, rate = 1, target = 1, raf = 0, dir = 1, inView = false;
     const loop = () => {
       rate += (target - rate) * 0.08; target += (dir - target) * 0.04;
-      anim.playbackRate = rate; raf = requestAnimationFrame(loop);
+      anim.playbackRate = rate;
+      // Back to normal speed: stop the loop until the next scroll
+      if (Math.abs(rate - dir) < 0.005 && Math.abs(target - dir) < 0.005) { anim.playbackRate = dir; raf = 0; return; }
+      raf = requestAnimationFrame(loop);
     };
     const onScroll = () => {
       const dy = window.scrollY - lastY; lastY = window.scrollY;
-      if (dy !== 0) dir = dy > 0 ? 1 : -1;
-      target = dir * Math.min(9, 1 + Math.abs(dy) * 0.35);
+      if (Math.abs(dy) < (coarse ? 2 : 0.5)) return;
+      dir = dy > 0 ? 1 : -1;
+      target = dir * Math.min(cap, 1 + Math.abs(dy) * 0.35);
+      if (inView && !raf) raf = requestAnimationFrame(loop);
     };
     // Only move (and run the speed loop) while the band is on screen
     const io = new IntersectionObserver(([e]) => {
+      inView = e.isIntersecting;
       if (e.isIntersecting) { anim.play(); if (!raf) raf = requestAnimationFrame(loop); }
       else { anim.pause(); cancelAnimationFrame(raf); raf = 0; }
     });
@@ -133,11 +141,11 @@ export function Marquee({ items }: { items: string[] }) {
   }, []);
   const row = items.flatMap((t, i) => [
     <span key={`t${i}`} className={i % 2 ? "marquee-outline" : "marquee-fill"}>{t}</span>,
-    <span key={`d${i}`} aria-hidden className="mx-8 inline-block h-4 w-4 rounded-full border-[3px] border-gold align-middle sm:mx-12" />,
+    <span key={`d${i}`} aria-hidden className="mx-6 inline-block h-3.5 w-3.5 rounded-full border-[3px] border-gold align-middle sm:mx-12 sm:h-4 sm:w-4" />,
   ]);
   return (
-    <div className="relative overflow-hidden border-y border-line py-8 sm:py-10" aria-label={items.join(", ")} role="img">
-      <div ref={track} className="flex w-max whitespace-nowrap font-display text-[clamp(2.4rem,7vw,5.5rem)] font-semibold leading-none tracking-[-0.03em]">
+    <div className="relative overflow-hidden border-y border-line py-6 sm:py-10" aria-label={items.join(", ")} role="img">
+      <div ref={track} className="flex w-max whitespace-nowrap font-display text-[1.9rem] font-semibold sm:text-[clamp(2.4rem,7vw,5.5rem)] leading-none tracking-[-0.03em]">
         <div className="flex items-center pr-8 sm:pr-12">{row}</div>
         <div className="flex items-center pr-8 sm:pr-12" aria-hidden>{row}</div>
       </div>

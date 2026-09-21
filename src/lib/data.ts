@@ -42,6 +42,13 @@ export const byNewest = (a: ChapterEvent, b: ChapterEvent) => {
 };
 export const upcomingEvents = () => events.filter(isUpcoming).sort((a, b) => (a.date || "").localeCompare(b.date || ""));
 export const pastEvents = () => events.filter(e => !isUpcoming(e)).sort(byNewest);
+/** How soon an upcoming event starts, for short labels: "today", "tomorrow", "in 5 days", or "on now" once it has started. */
+export function countdown(e: ChapterEvent) {
+  const start = parse(e.date);
+  if (!start) return "";
+  const days = Math.round((start.getTime() - today().getTime()) / 86400000);
+  return days < 0 ? "on now" : days === 0 ? "today" : days === 1 ? "tomorrow" : `in ${days} days`;
+}
 
 export const sessionLabel = (id: string) => id.replace("-", "–");
 

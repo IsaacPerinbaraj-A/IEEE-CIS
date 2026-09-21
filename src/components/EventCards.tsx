@@ -19,7 +19,8 @@ export function Poster({ e, className = "" }: { e: ChapterEvent; className?: str
   );
 }
 
-export function PosterCard({ e }: { e: ChapterEvent }) {
+/** `compact` drops the summary (the phone swipe row on Home). */
+export function PosterCard({ e, compact }: { e: ChapterEvent; compact?: boolean }) {
   return (
     <Link to={`/events/${e.slug}`} className="press group block" data-cursor="View">
       <Tilt className="rounded-2xl">
@@ -29,7 +30,7 @@ export function PosterCard({ e }: { e: ChapterEvent }) {
       </Tilt>
       <div className="mt-4 flex items-center gap-2 text-[14px] text-mute"><span className="text-violet-soft">{e.type}</span><span aria-hidden>/</span><span>{formatDate(e)}</span></div>
       <h3 className="mt-1 text-lg font-semibold group-hover:text-violet-soft">{e.title}</h3>
-      <p className="mt-1 text-[15px] text-mute">{e.summary}</p>
+      {!compact && <p className="mt-1 text-[15px] text-mute">{e.summary}</p>}
     </Link>
   );
 }
