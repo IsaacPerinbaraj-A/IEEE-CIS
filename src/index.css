@@ -179,13 +179,15 @@ body[data-intro="on"] .glow-b { right: calc(50% - 10vh); bottom: calc(50% - 40vh
 .site-header::before { content: ""; position: absolute; inset: 0; z-index: -1; background-color: rgba(15,10,28,.85);
   -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(51,40,77,.7);
   transform-origin: top; transition: transform .22s cubic-bezier(.2,.7,.2,1), background-color .22s; }
-.site-header-row, .site-brand-mark { transition: transform .22s cubic-bezier(.2,.7,.2,1); }
+.site-header-row, .site-brand-mark, .site-brand-name { transition: transform .22s cubic-bezier(.2,.7,.2,1); }
 .site-brand-sub { transition: opacity .22s; }
 @media (max-width: 767px) {
   .site-header[data-scrolled="1"]::before { transform: scaleY(.8235); background-color: rgba(15,10,28,.95); }
   .site-header[data-scrolled="1"] .site-header-row { transform: translateY(-6px); }
   .site-header[data-scrolled="1"] .site-brand-mark { transform: scale(.88); }
   .site-header[data-scrolled="1"] .site-brand-sub { opacity: 0; }
+  /* With the subtitle gone, move the name down to the middle of the bar, level with the logo and Menu */
+  .site-header[data-scrolled="1"] .site-brand-name { transform: translateY(9px); }
 }
 html[data-tier="low"] .site-header::before { -webkit-backdrop-filter: none; backdrop-filter: none; background-color: rgba(15,10,28,.96); }
 

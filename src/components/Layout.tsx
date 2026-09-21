@@ -79,7 +79,7 @@ function Navbar() {
             <RecMark className="site-brand-mark h-9 w-9" />
             {/* Narrow phones get a one-line subtitle so the brand never wraps into three lines */}
             <span className="min-w-0 leading-tight">
-              <span className="block font-display text-[15px] font-semibold tracking-tight">{site.name}</span>
+              <span className="site-brand-name block font-display text-[15px] font-semibold tracking-tight">{site.name}</span>
               <span className="site-brand-sub block text-[14px] text-mute min-[420px]:hidden">{site.city}</span>
               <span className="site-brand-sub hidden text-[13px] text-mute min-[420px]:block sm:text-[12.5px]">{site.college}</span>
             </span>
