@@ -23,7 +23,18 @@ function Navbar() {
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
   const toggle = useRef<HTMLButtonElement>(null);
+  const header = useRef<HTMLElement>(null);
   useEffect(() => setOpen(false), [pathname]);
+
+  // Phones: the bar slims down once you start scrolling (styles in index.css, .site-header)
+  useEffect(() => {
+    let raf = 0;
+    const update = () => { raf = 0; if (header.current) header.current.dataset.scrolled = window.scrollY > 24 ? "1" : "0"; };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => { cancelAnimationFrame(raf); window.removeEventListener("scroll", onScroll); };
+  }, []);
 
   // While the menu is open: lock page scroll, make the page behind it inert, and close on Escape
   // or when the window grows wide enough for the desktop nav
@@ -60,15 +71,16 @@ function Navbar() {
 
   return (
     <>
-      <header className="site-header sticky top-0 z-50 border-b border-line/70 bg-ink/85 backdrop-blur-md">
-        <div className="wrap flex h-[68px] items-center justify-between gap-3">
-          <Link to="/" onClick={closeFor("/")} className="flex min-w-0 items-center gap-3" aria-label={`${site.name} home`}>
-            <RecMark />
+      {/* The bar's background and border live on .site-header::before so phones can slim it without a layout jump */}
+      <header ref={header} className="site-header sticky top-0 z-50">
+        <div className="site-header-row wrap flex h-[68px] items-center justify-between gap-3">
+          <Link to="/" onClick={closeFor("/")} className="flex min-h-[44px] min-w-0 items-center gap-3" aria-label={`${site.name} home`}>
+            <RecMark className="site-brand-mark h-9 w-9" />
             {/* Narrow phones get a one-line subtitle so the brand never wraps into three lines */}
             <span className="min-w-0 leading-tight">
               <span className="block font-display text-[15px] font-semibold tracking-tight">{site.name}</span>
-              <span className="block text-[14px] text-mute min-[420px]:hidden">{site.city}</span>
-              <span className="hidden text-[13px] text-mute min-[420px]:block sm:text-[12.5px]">{site.college}</span>
+              <span className="site-brand-sub block text-[14px] text-mute min-[420px]:hidden">{site.city}</span>
+              <span className="site-brand-sub hidden text-[13px] text-mute min-[420px]:block sm:text-[12.5px]">{site.college}</span>
             </span>
           </Link>
           <nav aria-label="Main" className="hidden items-center gap-1 lg:flex">
@@ -88,7 +100,8 @@ function Navbar() {
           otherwise become the containing block of this fixed panel and squash it to the header's height. */}
       <nav id="mobile-nav" aria-label="Main" data-open={open ? "1" : undefined}
         className="mnav fixed inset-0 z-[45] flex flex-col overflow-y-auto scroll-pt-[80px] bg-ink pt-[68px] lg:hidden">
-        <div className="wrap my-auto pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-6">
+        {/* Phones: the links sit in the lower part of the screen, within thumb reach */}
+        <div className="wrap mt-auto pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-6 sm:my-auto">
           <ul>
             {menuItems.map((n, i) => (
               <li key={n.to} className="border-b border-line/70" style={{ "--i": i } as CSSProperties}>
@@ -109,9 +122,9 @@ function Navbar() {
           </ul>
           <Link to="/join" onClick={closeFor("/join")} className="mnav-fade btn-gold mt-8 w-full sm:hidden" style={{ "--i": menuItems.length } as CSSProperties}>Join the chapter</Link>
           <ul className="mnav-fade mt-8 flex flex-wrap gap-x-6 border-t border-line pt-4 text-[15px]" style={{ "--i": menuItems.length + 1 } as CSSProperties}>
-            <li><a className="inline-flex min-h-[44px] items-center gap-2 text-mute hover:text-cream" href={`mailto:${site.email}`}><Mail size={18} aria-hidden /> Email</a></li>
-            <li><a className="inline-flex min-h-[44px] items-center gap-2 text-mute hover:text-cream" href={site.linkedin} target="_blank" rel="noopener"><Linkedin size={18} aria-hidden /> LinkedIn<span className="sr-only"> (opens in a new tab)</span></a></li>
-            <li><a className="inline-flex min-h-[44px] items-center gap-2 text-mute hover:text-cream" href={site.instagram} target="_blank" rel="noopener"><Instagram size={18} aria-hidden /> Instagram<span className="sr-only"> (opens in a new tab)</span></a></li>
+            <li><a className="inline-flex min-h-[48px] items-center gap-2 text-mute hover:text-cream" href={`mailto:${site.email}`}><Mail size={18} aria-hidden /> Email</a></li>
+            <li><a className="inline-flex min-h-[48px] items-center gap-2 text-mute hover:text-cream" href={site.linkedin} target="_blank" rel="noopener"><Linkedin size={18} aria-hidden /> LinkedIn<span className="sr-only"> (opens in a new tab)</span></a></li>
+            <li><a className="inline-flex min-h-[48px] items-center gap-2 text-mute hover:text-cream" href={site.instagram} target="_blank" rel="noopener"><Instagram size={18} aria-hidden /> Instagram<span className="sr-only"> (opens in a new tab)</span></a></li>
           </ul>
         </div>
       </nav>

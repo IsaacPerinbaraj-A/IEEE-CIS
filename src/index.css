@@ -160,6 +160,22 @@ body[data-intro="on"] .story-shade { opacity: 0; }
 body[data-intro="on"] .glow-a { right: calc(50% - 30vh); top: calc(50% - 34vh); }
 body[data-intro="on"] .glow-b { right: calc(50% - 10vh); bottom: calc(50% - 40vh); }
 
+/* ---------- Site header: the background and border are on a pseudo-element, so on phones the bar can slim down
+   after a short scroll without changing its layout height (nothing below it jumps) ---------- */
+.site-header { isolation: isolate; }
+.site-header::before { content: ""; position: absolute; inset: 0; z-index: -1; background-color: rgba(15,10,28,.85);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(51,40,77,.7);
+  transform-origin: top; transition: transform .22s cubic-bezier(.2,.7,.2,1), background-color .22s; }
+.site-header-row, .site-brand-mark { transition: transform .22s cubic-bezier(.2,.7,.2,1); }
+.site-brand-sub { transition: opacity .22s; }
+@media (max-width: 767px) {
+  .site-header[data-scrolled="1"]::before { transform: scaleY(.8235); background-color: rgba(15,10,28,.95); }
+  .site-header[data-scrolled="1"] .site-header-row { transform: translateY(-6px); }
+  .site-header[data-scrolled="1"] .site-brand-mark { transform: scale(.88); }
+  .site-header[data-scrolled="1"] .site-brand-sub { opacity: 0; }
+}
+html[data-tier="low"] .site-header::before { -webkit-backdrop-filter: none; backdrop-filter: none; background-color: rgba(15,10,28,.96); }
+
 /* ---------- Mobile menu: the panel wipes down from the header, then each link rises out of its row ---------- */
 .mnav { clip-path: inset(0 0 100% 0); visibility: hidden; transition: clip-path .4s cubic-bezier(.65,0,.35,1), visibility 0s linear .4s; }
 .mnav[data-open="1"] { clip-path: inset(0 0 0 0); visibility: visible; transition: clip-path .55s cubic-bezier(.65,0,.35,1), visibility 0s; }
