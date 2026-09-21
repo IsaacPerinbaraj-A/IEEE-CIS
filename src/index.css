@@ -126,7 +126,7 @@ body[data-intro="on"] .story-shade { opacity: 0; }
 .story-shade-right { display: none; }
 /* Phones: the What We Do swipe deck (WhatWeDoDeck) sits in the lower part of one screen, below the formation */
 .story-deck { padding-bottom: 1.25rem; }
-.deck-track { scrollbar-width: none; scroll-padding-inline: 8vw; }
+.deck-track { scrollbar-width: none; scroll-padding-inline: 11vw; }
 .deck-track::-webkit-scrollbar { display: none; }
 .deck-card { transform-origin: center; will-change: transform, opacity; }
 /* Big outlined step number behind each What We Do card */

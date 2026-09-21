@@ -51,12 +51,12 @@ export default function WhatWeDoDeck({ label, title, items, colors }: { label: s
         <p className="text-[15px] font-medium text-violet-soft">{label}</p>
         <h2 className="h-section mt-2">{title}</h2>
       </div>
-      <div ref={track} data-deck-track className="deck-track mt-5 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-[8vw] pb-3 pt-1">
+      <div ref={track} data-deck-track className="deck-track mt-5 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-[11vw] pb-3 pt-1">
         {items.map((item, i) => {
           const Icon = pillarIcon[item.icon] ?? Lightbulb;
           return (
             <article key={item.title} role="group" aria-roledescription="slide" aria-label={`${i + 1} of ${items.length}`}
-              className="deck-card flex w-[84vw] shrink-0 snap-center flex-col rounded-3xl border border-line/80 bg-ink/90 p-6">
+              className="deck-card flex w-[78vw] shrink-0 snap-center flex-col rounded-3xl border border-line/80 bg-ink/90 p-6">
               <span className="grid h-10 w-10 place-items-center rounded-xl bg-raised" style={{ color: colors[i % colors.length] }}><Icon size={20} aria-hidden /></span>
               <h3 className="mt-4 text-[1.35rem] font-semibold leading-tight">{item.title}</h3>
               <p className="mt-3 text-[16px] leading-relaxed text-cream/85">{item.text}</p>
@@ -64,12 +64,11 @@ export default function WhatWeDoDeck({ label, title, items, colors }: { label: s
           );
         })}
       </div>
-      <div className="wrap mt-2 flex items-center justify-between">
-        <p className="text-[15px] tabular-nums text-mute" aria-live="polite"><span className="text-cream">{two(index + 1)}</span> / {two(items.length)}</p>
-        <div className="flex gap-2">
-          <button type="button" onClick={() => go(index - 1)} disabled={index === 0} aria-label="Previous" className="btn-ghost h-11 min-h-0 w-11 px-0 disabled:opacity-40"><ChevronLeft size={20} aria-hidden /></button>
-          <button type="button" onClick={() => go(index + 1)} disabled={index === items.length - 1} aria-label="Next" className="btn-ghost h-11 min-h-0 w-11 px-0 disabled:opacity-40"><ChevronRight size={20} aria-hidden /></button>
-        </div>
+      {/* Centred, so the back-to-top button in the bottom-right corner never covers them */}
+      <div className="wrap mt-2 flex items-center justify-center gap-5">
+        <button type="button" onClick={() => go(index - 1)} disabled={index === 0} aria-label="Previous" className="btn-ghost h-11 min-h-0 w-11 px-0 disabled:opacity-40"><ChevronLeft size={20} aria-hidden /></button>
+        <p className="min-w-[4.5rem] text-center text-[15px] tabular-nums text-mute" aria-live="polite"><span className="text-cream">{two(index + 1)}</span> / {two(items.length)}</p>
+        <button type="button" onClick={() => go(index + 1)} disabled={index === items.length - 1} aria-label="Next" className="btn-ghost h-11 min-h-0 w-11 px-0 disabled:opacity-40"><ChevronRight size={20} aria-hidden /></button>
       </div>
     </section>
   );
