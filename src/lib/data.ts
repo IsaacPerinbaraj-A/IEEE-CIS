@@ -3,6 +3,7 @@ import teamJson from "../data/team.json";
 import siteJson from "../data/site.json";
 import achievementsJson from "../data/achievements.json";
 import homeJson from "../data/home.json";
+import joinJson from "../data/join.json";
 
 /** Home and About page copy (hero, About the Society, What We Do), edited in src/data/home.json. `**text**` marks bold. */
 export type HomeContent = {
@@ -11,6 +12,14 @@ export type HomeContent = {
   whatWeDo: { label: string; title: string; items: { icon: string; title: string; text: string }[] };
 };
 export const home = homeJson as HomeContent;
+
+/**
+ * Join page content, edited in src/data/join.json. A step with `useMemberForm` links to the chapter form from
+ * Site settings (site.json `memberForm`); while that is empty the page offers "email us" instead.
+ */
+export type JoinStep = { title: string; text: string; cta: string; href: string; useMemberForm?: boolean };
+export type JoinContent = { steps: JoinStep[]; benefits: { title: string; text: string }[] };
+export const join = joinJson as JoinContent;
 
 export type ChapterEvent = {
   slug: string; title: string; type: string; domain?: string; series?: string;
