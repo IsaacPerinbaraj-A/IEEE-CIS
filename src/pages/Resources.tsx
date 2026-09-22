@@ -1,11 +1,14 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import PageHeader from "../components/PageHeader";
-import resources from "../data/resources.json";
+import resourcesJson from "../data/resources.json";
 import { ExternalLink } from "lucide-react";
 import { useTitle } from "../lib/useTitle";
 import { prefersReducedMotion } from "../lib/motion";
 import { useMediaQuery, PHONE } from "../lib/useMediaQuery";
 import { Reveal, Tilt } from "../components/Motion";
+import type { ResourceGroup } from "../lib/data";
+
+const resources = resourcesJson as ResourceGroup[];
 
 /** Height of the slim site header on phones; the domain bar sticks just under it. */
 const HEADER = 56;

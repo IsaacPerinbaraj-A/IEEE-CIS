@@ -4,13 +4,15 @@ import { Check, Mail, Sparkles } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 import Accordion from "../components/Accordion";
 import StickyAction from "../components/StickyAction";
-import faqs from "../data/faqs.json";
-import { join, site, type JoinStep } from "../lib/data";
+import faqsJson from "../data/faqs.json";
+import { join, site, type Faq, type JoinStep } from "../lib/data";
 import { Instagram } from "../lib/icons";
 import { prefersReducedMotion } from "../lib/motion";
 import { useMediaQuery, PHONE } from "../lib/useMediaQuery";
 import { useTitle } from "../lib/useTitle";
 import { Reveal, RevealWords, Tilt } from "../components/Motion";
+
+const faqs = faqsJson as Faq[];
 
 /** Where a step's button goes. Steps marked useMemberForm open the chapter form from Site settings (empty until it exists). */
 const linkFor = (s: JoinStep) => (s.useMemberForm ? site.memberForm : s.href);

@@ -4,38 +4,33 @@ import siteJson from "../data/site.json";
 import achievementsJson from "../data/achievements.json";
 import homeJson from "../data/home.json";
 import joinJson from "../data/join.json";
+import type {
+  Achievement, ChapterEvent, Faculty, Faq, Group, HomeContent, JoinBenefit, JoinContent, JoinStep, Member, ResourceGroup,
+  ResourceLink, Session, SiteSettings, TeamContent, WhatWeDoItem,
+} from "../../shared/content.ts";
+
+/*
+ * The content types live in shared/content.ts (the admin and its server use them too). src/data/*.json is the
+ * starting copy: after go-live every build overwrites it with the published content from the admin. The JSON is
+ * given explicit types here so different content can never break the type check.
+ */
+export type {
+  Achievement, ChapterEvent, Faculty, Faq, Group, HomeContent, JoinBenefit, JoinContent, JoinStep, Member, ResourceGroup,
+  ResourceLink, Session, SiteSettings, TeamContent, WhatWeDoItem,
+};
 
 /** Home and About page copy (hero, About the Society, What We Do), edited in src/data/home.json. `**text**` marks bold. */
-export type HomeContent = {
-  hero: { eyebrow: string; title: string; tagline: string; intro: string; primaryLabel: string; primaryLink: string; secondaryLabel: string; secondaryLink: string };
-  about: { label: string; title: string; paragraphs: string[] };
-  whatWeDo: { label: string; title: string; items: { icon: string; title: string; text: string }[] };
-};
 export const home = homeJson as HomeContent;
 
 /**
  * Join page content, edited in src/data/join.json. A step with `useMemberForm` links to the chapter form from
  * Site settings (site.json `memberForm`); while that is empty the page offers "email us" instead.
  */
-export type JoinStep = { title: string; text: string; cta: string; href: string; useMemberForm?: boolean };
-export type JoinContent = { steps: JoinStep[]; benefits: { title: string; text: string }[] };
 export const join = joinJson as JoinContent;
 
-export type ChapterEvent = {
-  slug: string; title: string; type: string; domain?: string; series?: string;
-  session: string;           // academic year, e.g. "2025-26"
-  date?: string;             // "YYYY-MM-DD", optional
-  endDate?: string; time?: string; venue?: string;
-  summary: string; description: string; poster?: string; register?: string; coordinator?: string;
-};
-export type Member = { name: string; role: string; photo?: string; linkedin?: string; github?: string; instagram?: string };
-export type Group = { domain: string; slug: string; members: Member[] };
-export type Session = { id: string; label: string; note?: string; faculty: { name: string; role: string }[]; groups: Group[] };
-export type Achievement = { title: string; year: string; description: string; people?: string; link?: string; image?: string };
-
-export const site = siteJson;
+export const site = siteJson as SiteSettings;
 export const events = eventsJson as ChapterEvent[];
-export const sessions = (teamJson as { sessions: Session[] }).sessions;
+export const sessions = (teamJson as TeamContent).sessions;
 export const achievements = achievementsJson as Achievement[];
 
 const today = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };

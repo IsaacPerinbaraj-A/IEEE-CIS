@@ -23,6 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 
-# secrets
+# secrets (.env.example holds placeholders only)
 .env
 .env.*
+!.env.example
+
+# written by the build (scripts/fetch-content.ts)
+public/content-version.json
+public/content-snapshot.json

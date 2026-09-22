@@ -20,4 +20,55 @@ export default tseslint.config([
       globals: globals.browser,
     },
   },
+  // The website and admin (browser) must never import the admin server, database code or Node-only modules
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [
+          { regex: '^([.][.]?/)+(.+/)?server(/|$)', message: 'The browser code must not import the admin server (server/).' },
+          { regex: '^(express|mongodb)(/|$)|^node:', message: 'The browser code must not import server-only packages.' },
+        ],
+      }],
+    },
+  },
+  // Admin server, build scripts and shared code run in Node (shared code also runs in the browser)
+  {
+    files: ['server/**/*.ts', 'scripts/**/*.ts', 'shared/**/*.ts'],
+    languageOptions: {
+      ecmaVersion: 2023,
+      globals: globals.node,
+    },
+    rules: {
+      'react-refresh/only-export-components': 'off',
+      'react-hooks/rules-of-hooks': 'off',
+      'react-hooks/exhaustive-deps': 'off',
+    },
+  },
+  // The admin server doesn't use the website's code
+  {
+    files: ['server/**/*.ts'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [{ regex: '^([.][.]?/)+(.+/)?src(/|$)', message: 'The admin server must not import the website code (src/). Put shared code in shared/.' }],
+      }],
+    },
+  },
+  // shared/ is imported by the browser and by Node: no Node-only or browser-only APIs, and no imports from src/ or server/
+  {
+    files: ['shared/**/*.ts'],
+    ignores: ['shared/**/*.test.ts'],
+    languageOptions: {
+      globals: globals['shared-node-browser'],
+    },
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [
+          { regex: '^([.][.]?/)+(.+/)?(src|server|scripts)(/|$)', message: 'shared/ must stand alone (it is used by the admin, the server and the build).' },
+          { regex: '^node:|^(express|mongodb|react|react-dom|react-router-dom|lucide-react)(/|$)', message: 'shared/ must not use Node-only or browser-only packages.' },
+        ],
+      }],
+      'no-restricted-globals': ['error', 'process', 'Buffer', 'require', '__dirname', '__filename', 'global', 'window', 'document', 'localStorage', 'sessionStorage', 'navigator'],
+    },
+  },
 ])
