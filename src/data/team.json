@@ -1,6 +1,186 @@
 {
   "sessions": [
     {
+      "id": "2026-27",
+      "label": "2026–27",
+      "faculty": [
+        {
+          "name": "Dr. Vijay K",
+          "role": "Associate Professor"
+        },
+        {
+          "name": "Ms. Akshaya V",
+          "role": "Assistant Professor"
+        }
+      ],
+      "groups": [
+        {
+          "domain": "Management",
+          "slug": "management",
+          "kind": "chapter",
+          "note": "Runs the chapter",
+          "icon": "management",
+          "members": [
+            {
+              "name": "Varneka K",
+              "role": "Chair"
+            },
+            {
+              "name": "Pavithra S",
+              "role": "Vice Chair"
+            },
+            {
+              "name": "Sajin Reyans J",
+              "role": "HR"
+            },
+            {
+              "name": "Niranjan V",
+              "role": "Treasurer"
+            },
+            {
+              "name": "Dineshraj R",
+              "role": "Secretary"
+            }
+          ]
+        },
+        {
+          "domain": "Artificial Intelligence",
+          "slug": "artificial-intelligence",
+          "kind": "technical",
+          "note": "Building with AI, from language models to applied projects.",
+          "icon": "ai",
+          "members": [
+            {
+              "name": "Noothan H C",
+              "role": "Lead"
+            },
+            {
+              "name": "Abdulla Sabith A",
+              "role": "Senior Associate"
+            },
+            {
+              "name": "Abhishek S",
+              "role": "Senior Associate"
+            }
+          ]
+        },
+        {
+          "domain": "Machine Learning",
+          "slug": "machine-learning",
+          "kind": "technical",
+          "note": "Models that learn from data, from classic algorithms to deep learning.",
+          "icon": "machine-learning",
+          "members": [
+            {
+              "name": "Pradhikshaya Anand",
+              "role": "Lead"
+            },
+            {
+              "name": "Saranya V",
+              "role": "Senior Associate"
+            }
+          ]
+        },
+        {
+          "domain": "Data Science",
+          "slug": "data-science",
+          "kind": "technical",
+          "note": "Cleaning, analysing and visualising data to answer real questions.",
+          "icon": "data-science",
+          "members": [
+            {
+              "name": "Zaara Lawrence",
+              "role": "Lead"
+            },
+            {
+              "name": "Sahana Shree VS",
+              "role": "Senior Associate"
+            }
+          ]
+        },
+        {
+          "domain": "Web Development",
+          "slug": "web-development",
+          "kind": "technical",
+          "note": "Building the chapter's web presence, including this site.",
+          "icon": "web-development",
+          "members": [
+            {
+              "name": "Isaac Perinbaraj A",
+              "role": "Lead"
+            },
+            {
+              "name": "Kevin Joe S",
+              "role": "Senior Associate"
+            }
+          ]
+        },
+        {
+          "domain": "Design",
+          "slug": "design",
+          "kind": "chapter",
+          "note": "Posters and visual identity",
+          "icon": "design",
+          "members": [
+            {
+              "name": "Rohita M",
+              "role": "Lead"
+            },
+            {
+              "name": "Nithin TS",
+              "role": "Senior Associate"
+            },
+            {
+              "name": "Rakesh B",
+              "role": "Senior Associate"
+            }
+          ]
+        },
+        {
+          "domain": "Video",
+          "slug": "video",
+          "kind": "chapter",
+          "note": "Filming and editing the chapter's event videos",
+          "icon": "video",
+          "members": [
+            {
+              "name": "Ashvanth M",
+              "role": "Lead"
+            },
+            {
+              "name": "Akshaya K",
+              "role": "Senior Associate"
+            },
+            {
+              "name": "Udhayan Shejay VS",
+              "role": "Senior Associate"
+            }
+          ]
+        },
+        {
+          "domain": "Events and Public Relations",
+          "slug": "events-public-relations",
+          "kind": "chapter",
+          "note": "Plans every event and handles outreach",
+          "icon": "event-management",
+          "members": [
+            {
+              "name": "S. V. Prathuksha",
+              "role": "Lead"
+            },
+            {
+              "name": "Shakthi S",
+              "role": "Senior Associate"
+            },
+            {
+              "name": "Srinithi K",
+              "role": "Senior Associate"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "2025-26",
       "label": "2025–26",
       "faculty": [],

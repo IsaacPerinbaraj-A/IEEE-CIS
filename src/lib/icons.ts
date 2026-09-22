@@ -1,4 +1,4 @@
-import { Linkedin, Github, Instagram, Brain, BarChart3, Eye, Cpu, Code2, Users, PenTool, CalendarDays, Megaphone, GraduationCap, Lightbulb, FlaskConical, Presentation, Briefcase, Sparkles, Bot, Cloud, ShieldCheck, CircuitBoard, type LucideIcon } from "lucide-react";
+import { Linkedin, Github, Instagram, Brain, BarChart3, Eye, Cpu, Code2, Users, PenTool, CalendarDays, Megaphone, GraduationCap, Lightbulb, FlaskConical, Presentation, Briefcase, Sparkles, Bot, Cloud, ShieldCheck, CircuitBoard, Video, type LucideIcon } from "lucide-react";
 import type { PillarIcon, TeamIcon } from "../../shared/content.ts";
 export { Linkedin, Github, Instagram };
 
@@ -13,7 +13,7 @@ export const pillarIcon: Record<string, LucideIcon> = {
 /** Icon for each team, keyed by its `icon` value in team.json (TEAM_ICONS in shared/content.ts). */
 export const domainIcon: Record<TeamIcon, LucideIcon> = {
   "machine-learning": Brain, "data-science": BarChart3, "computer-vision": Eye, iot: Cpu, "web-development": Code2,
-  ai: Sparkles, robotics: Bot, cloud: Cloud, security: ShieldCheck, hardware: CircuitBoard,
+  ai: Sparkles, robotics: Bot, cloud: Cloud, security: ShieldCheck, hardware: CircuitBoard, video: Video,
   management: Users, design: PenTool, "event-management": CalendarDays, "public-relations": Megaphone,
 };
 /** The icon a team shows on Home: its own choice, the one matching its name, or a neutral fallback. */

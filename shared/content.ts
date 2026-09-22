@@ -32,13 +32,13 @@ export const isTeamKind = (v: unknown): v is TeamKind => typeof v === "string" &
  * this list, so the admin's icon choices and the website can't drift apart.
  */
 export const TEAM_ICONS = ["machine-learning", "data-science", "computer-vision", "iot", "web-development", "ai",
-  "robotics", "cloud", "security", "hardware", "management", "design", "event-management", "public-relations"] as const;
+  "robotics", "cloud", "security", "hardware", "video", "management", "design", "event-management", "public-relations"] as const;
 export type TeamIcon = (typeof TEAM_ICONS)[number];
 export const TEAM_ICON_LABELS: Record<TeamIcon, string> = {
   "machine-learning": "Machine learning (brain)", "data-science": "Data science (chart)", "computer-vision": "Computer vision (eye)",
   iot: "Internet of things (chip)", "web-development": "Web development (code)", ai: "AI (sparkles)", robotics: "Robotics (bot)",
   cloud: "Cloud (cloud)", security: "Security (shield)", hardware: "Hardware (circuit)", management: "Management (people)",
-  design: "Design (pen)", "event-management": "Events (calendar)", "public-relations": "Outreach (megaphone)",
+  video: "Video (camera)", design: "Design (pen)", "event-management": "Events (calendar)", "public-relations": "Outreach (megaphone)",
 };
 export const isTeamIcon = (v: unknown): v is TeamIcon => typeof v === "string" && (TEAM_ICONS as readonly string[]).includes(v);
 
