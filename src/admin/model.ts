@@ -1,10 +1,11 @@
-import type { ChapterEvent, Session, Achievement, Member } from "../lib/data";
+import type { ChapterEvent, Session, Achievement, Member, JoinContent, JoinStep } from "../lib/data";
 import eventsJson from "../data/events.json";
 import teamJson from "../data/team.json";
 import siteJson from "../data/site.json";
 import faqsJson from "../data/faqs.json";
 import resourcesJson from "../data/resources.json";
 import achievementsJson from "../data/achievements.json";
+import joinJson from "../data/join.json";
 import adminJson from "../data/admin.json";
 
 export type Site = typeof siteJson;
@@ -18,9 +19,10 @@ export type Content = {
   faqs: Faq[];
   resources: ResourceGroup[];
   achievements: Achievement[];
+  join: JoinContent;
 };
 export type ContentKey = keyof Content;
-export type { ChapterEvent, Session, Achievement, Member };
+export type { ChapterEvent, Session, Achievement, Member, JoinContent, JoinStep };
 
 /** Where each piece of content lives in the repository. */
 export const FILES: Record<ContentKey, string> = {
@@ -30,9 +32,10 @@ export const FILES: Record<ContentKey, string> = {
   faqs: "src/data/faqs.json",
   resources: "src/data/resources.json",
   achievements: "src/data/achievements.json",
+  join: "src/data/join.json",
 };
 export const LABELS: Record<ContentKey, string> = {
-  events: "Events", team: "Team", site: "Site settings", faqs: "FAQs", resources: "Resources", achievements: "Achievements",
+  events: "Events", team: "Team", site: "Site settings", faqs: "FAQs", resources: "Resources", achievements: "Achievements", join: "Join page",
 };
 
 /** The content that was built into this copy of the site (used offline and as a fallback). */
@@ -43,6 +46,7 @@ export const bundled: Content = {
   faqs: faqsJson,
   resources: resourcesJson,
   achievements: achievementsJson as Achievement[],
+  join: joinJson as JoinContent,
 };
 export const adminConfig = adminJson as { repo: string; branch: string };
 
@@ -98,6 +102,28 @@ export function validateSite(s: Site): Errors {
   if (!s.name.trim()) err.name = "The chapter name can't be empty.";
   if (s.email && !isEmail(s.email)) err.email = "That doesn't look like an email address.";
   (["linkedin", "instagram", "memberForm"] as const).forEach(k => { if (s[k] && !isUrl(s[k])) err[k] = "Paste a full link starting with https://"; });
+  return err;
+}
+
+/** Join page steps and benefits. Keys look like "steps.0.title" and "benefits.2.text". */
+export function validateJoin(j: JoinContent): Errors {
+  const err: Errors = {};
+  j.steps.forEach((s, i) => {
+    const k = `steps.${i}.`;
+    if (!s.title.trim()) err[k + "title"] = "Give the step a title.";
+    // Phones remember ticked steps by title, so two steps can't share one
+    else if (j.steps.some((x, n) => n < i && x.title.trim() === s.title.trim())) err[k + "title"] = "Another step already has this title.";
+    if (!s.text.trim()) err[k + "text"] = "Say what to do in this step.";
+    if (!s.cta.trim()) err[k + "cta"] = "Add the button text, for example Visit IEEE CIS.";
+    if (!s.useMemberForm) {
+      if (!s.href.trim()) err[k + "href"] = "Paste the link the button opens.";
+      else if (!isUrl(s.href.trim())) err[k + "href"] = "Paste a full link starting with https://";
+    }
+  });
+  j.benefits.forEach((b, i) => {
+    if (!b.title.trim()) err[`benefits.${i}.title`] = "Give the benefit a short title.";
+    if (!b.text.trim()) err[`benefits.${i}.text`] = "Add a sentence about it.";
+  });
   return err;
 }
 

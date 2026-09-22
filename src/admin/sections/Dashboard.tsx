@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { CalendarDays, Users, Trophy, Settings, HelpCircle, BookOpen, UploadCloud } from "lucide-react";
+import { CalendarDays, Users, Trophy, Settings, HelpCircle, BookOpen, UploadCloud, UserPlus } from "lucide-react";
 import { useAdmin } from "../context";
 import { PageTitle } from "../ui";
 import { isUpcoming } from "../../lib/data";
@@ -13,6 +13,7 @@ export default function Dashboard() {
     { to: "team", Icon: Users, title: "Team", text: `${people} members in ${content.team.sessions[0]?.label || "the latest year"}` },
     { to: "achievements", Icon: Trophy, title: "Achievements", text: content.achievements.length ? `${content.achievements.length} listed` : "None yet" },
     { to: "site", Icon: Settings, title: "Site settings", text: "Email, social links, membership form" },
+    { to: "join", Icon: UserPlus, title: "Join page", text: `${content.join.steps.length} steps, ${content.join.benefits.length} benefits` },
     { to: "faqs", Icon: HelpCircle, title: "FAQs", text: `${content.faqs.length} questions` },
     { to: "resources", Icon: BookOpen, title: "Resources", text: `${content.resources.reduce((n, r) => n + r.links.length, 0)} links` },
   ];

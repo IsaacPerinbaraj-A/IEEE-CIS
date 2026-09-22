@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, NavLink, Route, Routes, useNavigate } from "react-router-dom";
-import { BookOpen, CalendarDays, ExternalLink, HelpCircle, LayoutDashboard, LogOut, Settings, Trophy, UploadCloud, Users } from "lucide-react";
+import { BookOpen, CalendarDays, ExternalLink, HelpCircle, LayoutDashboard, LogOut, Settings, Trophy, UploadCloud, UserPlus, Users } from "lucide-react";
 import { AdminContext, type AdminStore, type PendingImage } from "./context";
 import { githubBackend, type Backend } from "./backend";
 import { FILES, bundled, clone, serialize, slugify, type Content, type ContentKey } from "./model";
@@ -12,6 +12,7 @@ import EventsEditor from "./sections/EventsEditor";
 import TeamEditor from "./sections/TeamEditor";
 import SiteEditor from "./sections/SiteEditor";
 import FaqEditor from "./sections/FaqEditor";
+import JoinEditor from "./sections/JoinEditor";
 import ResourcesEditor from "./sections/ResourcesEditor";
 import AchievementsEditor from "./sections/AchievementsEditor";
 import PublishPanel from "./sections/PublishPanel";
@@ -24,6 +25,7 @@ const NAV = [
   { to: "/admin/team", label: "Team", Icon: Users },
   { to: "/admin/achievements", label: "Achievements", Icon: Trophy },
   { to: "/admin/site", label: "Site settings", Icon: Settings },
+  { to: "/admin/join", label: "Join page", Icon: UserPlus },
   { to: "/admin/faqs", label: "FAQs", Icon: HelpCircle },
   { to: "/admin/resources", label: "Resources", Icon: BookOpen },
 ];
@@ -146,6 +148,7 @@ function Workspace({ backend, who, initial, onSignOut }: { backend: Backend; who
               <Route path="team" element={<TeamEditor />} />
               <Route path="achievements" element={<AchievementsEditor />} />
               <Route path="site" element={<SiteEditor />} />
+              <Route path="join" element={<JoinEditor />} />
               <Route path="faqs" element={<FaqEditor />} />
               <Route path="resources" element={<ResourcesEditor />} />
               <Route path="publish" element={<PublishPanel />} />
