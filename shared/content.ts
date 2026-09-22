@@ -18,7 +18,32 @@ export type ChapterEvent = {
 
 export type Member = { name: string; role: string; photo?: string; linkedin?: string; github?: string; instagram?: string };
 export type Faculty = { name: string; role: string };
-export type Group = { domain: string; slug: string; members: Member[] };
+/**
+ * One team. `kind` decides where Home lists it: "technical" teams do the learning and building, "chapter" teams
+ * keep the chapter running. `note` is the one-line description Home shows, and `icon` is one of TEAM_ICONS.
+ */
+export type Group = { domain: string; slug: string; kind?: TeamKind; note?: string; icon?: TeamIcon; members: Member[] };
+export const TEAM_KINDS = ["technical", "chapter"] as const;
+export type TeamKind = (typeof TEAM_KINDS)[number];
+export const isTeamKind = (v: unknown): v is TeamKind => typeof v === "string" && (TEAM_KINDS as readonly string[]).includes(v);
+
+/**
+ * Icons a team may use on Home. src/lib/icons.ts maps each one to an icon (`domainIcon`) and is checked against
+ * this list, so the admin's icon choices and the website can't drift apart.
+ */
+export const TEAM_ICONS = ["machine-learning", "data-science", "computer-vision", "iot", "web-development", "ai",
+  "robotics", "cloud", "security", "hardware", "management", "design", "event-management", "public-relations"] as const;
+export type TeamIcon = (typeof TEAM_ICONS)[number];
+export const TEAM_ICON_LABELS: Record<TeamIcon, string> = {
+  "machine-learning": "Machine learning (brain)", "data-science": "Data science (chart)", "computer-vision": "Computer vision (eye)",
+  iot: "Internet of things (chip)", "web-development": "Web development (code)", ai: "AI (sparkles)", robotics: "Robotics (bot)",
+  cloud: "Cloud (cloud)", security: "Security (shield)", hardware: "Hardware (circuit)", management: "Management (people)",
+  design: "Design (pen)", "event-management": "Events (calendar)", "public-relations": "Outreach (megaphone)",
+};
+export const isTeamIcon = (v: unknown): v is TeamIcon => typeof v === "string" && (TEAM_ICONS as readonly string[]).includes(v);
+
+/** Roles that make someone the team's leader on Home ("ML Head", "AI Lead", "Events Coordinator"). */
+export const LEADER_ROLE = /\b(head|lead|leader|coordinator)\b/i;
 /** One academic year of the team. The first session in the list is the one the Team page shows by default. */
 export type Session = { id: string; label: string; note?: string; faculty: Faculty[]; groups: Group[] };
 export type TeamContent = { sessions: Session[] };

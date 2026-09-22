@@ -6,23 +6,17 @@ import WhatWeDoDeck from "../components/WhatWeDoDeck";
 import { Reveal, RevealWords, Tilt, Marquee, Magnetic, RollLabel, PlayWhenVisible } from "../components/Motion";
 import { CisLogoTile } from "../components/Brand";
 import { PosterCard } from "../components/EventCards";
-import { domainIcon, pillarIcon } from "../lib/icons";
+import { teamIcon, pillarIcon } from "../lib/icons";
 import { upcomingEvents, pastEvents, events, sessions, formatDate, formatTime, countdown, home } from "../lib/data";
 import { useMediaQuery, PHONE } from "../lib/useMediaQuery";
+import { LEADER_ROLE } from "../../shared/content.ts";
 import { useTitle } from "../lib/useTitle";
 import { richText } from "../lib/richText";
 
-const technical: Record<string, string> = {
-  "machine-learning": "Models that learn from data, from classic algorithms to deep learning and LLMs.",
-  "data-science": "Cleaning, analysing and visualising data to answer real questions.",
-  "computer-vision": "Teaching machines to understand images and video.",
-  iot: "Sensors, microcontrollers and connected devices you can build and hold.",
-  "web-development": "Building the chapter's web presence, including this site.",
-};
-const support: Record<string, string> = {
-  management: "Runs the chapter", design: "Posters and visual identity",
-  "event-management": "Plans and runs every event", "public-relations": "Outreach and social media",
-};
+/** Small numbers read better as words in a heading: "Nine teams, one chapter". */
+const WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"];
+const count = (n: number) => WORDS[n] ?? String(n);
+const sentenceCase = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 /** Dot colour for each "What We Do" step, matching the particle formation that arrives with it (ParticleStory COLORS). */
 const STEP_COLORS = ["#22D3EE", "#F2B544", "#A78BFA", "#F472B6", "#22D3EE", "#F2B544"];
@@ -53,6 +47,9 @@ export default function Home() {
   const recent = pastEvents().slice(0, 4);
   const current = sessions[0];
   const groups = current.groups;
+  // Which teams are shown where, and the wording around them, all come from team.json (edited in the admin)
+  const technical = groups.filter(g => (g.kind ?? "technical") === "technical");
+  const chapter = groups.filter(g => g.kind === "chapter");
 
   const hero = (
     <div className="wrap hero-wrap relative w-full">
@@ -146,23 +143,23 @@ export default function Home() {
       {/* Domains */}
       <section className="wrap mt-20 grid gap-10 sm:mt-28 sm:gap-12 lg:grid-cols-[minmax(0,380px)_1fr]">
         <Reveal className="lg:sticky lg:top-28 lg:self-start">
-          <RevealWords text="Nine teams, one chapter" className="h-section" />
-          <p className="lede mt-4">Five technical domains do the learning and building. Four more keep the chapter running. Pick the one that fits you.</p>
+          <RevealWords text={`${sentenceCase(count(groups.length))} teams, one chapter`} className="h-section" />
+          <p className="lede mt-4">{sentenceCase(count(technical.length))} technical {technical.length === 1 ? "domain does" : "domains do"} the learning and building. {sentenceCase(count(chapter.length))} more {chapter.length === 1 ? "keeps" : "keep"} the chapter running. Pick the one that fits you.</p>
           <Link to="/team" className="link mt-6 inline-block max-sm:hidden">Meet the {current.label} team</Link>
         </Reveal>
         {phone ? (
           <Reveal>
-            <p className="text-[14px] font-medium text-mute">Technical domains · {Object.keys(technical).length}</p>
+            <p className="text-[14px] font-medium text-mute">Technical domains · {technical.length}</p>
             <ul className="mt-3 divide-y divide-line overflow-hidden rounded-2xl border border-line bg-panel">
-              {Object.keys(technical).map(k => groups.find(g => g.slug === k)).filter((g): g is NonNullable<typeof g> => !!g).map(g => {
-                const Icon = domainIcon[g.slug];
+              {technical.map(g => {
+                const Icon = teamIcon(g);
                 return (
                   <li key={g.slug}>
                     <Link to={`/team?domain=${g.slug}`} className="press flex min-h-[76px] items-center gap-3.5 px-4 py-3.5 active:bg-raised">
                       <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-raised text-violet-soft"><Icon size={20} aria-hidden /></span>
                       <span className="min-w-0 flex-1">
                         <span className="block font-semibold">{g.domain}</span>
-                        <span className="mt-0.5 line-clamp-2 text-[14px] leading-snug text-mute">{technical[g.slug]}</span>
+                        {g.note && <span className="mt-0.5 line-clamp-2 text-[14px] leading-snug text-mute">{g.note}</span>}
                       </span>
                       <ChevronRight size={18} aria-hidden className="shrink-0 text-mute" />
                     </Link>
@@ -170,15 +167,15 @@ export default function Home() {
                 );
               })}
             </ul>
-            <p className="mt-7 text-[14px] font-medium text-mute">Running the chapter · {groups.filter(g => support[g.slug]).length}</p>
+            <p className="mt-7 text-[14px] font-medium text-mute">Running the chapter · {chapter.length}</p>
             <ul className="mt-3 divide-y divide-line overflow-hidden rounded-2xl border border-line bg-panel">
-              {groups.filter(g => support[g.slug]).map(g => {
-                const Icon = domainIcon[g.slug];
+              {chapter.map(g => {
+                const Icon = teamIcon(g);
                 return (
                   <li key={g.slug}>
                     <Link to={`/team?domain=${g.slug}`} className="press flex min-h-[64px] items-center gap-3.5 px-4 py-3 active:bg-raised">
                       <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-raised text-mute"><Icon size={19} aria-hidden /></span>
-                      <span className="min-w-0 flex-1"><span className="block font-medium">{g.domain}</span><span className="block text-[14px] text-mute">{support[g.slug]}</span></span>
+                      <span className="min-w-0 flex-1"><span className="block font-medium">{g.domain}</span>{g.note && <span className="block text-[14px] text-mute">{g.note}</span>}</span>
                       <ChevronRight size={18} aria-hidden className="shrink-0 text-mute" />
                     </Link>
                   </li>
@@ -190,9 +187,9 @@ export default function Home() {
         ) : (
         <div>
           <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
-            {Object.keys(technical).map(k => groups.find(g => g.slug === k)).filter((g): g is NonNullable<typeof g> => !!g).map((g, i) => {
-              const Icon = domainIcon[g.slug];
-              const heads = g.members.filter(m => /head/i.test(m.role)).map(m => m.name);
+            {technical.map((g, i) => {
+              const Icon = teamIcon(g);
+              const heads = g.members.filter(m => LEADER_ROLE.test(m.role)).map(m => m.name);
               return (
                 <Reveal key={g.slug} delay={i * 90} className={i === 0 ? "sm:col-span-2" : ""}>
                   <Tilt className="h-full rounded-2xl" max={6}>
@@ -201,7 +198,7 @@ export default function Home() {
                       <Icon className="mt-0.5 shrink-0 text-violet-soft" size={26} />
                       <div className="min-w-0 sm:mt-5">
                         <h3 className="text-lg font-semibold sm:text-xl">{g.domain}</h3>
-                        <p className="mt-1 text-[15px] text-mute sm:mt-2 sm:text-[17px]">{technical[g.slug]}</p>
+                        {g.note && <p className="mt-1 text-[15px] text-mute sm:mt-2 sm:text-[17px]">{g.note}</p>}
                         <p className="mt-2 text-[14px] text-mute/90 sm:mt-4">{heads.length ? `Led by ${heads.join(" and ")}` : `${g.members.length} members`}</p>
                       </div>
                     </Link>
@@ -212,13 +209,13 @@ export default function Home() {
           </div>
           <Reveal delay={200}>
             <ul className="mt-4 grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2">
-              {groups.filter(g => support[g.slug]).map(g => {
-                const Icon = domainIcon[g.slug];
+              {chapter.map(g => {
+                const Icon = teamIcon(g);
                 return (
                   <li key={g.slug} className="bg-ink">
                     <Link to={`/team?domain=${g.slug}`} className="press flex items-center gap-4 px-5 py-4 transition-colors hover:bg-panel active:bg-panel">
                       <Icon size={20} className="shrink-0 text-mute" />
-                      <span><span className="block font-medium">{g.domain}</span><span className="block text-[14px] text-mute">{support[g.slug]}</span></span>
+                      <span><span className="block font-medium">{g.domain}</span>{g.note && <span className="block text-[14px] text-mute">{g.note}</span>}</span>
                     </Link>
                   </li>
                 );

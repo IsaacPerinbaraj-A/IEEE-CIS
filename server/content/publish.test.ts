@@ -24,12 +24,20 @@ const at = (minutes: number) => new Date(T0.getTime() + minutes * 60_000);
 let starting: StartingCopy | null = null;
 const startingCopy = async () => (starting ??= await readStartingCopy(process.cwd()));
 
-/** A store with the starting copy imported as release 1. */
-async function imported(): Promise<MemoryStore> {
+/** A store with the starting copy imported as release 1. `spoil` can damage the copy first, as an old import could. */
+async function imported(spoil?: (copy: StartingCopy) => void): Promise<MemoryStore> {
   const store = createMemoryStore();
-  await store.transaction(s => importStartingInStore(s, structuredClone(starting ?? { sections: {} as SectionContent, images: [], warnings: [] }), OWNER, T0));
+  const copy = structuredClone(starting ?? { sections: {} as SectionContent, images: [], warnings: [] });
+  spoil?.(copy);
+  await store.transaction(s => importStartingInStore(s, copy, OWNER, T0));
   return store;
 }
+
+/** Five member links that aren't full links, like the ones the site started with. */
+const spoilTeamLinks = (copy: StartingCopy) => {
+  const members = copy.sections.team.sessions[0].groups.flatMap(g => g.members).slice(0, 5);
+  members.forEach((m, i) => { m[i % 2 ? "github" : "linkedin"] = "just-a-username"; });
+};
 
 const httpError = (status: number, code: string) => (e: unknown) => {
   assert.ok(e instanceof HttpError, String(e));
@@ -43,20 +51,14 @@ const publish = (store: MemoryStore, input: Partial<PublishInput> & { sections: 
 
 const live = async (store: MemoryStore) => (await contentResponse(store)).sections as SectionContent;
 
-test("reading the starting copy: all sections, all photos, and the known link warnings", async () => {
+test("reading the starting copy: all sections, all photos, and no rule warnings", async () => {
   const copy = await startingCopy();
   assert.deepEqual(Object.keys(copy.sections), [...SECTION_KEYS]);
   assert.equal(copy.images.length, 34);
   assert.ok(copy.images.every(i => i.size > 0 && i.width >= 16 && i.sha256.length === 64));
-  const byKey = (w: ErrorItem) => `${w.section}:${w.key}`;
-  assert.deepEqual(copy.warnings.map(byKey).sort(), [
-    "team:sessions.0.groups.3.members.2.github",
-    "team:sessions.0.groups.5.members.1.github",
-    "team:sessions.0.groups.5.members.1.linkedin",
-    "team:sessions.0.groups.6.members.1.github",
-    "team:sessions.0.groups.7.members.0.github",
-  ]);
-  assert.ok(copy.warnings.every(w => w.label.startsWith("Team 2025")));
+  // The content shipped with the site must always pass the rules, or the first import starts with problems
+  const byKey = (w: ErrorItem) => `${w.section}:${w.key} (${w.message})`;
+  assert.deepEqual(copy.warnings.map(byKey), []);
 });
 
 test("before the import nothing is published; the import makes release 1 once", async () => {
@@ -184,8 +186,10 @@ test("rule breaks, unknown photos and unknown bases are refused", async () => {
     return true;
   });
 
-  // The starting Team section has 5 links that aren't full links: it can't be published until they're fixed
-  await assert.rejects(Promise.resolve().then(() => checkSections({ team: base.team })), httpError(422, "invalid"));
+  // A link that isn't a full link is refused, with the person and field named
+  const broken = structuredClone(base.team);
+  broken.sessions[0].groups[0].members[0].github = "just-a-username";
+  await assert.rejects(Promise.resolve().then(() => checkSections({ team: broken })), httpError(422, "invalid"));
 
   const events = [...base.events, { ...base.events[0], slug: "new-event", title: "New event", poster: "/images/events/new-event-0123456789.webp" }];
   await assert.rejects(publish(store, { sections: { events } }), (e: unknown) => {
@@ -246,20 +250,16 @@ test("restore makes an old release (or one section) live again as a new release"
   await assert.rejects(store.transaction(s => restoreInStore(s, { release: 99, section: null, note: "" }, ARUN, at(5))), httpError(404, "not_found"));
   assert.equal(store.state.releases.size, 5);
 
-  // An old version that breaks today's rules can't go live again (the starting team links)
-  const team = structuredClone(base.team);
-  for (const g of team.sessions[0].groups) for (const m of g.members) {
-    if (m.github && !/^https:\/\//.test(m.github)) m.github = "";
-    if (m.linkedin && !/^https:\/\//.test(m.linkedin)) m.linkedin = "";
-  }
-  await publish(store, { baseRelease: 5, sections: { team } }, PRIYA, at(5.5));
-  await assert.rejects(store.transaction(s => restoreInStore(s, { release: 1, section: "team", note: "" }, ARUN, at(5.6))), (e: unknown) => {
+  // An old version that breaks today's rules can't go live again
+  const older = await imported(spoilTeamLinks);          // release 1 holds five links that aren't full links
+  await publish(older, { baseRelease: 1, sections: { team: base.team } }, PRIYA, at(5.5));   // release 2 fixes them
+  await assert.rejects(older.transaction(s => restoreInStore(s, { release: 1, section: "team", note: "" }, ARUN, at(5.6))), (e: unknown) => {
     httpError(422, "invalid")(e);
     assert.match((e as HttpError).message, /^Team from version #1 breaks the current content rules/);
     assert.equal(((e as HttpError).extra.items as ErrorItem[]).length, 5);
     return true;
   });
-  assert.equal(store.state.releases.size, 6);
+  assert.equal(older.state.releases.size, 2, "the refused restore adds no release");
 
   // A publish that started before the restore merges with it
   const merged = await publish(store, { baseRelease: 3, sections: { faqs: [...base.faqs, { q: "Q1?", a: "A1." }, { q: "Q2?", a: "A2." }] } }, PRIYA, at(6));

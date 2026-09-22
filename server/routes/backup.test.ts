@@ -51,8 +51,8 @@ test("a backup reads back as the same content, images and warnings", async () =>
   assert.deepEqual(parsed.sections, start.sections);
   assert.equal(parsed.images.length, 3);
   assert.deepEqual(parsed.images.map(i => [i.path, i.sha256, i.size]), start.images.slice(0, 3).map(i => [i.path, i.sha256, i.size]));
-  // The starting copy's five team links that aren't full links come back as warnings, not as a refusal
-  assert.equal(parsed.warnings.filter(w => w.section === "team").length, 5);
+  // The starting copy passes every rule, so a backup of it comes back without warnings
+  assert.deepEqual(parsed.warnings, []);
 });
 
 test("damaged or foreign backup files are refused with a plain reason", async () => {

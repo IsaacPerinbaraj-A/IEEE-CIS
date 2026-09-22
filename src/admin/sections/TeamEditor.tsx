@@ -4,6 +4,7 @@ import { useAdmin } from "../context";
 import { IconButton, ImageInput, Modal, PageTitle, SelectField, TextArea, TextField } from "../ui";
 import CropDialog from "../CropDialog";
 import { clone, emptyMember, slugify, validateMember, type Errors, type Member, type Session } from "../model";
+import { TEAM_ICONS, TEAM_ICON_LABELS, TEAM_KINDS, type TeamIcon, type TeamKind } from "../../../shared/content.ts";
 import { fileToImage } from "../image";
 import MemberCard from "../../components/MemberCard";
 import { initials } from "../../lib/data";
@@ -91,6 +92,10 @@ export default function TeamEditor() {
         <section key={g.slug + gi} className="adm-card mb-5">
           <div className="mb-5 flex flex-wrap items-end gap-3">
             <TextField label="Team name" value={g.domain} className="min-w-[200px] flex-1" onChange={v => setSession(x => { x.groups[gi].domain = v; return x; })} />
+            <SelectField label="Shown on Home as" value={g.kind ?? "technical"} className="min-w-[220px]"
+              hint="Technical teams learn and build; the others keep the chapter running."
+              options={TEAM_KINDS.map(k => ({ value: k, label: k === "technical" ? "A technical domain" : "Keeps the chapter running" }))}
+              onChange={v => setSession(x => { x.groups[gi].kind = v as TeamKind; return x; })} />
             <div className="flex gap-2">
               <IconButton label="Move team up" disabled={gi === 0} onClick={() => setSession(x => ({ ...x, groups: move(x.groups, gi, -1) }))}><ArrowUp size={16} /></IconButton>
               <IconButton label="Move team down" disabled={gi === s.groups.length - 1} onClick={() => setSession(x => ({ ...x, groups: move(x.groups, gi, 1) }))}><ArrowDown size={16} /></IconButton>
@@ -100,6 +105,15 @@ export default function TeamEditor() {
               }}><Trash2 size={16} /></IconButton>
             </div>
           </div>
+          <div className="mb-5 flex flex-wrap items-end gap-3">
+            <TextField label="One-line description" value={g.note ?? ""} className="min-w-[260px] flex-1"
+              hint="Shown under the team's name on the home page, for example “Teaching machines to understand images and video.”"
+              onChange={v => setSession(x => { x.groups[gi].note = v; return x; })} />
+            <SelectField label="Icon" value={g.icon ?? "machine-learning"} className="min-w-[240px]"
+              options={TEAM_ICONS.map(i => ({ value: i, label: TEAM_ICON_LABELS[i] }))}
+              onChange={v => setSession(x => { x.groups[gi].icon = v as TeamIcon; return x; })} />
+          </div>
+
           <ul className="grid grid-cols-1 gap-2">
             {g.members.map((m, mi) => (
               <li key={m.name + mi} className="flex items-center gap-3 rounded-xl border border-line bg-ink/60 p-2.5">
@@ -118,7 +132,7 @@ export default function TeamEditor() {
       ))}
       <button className="btn-ghost" onClick={() => {
         const name = prompt("Name of the new team, for example Robotics");
-        if (name?.trim()) setSession(x => ({ ...x, groups: [...x.groups, { domain: name.trim(), slug: slugify(name), members: [] }] }));
+        if (name?.trim()) setSession(x => ({ ...x, groups: [...x.groups, { domain: name.trim(), slug: slugify(name), kind: "technical", note: "", icon: "machine-learning", members: [] }] }));
       }}><Plus size={18} /> Add a team</button>
 
       {yearModal}
@@ -162,7 +176,7 @@ function MemberForm({ initial, isNew, groups, groupIndex, onClose, onSave, onDel
         <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_220px]">
           <div className="grid grid-cols-1 gap-4">
             <TextField label="Full name" value={m.name} error={errors.name} onChange={v => set({ name: v })} />
-            <TextField label="Role" value={m.role} error={errors.role} hint="For example Chair, ML Head, Design Senior Associate." onChange={v => set({ role: v })} />
+            <TextField label="Role" value={m.role} error={errors.role} hint="For example Chair, ML Head, Design Senior Associate. A role with Head, Lead or Coordinator in it is shown as the team's leader on the home page." onChange={v => set({ role: v })} />
             <SelectField label="Team" value={String(gi)} onChange={v => setGi(Number(v))} options={groups.map((g, i) => ({ value: String(i), label: g }))} />
             <ImageInput square label="Photo" src={preview(m.photo)} onRemove={() => set({ photo: "" })}
               hint={imgError || "Any photo works. You'll frame it as a square, and it's compressed and uploaded straight away."}

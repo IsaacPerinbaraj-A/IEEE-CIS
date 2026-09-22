@@ -15,6 +15,7 @@ import {
   type SiteSettings, type TeamContent, type WhatWeDoItem,
 } from "./content.ts";
 import { SECTION_LABELS, isImagePath, type SectionKey } from "./sections.ts";
+import { isTeamIcon, isTeamKind } from "./content.ts";
 import { charCount, cleanText, truncate } from "./text.ts";
 
 export type Errors = Record<string, string>;
@@ -42,7 +43,7 @@ export const SESSION_ID_RE = /^\d{4}-\d{2}$/;
 
 /** Length limits in characters, and list limits in items. */
 export const MAX = {
-  title: 120, slug: 80, eventType: 40, domain: 80, series: 120, venue: 200, summary: 300, description: 5000, person: 200,
+  title: 120, slug: 80, eventType: 40, domain: 80, teamNote: 140, series: 120, venue: 200, summary: 300, description: 5000, person: 200,
   url: 2000, name: 100, role: 100, yearLabel: 40, note: 500, email: 200, place: 200, mapQuery: 200,
   question: 300, answer: 2000, linkNote: 300, stepText: 500, buttonText: 60, benefitText: 300, achievementText: 2000,
   people: 300, year: 20, heroLine: 120, heroIntro: 1000, buttonLabel: 40, heading: 60, sectionTitle: 160, paragraph: 2000,
@@ -155,6 +156,9 @@ export function validateTeam(t: TeamContent): Errors {
       const gp = `${p}.groups.${gi}`;
       if (!g.domain.trim()) err[`${gp}.domain`] = "Give the team a name.";
       cap(err, `${gp}.domain`, g.domain, MAX.domain);
+      if (g.kind !== undefined && !isTeamKind(g.kind)) err[`${gp}.kind`] = "Choose whether this team is technical or keeps the chapter running.";
+      if (g.note !== undefined) cap(err, `${gp}.note`, g.note, MAX.teamNote);
+      if (g.icon !== undefined && !isTeamIcon(g.icon)) err[`${gp}.icon`] = "Pick one of the icons in the list.";
       if (!SLUG_RE.test(g.slug)) err[`${gp}.slug`] = "Use letters or numbers in the team's name.";
       else if (firstIndex(s.groups, x => x.slug === g.slug) !== gi) err[`${gp}.slug`] = "Another team in this year has the same name.";
       if (g.members.length > MAX.members) err[`${gp}.members`] = tooMany(MAX.members, "members");
@@ -432,9 +436,15 @@ function readEvents(v: unknown, ctx: Ctx): ChapterEvent[] {
 
 function readGroup(v: unknown, path: string, ctx: Ctx): Group {
   const src = readRecord(v, path, ctx);
+  // kind, note and icon decide how Home lists the team; an unknown value falls back rather than failing the build
+  const kind = readText(src.kind, at(path, "kind"), ctx), icon = readText(src.icon, at(path, "icon"), ctx);
+  const note = readText(src.note, at(path, "note"), ctx);
   return {
     domain: readText(src.domain, at(path, "domain"), ctx),
     slug: readText(src.slug, at(path, "slug"), ctx),
+    ...(isTeamKind(kind) ? { kind } : {}),
+    ...(note ? { note } : {}),
+    ...(isTeamIcon(icon) ? { icon } : {}),
     members: readListOf(src.members, at(path, "members"), ctx, (m, p) => readFields<Member>(m, MEMBER_FIELDS, p, ctx)),
   };
 }

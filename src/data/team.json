@@ -8,6 +8,9 @@
         {
           "domain": "Management",
           "slug": "management",
+          "kind": "chapter",
+          "note": "Runs the chapter",
+          "icon": "management",
           "members": [
             {
               "name": "Swarna Lakshmi B",
@@ -52,8 +55,141 @@
           ]
         },
         {
+          "domain": "Machine Learning",
+          "slug": "machine-learning",
+          "kind": "technical",
+          "note": "Models that learn from data, from classic algorithms to deep learning and LLMs.",
+          "icon": "machine-learning",
+          "members": [
+            {
+              "name": "Shriram N",
+              "role": "ML Head",
+              "photo": "/images/team/shriram-n.webp",
+              "linkedin": "https://www.linkedin.com/in/shriram-n-a4a916294",
+              "github": "https://github.com/Shriram154",
+              "instagram": "https://www.instagram.com/nshriram0024?igsh=MTdid2ZzdDFvZGk3Yg=="
+            },
+            {
+              "name": "Shri Dharashini M",
+              "role": "ML Head",
+              "photo": "/images/team/shri-dharashini-m.webp",
+              "linkedin": "https://www.linkedin.com/in/shri-dharshini-m",
+              "github": "https://github.com/shridharshinim",
+              "instagram": "https://instagram.com/dharshhiniii_"
+            },
+            {
+              "name": "Sanjay R",
+              "role": "ML Senior Associate",
+              "photo": "/images/team/sanjay-r.webp",
+              "linkedin": "https://www.linkedin.com/in/sanjay-rox7",
+              "github": "https://github.com/Sanjayrox",
+              "instagram": "https://instagram.com/Sanjayrox7"
+            }
+          ]
+        },
+        {
+          "domain": "Data Science",
+          "slug": "data-science",
+          "kind": "technical",
+          "note": "Cleaning, analysing and visualising data to answer real questions.",
+          "icon": "data-science",
+          "members": [
+            {
+              "name": "Sai Sanjay SV",
+              "role": "DS Head",
+              "photo": "/images/team/sai-sanjay-sv.webp",
+              "linkedin": "https://www.linkedin.com/in/sai-sanjay-b7b4082a2/",
+              "github": "https://github.com/sanjaytypes",
+              "instagram": "https://www.instagram.com/___.sxnjxy/"
+            },
+            {
+              "name": "Dilip Kannan",
+              "role": "DS Head",
+              "photo": "/images/team/dilip-kannan.webp",
+              "linkedin": "https://www.linkedin.com/in/dilip-kannan-k-4834182a2",
+              "github": "https://github.com/DILIP-KANNAN/",
+              "instagram": "https://www.instagram.com/dilipkannan_/"
+            },
+            {
+              "name": "Lokaa V",
+              "role": "DS Senior Associate",
+              "photo": "/images/team/lokaa-v.webp",
+              "linkedin": "https://www.linkedin.com/in/lokaa-v-0345b42a2",
+              "instagram": "https://www.instagram.com/lokaa_1910?igsh=MWczMmFyZm85M2xyeA%3D%3D&utm_source=qr"
+            }
+          ]
+        },
+        {
+          "domain": "Computer Vision",
+          "slug": "computer-vision",
+          "kind": "technical",
+          "note": "Teaching machines to understand images and video.",
+          "icon": "computer-vision",
+          "members": [
+            {
+              "name": "Lakshiya Sri KM",
+              "role": "CV Head",
+              "photo": "/images/team/lakshiya-sri-km.webp",
+              "linkedin": "https://www.linkedin.com/in/lakshiya-sri-k-m-ba91772a2/",
+              "github": "https://github.com/LAKSHIYA24",
+              "instagram": "https://instagram.com/lakshiya_05"
+            },
+            {
+              "name": "Prathisha R",
+              "role": "CV Head",
+              "photo": "/images/team/prathisha-r.webp",
+              "linkedin": "https://www.linkedin.com/in/prathisha-rammohan-b755b32a2",
+              "github": "https://github.com/231501119",
+              "instagram": "https://www.instagram.com/prathisha_05?igsh=MTZ4aGs4ODBtMzl5YQ=="
+            },
+            {
+              "name": "Devesh D",
+              "role": "CV Senior Associate",
+              "photo": "/images/team/devesh-d.webp",
+              "linkedin": "https://www.linkedin.com/in/devesh09",
+              "github": "https://github.com/devesh09D",
+              "instagram": "https://instagram.com/_itz_me_dev_sh"
+            }
+          ]
+        },
+        {
+          "domain": "Internet of Things",
+          "slug": "iot",
+          "kind": "technical",
+          "note": "Sensors, microcontrollers and connected devices you can build and hold.",
+          "icon": "iot",
+          "members": [
+            {
+              "name": "Doneeswaran J",
+              "role": "IoT Head",
+              "photo": "/images/team/doneeswaran-j.webp",
+              "linkedin": "https://www.linkedin.com/in/doneeswaran-j",
+              "github": "https://github.com/Doneeswaran",
+              "instagram": "https://www.instagram.com/j.doneeswaran?igsh=eThlbWpmcHMyaDVu"
+            },
+            {
+              "name": "Harish M",
+              "role": "IoT Head",
+              "photo": "/images/team/harish-m.webp",
+              "linkedin": "https://www.linkedin.com/in/harishm007",
+              "instagram": ""
+            },
+            {
+              "name": "Umesh Sarathy",
+              "role": "IoT Senior Associate",
+              "photo": "/images/team/umesh-sarathy.webp",
+              "linkedin": "https://www.linkedin.com/in/umesh-sarathy-s-k-0771122a0",
+              "github": "https://github.com/umeshsarathy",
+              "instagram": "https://www.instagram.com/umeshsarathy_?igsh=MXkyazdsM21vN2hseQ=="
+            }
+          ]
+        },
+        {
           "domain": "Web Development",
           "slug": "web-development",
+          "kind": "technical",
+          "note": "Building the chapter's web presence, including this site.",
+          "icon": "web-development",
           "members": [
             {
               "name": "Tarun Aanand S G",
@@ -90,126 +226,11 @@
           ]
         },
         {
-          "domain": "Machine Learning",
-          "slug": "machine-learning",
-          "members": [
-            {
-              "name": "Shriram N",
-              "role": "ML Head",
-              "photo": "/images/team/shriram-n.webp",
-              "linkedin": "https://www.linkedin.com/in/shriram-n-a4a916294",
-              "github": "https://github.com/Shriram154",
-              "instagram": "https://www.instagram.com/nshriram0024?igsh=MTdid2ZzdDFvZGk3Yg=="
-            },
-            {
-              "name": "Shri Dharashini M",
-              "role": "ML Head",
-              "photo": "/images/team/shri-dharashini-m.webp",
-              "linkedin": "https://www.linkedin.com/in/shri-dharshini-m",
-              "github": "https://github.com/shridharshinim",
-              "instagram": "https://instagram.com/dharshhiniii_"
-            },
-            {
-              "name": "Sanjay R",
-              "role": "ML Senior Associate",
-              "photo": "/images/team/sanjay-r.webp",
-              "linkedin": "https://www.linkedin.com/in/sanjay-rox7",
-              "github": "https://github.com/Sanjayrox",
-              "instagram": "https://instagram.com/Sanjayrox7"
-            }
-          ]
-        },
-        {
-          "domain": "Data Science",
-          "slug": "data-science",
-          "members": [
-            {
-              "name": "Sai Sanjay SV",
-              "role": "DS Head",
-              "photo": "/images/team/sai-sanjay-sv.webp",
-              "linkedin": "https://www.linkedin.com/in/sai-sanjay-b7b4082a2/",
-              "github": "https://github.com/sanjaytypes",
-              "instagram": "https://www.instagram.com/___.sxnjxy/"
-            },
-            {
-              "name": "Dilip Kannan",
-              "role": "DS Head",
-              "photo": "/images/team/dilip-kannan.webp",
-              "linkedin": "https://www.linkedin.com/in/dilip-kannan-k-4834182a2",
-              "github": "https://github.com/DILIP-KANNAN/",
-              "instagram": "https://www.instagram.com/dilipkannan_/"
-            },
-            {
-              "name": "Lokaa V",
-              "role": "DS Senior Associate",
-              "photo": "/images/team/lokaa-v.webp",
-              "linkedin": "https://www.linkedin.com/in/lokaa-v-0345b42a2",
-              "instagram": "https://www.instagram.com/lokaa_1910?igsh=MWczMmFyZm85M2xyeA%3D%3D&utm_source=qr"
-            }
-          ]
-        },
-        {
-          "domain": "Computer Vision",
-          "slug": "computer-vision",
-          "members": [
-            {
-              "name": "Lakshiya Sri KM",
-              "role": "CV Head",
-              "photo": "/images/team/lakshiya-sri-km.webp",
-              "linkedin": "https://www.linkedin.com/in/lakshiya-sri-k-m-ba91772a2/",
-              "github": "https://github.com/LAKSHIYA24",
-              "instagram": "https://instagram.com/lakshiya_05"
-            },
-            {
-              "name": "Prathisha R",
-              "role": "CV Head",
-              "photo": "/images/team/prathisha-r.webp",
-              "linkedin": "https://www.linkedin.com/in/prathisha-rammohan-b755b32a2",
-              "github": "https://github.com/231501119",
-              "instagram": "https://www.instagram.com/prathisha_05?igsh=MTZ4aGs4ODBtMzl5YQ=="
-            },
-            {
-              "name": "Devesh D",
-              "role": "CV Senior Associate",
-              "photo": "/images/team/devesh-d.webp",
-              "linkedin": "https://www.linkedin.com/in/devesh09",
-              "github": "https://github.com/devesh09D",
-              "instagram": "https://instagram.com/_itz_me_dev_sh"
-            }
-          ]
-        },
-        {
-          "domain": "Internet of Things",
-          "slug": "iot",
-          "members": [
-            {
-              "name": "Doneeswaran J",
-              "role": "IoT Head",
-              "photo": "/images/team/doneeswaran-j.webp",
-              "linkedin": "https://www.linkedin.com/in/doneeswaran-j",
-              "github": "https://github.com/Doneeswaran",
-              "instagram": "https://www.instagram.com/j.doneeswaran?igsh=eThlbWpmcHMyaDVu"
-            },
-            {
-              "name": "Harish M",
-              "role": "IoT Head",
-              "photo": "/images/team/harish-m.webp",
-              "linkedin": "https://www.linkedin.com/in/harishm007",
-              "instagram": ""
-            },
-            {
-              "name": "Umesh Sarathy",
-              "role": "IoT Senior Associate",
-              "photo": "/images/team/umesh-sarathy.webp",
-              "linkedin": "https://www.linkedin.com/in/umesh-sarathy-s-k-0771122a0",
-              "github": "https://github.com/umeshsarathy",
-              "instagram": "https://www.instagram.com/umeshsarathy_?igsh=MXkyazdsM21vN2hseQ=="
-            }
-          ]
-        },
-        {
           "domain": "Design",
           "slug": "design",
+          "kind": "chapter",
+          "note": "Posters and visual identity",
+          "icon": "design",
           "members": [
             {
               "name": "Gnaanesh BB",
@@ -240,6 +261,9 @@
         {
           "domain": "Event Management",
           "slug": "event-management",
+          "kind": "chapter",
+          "note": "Plans and runs every event",
+          "icon": "event-management",
           "members": [
             {
               "name": "Sathyanath L",
@@ -262,6 +286,9 @@
         {
           "domain": "Public Relations",
           "slug": "public-relations",
+          "kind": "chapter",
+          "note": "Outreach and social media",
+          "icon": "public-relations",
           "members": [
             {
               "name": "Rashmi R",
@@ -297,6 +324,9 @@
         {
           "domain": "Management",
           "slug": "management",
+          "kind": "chapter",
+          "note": "Runs the chapter",
+          "icon": "management",
           "members": [
             {
               "name": "Pugal M",
