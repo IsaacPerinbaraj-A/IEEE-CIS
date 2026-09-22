@@ -189,6 +189,11 @@ body[data-intro="on"] .glow-b { right: calc(50% - 10vh); bottom: calc(50% - 40vh
   /* With the subtitle gone, move the name down to the middle of the bar, level with the logo and Menu */
   .site-header[data-scrolled="1"] .site-brand-name { transform: translateY(9px); }
 }
+/* Only the visible bar takes taps. When the phone header slims, its box is still 68px tall; the transparent strip
+   under the bar lets taps through to anything pinned below it (sticky year headers, the Team strip). */
+.site-header { pointer-events: none; }
+.site-header::before, .site-header-row > * { pointer-events: auto; }
+
 html[data-tier="low"] .site-header::before { -webkit-backdrop-filter: none; backdrop-filter: none; background-color: rgba(15,10,28,.96); }
 
 /* ---------- Mobile menu: the panel wipes down from the header, then each link rises out of its row ---------- */
