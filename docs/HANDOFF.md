@@ -2,6 +2,8 @@
 
 Written 10 September 2026 at the end of a long chat (updated after the layout, responsive and admin round), so the work can continue in a new chat or in Claude Code without losing anything.
 
+**Update, 22 September 2026:** the Git-based admin (GitHub tokens, commits) was replaced by a database-backed admin: Vercel (site) + Render (admin server) + MongoDB Atlas (content, history, photos, accounts). Section 4 describes the new setup; setup steps are in `docs/SETUP.md`, the editors' guide in `docs/ADMIN-GUIDE.md`, and the plan in `MERGE-REPORT/6-admin-database-plan.md` (outside the repo).
+
 ---
 
 ## How to continue in a new chat
@@ -43,7 +45,7 @@ The newest, complete version of the site is the `website/` folder. The standalon
 13. **Latest round (current state):** the user reported (with screenshots at 1536 × 730, 125% scaling) that the 3D shapes sat too far right and were clipped, and asked for full responsiveness, an admin page for editing everything, and suggestions.
     - **Layout fix:** shapes are now placed inside measured regions of the page (content column, beside the hero text / step cards / page titles) with a perspective-aware fitting helper (`layout.ts` → `fitShape`), so near-camera parts never leave the screen. Headline sized by width and height.
     - **Responsive:** automated audit of 10 pages × 13 devices (320 px phone to 2560 px monitor, landscape phones, tablets): the only overflow (Contact page on phones) fixed; visual checks of hero, story and headers on 9 devices. Home switches between side-by-side and stacked with one shared media query.
-    - **Admin page built** at `/admin` (details in section 4). Tested end to end in local mode (files verified on disk, then restored) and against a simulated GitHub API (bad token, sign-in, conflict warning, publish with automatic retry). Checked on phones (320/390 px), which exposed and fixed a grid overflow in admin lists.
+    - **Admin page built** at `/admin` (the Git-based version, replaced by the database admin on 22 Sept 2026; see section 4). Tested end to end in local mode (files verified on disk, then restored) and against a simulated GitHub API (bad token, sign-in, conflict warning, publish with automatic retry). Checked on phones (320/390 px), which exposed and fixed a grid overflow in admin lists.
 
 ---
 
@@ -81,23 +83,25 @@ The newest, complete version of the site is the `website/` folder. The standalon
 
 - React 18, TypeScript 5.8, Vite 7, Tailwind 3, React Router 6, lucide-react **0.294** (keep this version: newer versions removed the LinkedIn/GitHub/Instagram brand icons), self-hosted fonts via `@fontsource/unbounded` (500, 600) and `@fontsource-variable/geist`.
 - Removed from the old project: three.js, Vanta, snow, admin login, `.env`.
-- Dev-only: `@types/node` (for `admin-local-backend.ts`).
-- Commands: `npm install`, `npm run dev` (localhost:5173, also enables the admin's local mode), `npm run build` (outputs `dist/`), `npm run lint`.
+- Admin server: `express` 5 and `mongodb` 7 (run on Render; Node runs the TypeScript directly). Dev-only: `@types/node`, `@types/express`.
+- Commands: `npm install`, `npm run dev` (localhost:5173; proxies `/api` to the admin server), `npm run server` (admin server on :8787, reads `.env.local`), `npm run build` (content pull, then `tsc -b` and Vite; outputs `dist/`), `npm run lint`, `npm run test:server`. Node 22.18 or newer.
 - Build size: main JS about 278 KB (89 KB gzipped); admin loads separately (about 65 KB, 20 KB gzipped); CSS about 47 KB. Images 1.2 MB total (old: ~45 MB).
 
 ### Hosting
 
-- `BrowserRouter` with `public/_redirects` (Netlify) and `vercel.json` (Vercel) already set up so deep links work.
-- GitHub Pages: switch `BrowserRouter` to `HashRouter` in `src/App.tsx`.
-- Content updates: through `/admin` (publishes to GitHub), or by editing the JSON in GitHub; the host auto-redeploys.
+- Vercel serves the site (`BrowserRouter`; `vercel.json` has the SPA fallback for deep links). Render runs the admin server (`render.yaml`). MongoDB Atlas M0 is the database. Netlify isn't used (`public/_redirects` was removed).
+- `vercel.json`: `/api/*` is rewritten to the Render service (placeholder host `REPLACE-WITH-RENDER-SERVICE` until go-live), no caching for `/api` and `/content-version.json`, and `/admin` is served from `admin.html` with a strict Content-Security-Policy, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer` and `noindex`.
+- Content updates: through `/admin`. Publish saves a release in the database and calls Vercel's Deploy Hook; the build pulls the release into `src/data` and `public/images` (`scripts/fetch-content.ts`). After go-live, editing `src/data` in GitHub doesn't change the live site.
 - `public/robots.txt` disallows `/admin`.
 
 ### File structure
 
 ```
-index.html                 meta/OG tags, favicon, inline script that hides the chrome before the intro
-public/_redirects          Netlify SPA rewrite
-vercel.json                Vercel SPA rewrite
+index.html                 meta/OG tags, favicon, <script src="/intro.js"> that hides the chrome before the intro
+public/intro.js            sets body[data-intro="on"] before first paint on / (a file so the admin's CSP allows it)
+vercel.json                Vercel: /api rewrite to Render, /admin → admin.html with CSP, SPA fallback
+render.yaml                Render Blueprint for the admin server (free, Singapore, node server/index.ts, /healthz)
+.env.example               the admin server's settings, placeholders only (real values: .env.local, Render, Vercel)
 public/brand/              rec-main-logo.png (REC purple/gold), ieee-logo.svg (IEEE CIS logo, black text)
 public/images/team/        28 face-cropped 480x480 WebP photos
 public/images/events/      6 posters (max 900px WebP)
@@ -124,18 +128,14 @@ src/components/particles/ParticleStory.tsx  home intro + scroll story
 src/components/particles/HeaderParticles.tsx page header formations
 src/pages/                  Home, Events, EventDetail, Team, About, Achievements, Resources, Join, Contact, NotFound
 src/components/particles/layout.ts          SIDE_QUERY (side-by-side vs stacked), BOUNDS per formation, fitShape()
-src/admin/AdminApp.tsx      admin shell: sign-in gate, loading, draft state, image queue, nav, unpublished-changes bar
-src/admin/Login.tsx         GitHub token sign-in, local-mode and offline options, token help
-src/admin/session.ts        stored repo/branch/token helpers
-src/admin/backend.ts        github (Git Data API, one commit, retry), local (dev server), offline (downloads) backends
-src/admin/model.ts          content types, file paths, validation, slugify, academic-year helper, tidyEvent
-src/admin/image.ts          in-browser image processing (square crop 480 px, fit 900 px, WebP with JPEG fallback)
-src/admin/context.ts        shared admin state (AdminContext, useAdmin)
-src/admin/ui.tsx            form fields, image picker, accessible modal, icon buttons
-src/admin/CropDialog.tsx    drag/zoom/keyboard photo framing
-src/admin/sections/         Dashboard, EventsEditor, TeamEditor, AchievementsEditor, SiteEditor, FaqEditor, ResourcesEditor, PublishPanel
-src/data/admin.json         { "repo": "", "branch": "main" } → set the repository for the admin
-admin-local-backend.ts      Vite dev-server plugin: /__admin/ping, /__admin/file, /__admin/commit (dev only, path allow-list)
+src/admin/                  the admin client: sign-in and setup links, editors (incl. Home), autosaved drafts, publish
+                            with merge/conflict handling and live status, History, Accounts (owner), image processing
+shared/                     content types, section list, validators, 3-way merge, diff, passphrase rules, API contract
+server/                     admin server (Express 5 + mongodb driver): auth, sessions, throttling, publish, history,
+                            images, presence, accounts, backups, build export
+scripts/fetch-content.ts    prebuild: pulls the published release into src/data + public/images (content-build.ts)
+docs/SETUP.md               click-by-click setup of Atlas, Render and Vercel, first owner, local running
+docs/ADMIN-GUIDE.md         guide for office bearers and the web lead (backups, outages, yearly handover)
 public/robots.txt           keeps /admin out of search engines
 CLAUDE.md, docs/HANDOFF.md  instructions for Claude Code and this handoff
 README.md                   how to run, deploy, use the admin, update content, prepare images, tweak animations
@@ -157,14 +157,16 @@ README.md                   how to run, deploy, use the admin, update content, p
 | `*` | 404 | chaos | "This page doesn't exist" with links |
 | `/admin/*` | Admin (outside the site layout) | none | Dashboard, Events, Team, Achievements, Site settings, FAQs, Resources, Publish |
 
-### Admin page
+### Admin page (database-backed, since 22 September 2026)
 
-- **Sign-in:** each editor uses their own fine-grained GitHub personal access token (repository access: only the website repo; permission: Contents read/write). Verified on sign-in (must have push access). Token kept in `sessionStorage` (or `localStorage` if "Keep me signed in"). Repo/branch from `src/data/admin.json` or the sign-in form. Only repository collaborators can publish.
-- **Modes:** GitHub (live), local (`npm run dev`, writes files via `admin-local-backend.ts`), offline (Publish downloads the changed files).
-- **Editors:** events (search, filters, poster upload, auto page address and academic year, live preview with the real PosterCard), team (academic years incl. "New academic year" that copies team names and faculty, faculty, rename/reorder/delete teams, add/edit/move/reorder/remove members, photo crop, live MemberCard preview), achievements (with photos), site settings, FAQs, resources.
-- **Publish:** lists changes in plain words ("1 added, 2 edited"), optional message, checks whether GitHub changed since loading (warns before overwriting someone else), then one commit (blobs → tree → commit → move branch, retries once on a race). Success links to the commit.
-- **Safety:** drafts only in memory until Publish; warning when closing the tab with unpublished changes; confirmation on deletes and sign-out; noindex; not loaded for normal visitors.
-- **Images:** saved as `public/images/{team|events|achievements}/<slug>.webp` with `?v=<timestamp>` in the data to bust caches. Old replaced images are left in the repo.
+- **Architecture:** the browser calls `/api/*` on the site's own origin; Vercel rewrites it to the Render service, so the session cookie is first-party. Render holds every secret (`MONGODB_URI`, `EXPORT_TOKEN`, `DEPLOY_HOOK_URL`, `IP_HASH_KEY`, one-time `SETUP_TOKEN`); Vercel holds only `CONTENT_EXPORT_URL` and `CONTENT_EXPORT_TOKEN`. Only Render connects to Atlas (Atlas allows Render's outbound IP ranges only). GitHub holds only code.
+- **Sign-in:** username + passphrase (15+ characters, checked against known breaches and obvious words), checked only on the server; sessions in MongoDB (60 min idle, 12 h absolute, HttpOnly `__Host-` cookie). Login throttling per username (doubling delay after 5 failures, at most 15 min, never a permanent lock) and per IP. One owner (web lead) and editors; invites and resets are one-time links that expire after 72 hours.
+- **Editing:** events, team, achievements, site settings, Join page, FAQs, resources and the Home page (hero, About the Society, What We Do: at least 6 items). Unpublished edits autosave on the device (per signed-in user) until Publish. A presence note shows who is editing which section.
+- **Publish:** every publish is a numbered release, kept forever. Changes are merged item by item against the release the editor started from; only same-item clashes are reported ("Load theirs" / "Publish mine anyway"). After saving, the server calls Vercel's Deploy Hook; the admin polls `/content-version.json` until the new release is live.
+- **History and undo:** make an old release (or one section of it) live again; that creates a new release.
+- **Images:** processed in the browser (square 480 px, posters 900 px wide, WebP with JPEG fallback), stored in MongoDB under content-addressed paths (`/images/<folder>/<name>-<10 hex of sha256>.webp`), copied into `public/images` at build time.
+- **Owner extras:** Accounts (invite, reset link, deactivate/reactivate, activity log), monthly backup download and import, "Import starting content" (loads `src/data` + `public/images` as release #1).
+- **Build:** `scripts/fetch-content.ts` pulls the release (retries about 3 min while Render wakes), validates every section (stops the build on any rule break), downloads only new or changed images (SHA-256 checked), and writes `/content-snapshot.json` and `/content-version.json`. If Render can't be reached it copies the live site's snapshot instead; only the very first deploy uses the repo's `src/data`.
 
 ### Design system
 
@@ -194,7 +196,7 @@ README.md                   how to run, deploy, use the admin, update content, p
 **Home (`ParticleStory.tsx`):** formations 0 intro cloud, 1 chapter-name text, 2 hero globe, 3-8 one abstract formation per What We Do item: network (faces camera with sway), helix, hills, constellation, ripple, swarm. 6,500 particles desktop, 2,600 phones. The canvas is sticky while the hero and six step cards scroll over it; formation index is interpolated from each step element's real position; soft glow blobs behind change colour per formation.
 - Step cards: "What We Do · 1 of 6" to "6 of 6" from `src/data/home.json` (Technical Learning, Innovation & Development, Research & Exploration, Collaboration, Events & Discussions, Industry & Professional Development). The four CI ideas (neural networks, fuzzy systems, evolutionary computation, swarm intelligence) were removed from all visible content at the club's request in Sept 2026; do not bring them back.
 - **Intro:** plays when the site is opened or refreshed on `/` (module flag `openedOnHome` + `introPlayedThisLoad`, set only when the intro finishes). Not on in-site navigation back to Home, not after opening another page first. Forces scroll to top (`history.scrollRestoration = "manual"`). Timeline: loading bar, then gather into "IEEE CIS / REC" (desktop) or "IEEE / CIS / REC" (phones) over 1.7 s, hold 1.3 s with "Computational Intelligence Society / Rajalakshmi Engineering College, Chennai" under the text, then release into the globe over 1.5 s. Skip button (with countdown ring) or Esc skips (0.7 s release). Particles are **not interactive during the intro**.
-- `body[data-intro]` states: `on` (header, hero items `.intro-item`, progress bar, back-to-top, `.story-shade` hidden; scroll locked), `leaving` (chrome animates in with delays), `done`. An inline script in `index.html` sets `on` before first paint on `/` (unless reduced motion). Fallbacks set `done` if WebGL is missing.
+- `body[data-intro]` states: `on` (header, hero items `.intro-item`, progress bar, back-to-top, `.story-shade` hidden; scroll locked), `leaving` (chrome animates in with delays), `done`. `public/intro.js` (a blocking `<script src>` at the start of `<body>` in `index.html`) sets `on` before first paint on `/` (unless reduced motion). Fallbacks set `done` if WebGL is missing.
 - Clicking empty space on the home scene sends a shockwave. Home scene wrapper is pulled up under the navbar (`-mt-[69px]`).
 
 **Page headers (`HeaderParticles.tsx`):** 3,000 particles desktop, 1,500 phones; assemble from a scattered cloud over 1.8 s; force field and click shockwave active; presets: sphere, neural, fuzzy, helix, swarm, chaos, rings, constellation, ripple.
@@ -260,14 +262,14 @@ Session **2024–25** (from posters): Pugal M (Chair), Shrinithi S (Vice Chair),
 - [ ] Which LinkedIn URL is official; confirm Instagram handle `@ieee_cis_rec`.
 - [ ] Roles for the 21 unused old photos, if they should appear (e.g. as alumni).
 - [ ] Change the old admin password anywhere it was reused.
-- [ ] Put the site on GitHub, connect Netlify or Vercel, set `"repo"` in `src/data/admin.json`, add office bearers as collaborators, and try the admin against the real repository (so far tested against a simulated GitHub).
+- [ ] Go live with the database admin (`docs/SETUP.md`): Atlas, Render, Vercel, replace the `/api` host in `vercel.json`, create the owner account, import the starting content, fix the five team links that aren't full links (`linkedin.com/in/harishm007`, `git.harishm.tech`, `NIL`, `AntonyJadrien `, `@Sathyanath-L`), publish, and test on a real phone. Nothing has been tested against real Atlas/Render/Vercel yet.
 - [ ] Test on a real laptop and phone (all testing was in a headless browser with software graphics).
 
 ## 6. Offered but not done yet (possible next steps)
 
-- ~~Admin panel~~: **done** (custom Git-based admin, see section 4).
+- ~~Admin panel~~: **done**. First a Git-based admin (Sept 2026), replaced on 22 Sept 2026 by the database admin (section 4).
 - Suggestions given to the user: achievements content (SIH results etc.); event photo gallery (uploadable via admin); alumni section from past years' teams; domain project showcases with GitHub links; "add all events to my calendar" subscription link; certificate verification; share images (Open Graph) per page/event; privacy-friendly analytics (Plausible or Umami); custom domain; yearly handover of repository access.
-- Possible admin additions: gallery editor, cleanup of replaced images, preview deploys via branches, editing "What we explore"/Home copy.
+- Possible admin additions: gallery editor, two-step sign-in codes (planned for later), editing more page copy. (Home copy editing is done.)
 - Deploy to Netlify/Vercel and connect a domain.
 - Lighthouse/performance audit on real hardware; maybe code-split the home-page particle code.
 - Replace the placeholder REC mark or CIS tile if the chapter has an official combined logo.
@@ -276,7 +278,9 @@ Session **2024–25** (from posters): Pugal M (Chair), Shrinithi S (Vice Chair),
 
 - `tsconfig.app.json` has `erasableSyntaxOnly`: no constructor parameter properties (declare fields, assign in constructor). `resolveJsonModule` was added for JSON imports.
 - ESLint `react-refresh/only-export-components`: files exporting components must only export components. That's why icon maps live in `src/lib/icons.ts`.
-- The intro depends on three places staying in sync: the inline script in `index.html`, `ParticleStory.tsx`, and the `body[data-intro]` rules in `index.css`.
+- The intro depends on three places staying in sync: `public/intro.js` (loaded from `index.html`), `ParticleStory.tsx`, and the `body[data-intro]` rules in `index.css`.
+- The admin runs under a strict CSP (`vercel.json`): no inline scripts, no third-party requests. `dist/admin.html` is `index.html` minus its inline preload script (the `adminHtml` plugin in `vite.config.ts`).
+- Content rules (`shared/validate.ts`) run in the admin, on the server and in the build; a build stops on any rule break (Vercel keeps the old site).
 - `PageHeader` accepts `shape` (formation) and optional `aside` / `below` slots.
 - `data-cursor="Label"` on any element shows that label in the cursor ring.
 - Contact form has no backend (opens the visitor's email app). The map is a Google Maps embed with a CSS colour-invert filter.

@@ -5,7 +5,7 @@ Built with React, TypeScript, Vite and Tailwind CSS.
 
 ## Run it on your computer
 
-You need Node.js 20 or newer.
+You need Node.js 22.18 or newer (24 recommended).
 
 ```bash
 npm install
@@ -13,66 +13,47 @@ npm run dev       # opens a live preview at http://localhost:5173
 npm run build     # makes the final site in the dist/ folder
 ```
 
+The admin needs its server too: `npm run server` in a second terminal (settings in `.env.local`, see
+[docs/SETUP.md](docs/SETUP.md#running-everything-on-your-computer)). `npm run lint` and `npm run test:server` run the checks.
+
 ## Put it online
 
-**Netlify or Vercel (recommended):** connect this GitHub repository. Build command `npm run build`, output folder `dist`.
-The files `public/_redirects` (Netlify) and `vercel.json` (Vercel) are already set up so links like `/events/rewired` work.
+The site is set up for three free services (step by step in [docs/SETUP.md](docs/SETUP.md)):
 
-**GitHub Pages:** it can't handle page links on its own. In `src/App.tsx`, change `BrowserRouter` to `HashRouter`
-(both in the import line and in the JSX). Links will then look like `/#/events`.
+- **Vercel** serves the website. `vercel.json` handles page links like `/events/rewired`, forwards `/api` to the
+  admin server, and adds security headers to `/admin`.
+- **Render** runs the admin server (`server/`), described in `render.yaml`.
+- **MongoDB Atlas** (free M0) stores the published content, its history, photos and admin accounts.
 
-After that, every change pushed to GitHub redeploys the site automatically. Nobody needs a login or an admin page.
+Code changes pushed to `main` on GitHub redeploy the site automatically. Content changes come from the admin.
 
 ---
 
 ## Admin page (the easy way to update the site)
 
-Open **`/admin`** on the live site (for example `https://your-site.netlify.app/admin`). From there you can add and edit
-events and posters, update the team (names, roles, photos, links, new academic years), achievements, site settings,
-FAQs and resources. Every form shows a live preview. **Nothing changes on the site until you press Publish**, which
-saves everything to GitHub in one update; the host then rebuilds the site in a minute or two.
+Open **`/admin`** on the live site. From there office bearers edit events and posters, the team (names, roles,
+photos, links, new academic years), achievements, the Home page (hero, About the Society, What We Do), the Join page,
+FAQs, resources and site settings. Every form shows a live preview.
 
-Photos are processed in your browser before upload: member photos are framed as a square (drag and zoom) and saved as
-480 × 480 WebP, posters are resized to 900 px wide. A 5 MB phone photo ends up around 20–60 KB.
+- **Sign-in:** each person has their own username and passphrase, checked on the admin server. The web lead invites
+  people from the Accounts page; there is no public sign-up.
+- **Unpublished changes** save on your device automatically until you press **Publish**.
+- **Publish** saves a numbered release in the database and rebuilds the site (1–3 minutes). If someone else published
+  in the meantime, changes to different items are combined; only edits to the same item ask you to choose.
+- **History** keeps every release. Undo makes an old release, or one section of it, live again as a new release.
+- **Photos** are processed in your browser before upload: member photos are framed as a square (drag and zoom) and
+  saved as 480 × 480 WebP, posters are resized to 900 px wide. A 5 MB phone photo ends up around 20–60 KB.
+- The admin is excluded from search engines and loaded separately, so visitors never download it.
 
-### One-time setup (web lead)
-
-1. Put this project in a GitHub repository and connect it to Netlify or Vercel (see "Put it online").
-2. In `src/data/admin.json`, set `"repo"` to the repository, for example `"ieee-cis-rec/website"`, and `"branch"`
-   to the branch the host deploys (usually `main`). Commit and push.
-3. Add each office bearer who should edit the site as a collaborator on the repository
-   (GitHub repository → Settings → Collaborators → Add people, with Write access).
-
-### Signing in (each editor)
-
-Each editor creates their own **fine-grained personal access token** on GitHub:
-Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token →
-Repository access: *Only select repositories* (pick the website) → Permissions: **Contents: Read and write** → Generate.
-Paste it on the `/admin` sign-in screen. The token stays in that browser tab (or on that device if you tick
-"Keep me signed in"). It is never part of the website's code. Remove someone's access by removing them as a
-collaborator, or they can delete their token on GitHub.
-
-### Other ways to use the admin
-
-- **Local mode:** when you run `npm run dev`, `/admin` offers "Edit the files on this computer". Changes save
-  straight into `src/data/` and `public/images/`; commit and push them with Git. (This is handled by
-  `admin-local-backend.ts`, which only exists in the dev server, never in the built site.)
-- **Offline mode:** "Continue without signing in" lets anyone draft changes; Publish then downloads the changed
-  files so someone with access can upload them to the same folders in GitHub.
-
-### Good to know
-
-- If someone else published while you were editing, the admin warns you before replacing their changes.
-- Closing the tab with unpublished changes asks for confirmation. Drafts are not saved anywhere until you publish.
-- Replaced photos and posters stay in the repository as old files; delete them in GitHub if you want to tidy up.
-- The admin is excluded from search engines (`robots.txt` and a `noindex` tag) and is loaded separately, so
-  visitors never download it.
+The full guide for editors and the web lead (accounts, monthly backups, what to do when something is down, the yearly
+handover) is [docs/ADMIN-GUIDE.md](docs/ADMIN-GUIDE.md).
 
 ## Updating the site by hand
 
-All content lives in `src/data/`. The admin page edits these same files for you; this section is for people who
-prefer editing them directly. You only edit these files, never the design code.
-After editing, check it with `npm run dev`, then push to GitHub.
+Content lives in `src/data/`. **Once the admin is live, use the admin instead:** every build replaces these files
+with the content published in the admin, so editing them in GitHub doesn't change the live site. They remain the
+starting copy (imported into the admin once) and the content `npm run dev` shows on your computer. The formats
+below are also what the admin stores.
 
 ### Add an event: `src/data/events.json`
 
@@ -131,6 +112,8 @@ Team `slug` values power the filter and the icons, so keep them as they are.
 
 Large photos make the site slow on mobile data. Before adding images:
 
+The admin prepares photos for you. For the starting copy and local work:
+
 - **Team photos:** square, about 480 × 480 px, face in the middle. Save as `.webp` in `public/images/team/`.
 - **Posters:** at most 900 px wide, `.webp`, in `public/images/events/`.
 - Aim for under 150 KB each. Free tool: https://squoosh.app
@@ -148,15 +131,20 @@ for perspective, so they never run off the screen edge or under the text.
 ## Where things are
 
 ```
-src/data/                  content (edited by the admin, or by hand); admin.json = repository for the admin
+src/data/                  content: the starting copy (each live build overwrites it with the published content)
 src/pages/                 one file per page
 src/components/            shared pieces: navbar, footer, cards, motion effects
 src/components/particles/  3D engine, formations, home story, header particles, layout fitting
-src/admin/                 the /admin page: sign-in, editors, GitHub/local/offline publishing, image processing
+src/admin/                 the /admin page: sign-in, editors, publishing, history, accounts, image processing
+shared/                    content types, rules, merging and the API contract, used by the admin, server and build
+server/                    the admin server (Render): Express + MongoDB, run by Node directly (no build step)
+scripts/                   fetch-content.ts: pulls the published content into src/data and public/images at build time
 src/lib/                   data loading, date formatting, calendar files, icons
 public/images/             team photos, posters, achievement photos
 public/brand/              REC and IEEE CIS logos
-admin-local-backend.ts     dev-server-only file access for the admin's local mode
+public/intro.js            hides the page chrome before first paint while the home intro plays
+vercel.json, render.yaml   hosting settings for Vercel (site) and Render (admin server)
+docs/                      SETUP.md (hosting setup), ADMIN-GUIDE.md (using the admin), HANDOFF.md (project history)
 ```
 
 ## Animations and 3D effects
@@ -192,5 +180,5 @@ mouse effects, and browsers without WebGL simply show the pages without particle
 **Common tweaks** (in `src/components/particles/ParticleStory.tsx`):
 - Change the intro text: edit `["IEEE CIS", "REC"]` (desktop) and `["IEEE", "CIS", "REC"]` (phones).
 - Change colours: edit the `COLORS` and `GLOW` lists (one pair per formation).
-- Turn the intro off completely: in `ParticleStory.tsx` set `const playIntro = false`, and remove the `<script>` block in `index.html`.
+- Turn the intro off completely: in `ParticleStory.tsx` set `const playIntro = false`, and remove the `<script src="/intro.js">` line in `index.html`.
 - Change the intro timing: `FORM` (gathering) and `HOLD` (how long the name stays), in milliseconds.
