@@ -1,6 +1,5 @@
 import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
-import adminLocalBackend from './admin-local-backend'
 import { PAGE_ROUTES } from './src/lib/routeTable'
 
 /**
@@ -57,9 +56,37 @@ function pagePreload(): Plugin {
   }
 }
 
+/**
+ * The admin's own copy of index.html (dist/admin.html). vercel.json serves it for /admin and /admin/* with a strict
+ * Content-Security-Policy (script-src 'self'), which would block the inline preload script above. The copy is
+ * index.html without its inline scripts; that script skips /admin anyway, so the admin works exactly the same.
+ * Everything the page still loads is a file on the site (the entry, its preloads, the CSS and /intro.js). Build only.
+ */
+function adminHtml(): Plugin {
+  return {
+    name: 'cis-admin-html',
+    apply: 'build',
+    enforce: 'post',
+    generateBundle(_options, bundle) {
+      const index = bundle['index.html']
+      if (!index || index.type !== 'asset') return
+      const html = typeof index.source === 'string' ? index.source : new TextDecoder().decode(index.source)
+      const admin = html.replace(/\s*<script>[\s\S]*?<\/script>/g, '')
+      if (/<script(?![^>]*\bsrc=)[^>]*>/.test(admin)) this.error('admin.html would still contain an inline script, which the admin CSP blocks')
+      this.emitFile({ type: 'asset', fileName: 'admin.html', source: admin })
+    },
+  }
+}
+
+/** The admin server (npm run server) for /api during `npm run dev` and `npm run preview`. 127.0.0.1, not localhost:
+ *  Node may resolve localhost to IPv6 (::1) first. */
+const apiProxy = { '/api': 'http://127.0.0.1:8787' }
+
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), adminLocalBackend(), pagePreload()],
+  plugins: [react(), pagePreload(), adminHtml()],
+  server: { proxy: apiProxy },
+  preview: { proxy: apiProxy },
   build: {
     rollupOptions: {
       output: {

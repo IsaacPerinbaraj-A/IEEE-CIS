@@ -1,0 +1,41 @@
+# Render Blueprint for the admin server (Render → New → Blueprint → pick this repository).
+# One free web service in Singapore. It runs server/index.ts directly (Node 24 runs TypeScript with no build step)
+# from the repository root, so it can also read shared/ and the starting copy in src/data and public/images.
+# Values marked "sync: false" are typed into Render's dashboard when the Blueprint is created (docs/SETUP.md);
+# they are never stored in this file.
+services:
+  - type: web
+    name: ieee-cis-admin
+    runtime: node
+    plan: free
+    region: singapore
+    branch: main
+    buildCommand: npm ci
+    startCommand: node server/index.ts
+    healthCheckPath: /healthz
+    # Redeploy only when the server's code or the starting copy changes (a content publish never touches GitHub)
+    buildFilter:
+      paths:
+        - server/**
+        - shared/**
+        - src/data/**
+        - public/images/**
+        - package.json
+        - package-lock.json
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGODB_DB
+        value: cis
+      - key: SITE_ORIGIN
+        sync: false
+      - key: EXPORT_TOKEN
+        sync: false
+      - key: IP_HASH_KEY
+        sync: false
+      - key: DEPLOY_HOOK_URL
+        sync: false
+      - key: SETUP_TOKEN
+        sync: false
