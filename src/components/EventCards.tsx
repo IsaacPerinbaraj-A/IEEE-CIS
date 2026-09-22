@@ -1,14 +1,25 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { CalendarDays, MapPin } from "lucide-react";
-import { type ChapterEvent, formatDate } from "../lib/data";
+import { CalendarDays, ChevronRight, MapPin } from "lucide-react";
+import { type ChapterEvent, formatDate, isUpcoming, shortDate, statusLabel } from "../lib/data";
 import { Tilt } from "./Motion";
 
-/** Shows the poster, or a typographic stand-in for events that don't have one yet (or whose poster file fails to load). */
-export function Poster({ e, className = "" }: { e: ChapterEvent; className?: string }) {
+/**
+ * Shows the poster, or a typographic stand-in for events that don't have one yet (or whose poster file fails to load).
+ * `mini` is the small stand-in for list-row thumbnails: the gold ring and the first letter of the title.
+ */
+export function Poster({ e, className = "", mini }: { e: ChapterEvent; className?: string; mini?: boolean }) {
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
   if (e.poster && failedSrc !== e.poster) {
     return <img src={e.poster} alt={`${e.title} poster`} loading="lazy" decoding="async" onError={() => setFailedSrc(e.poster ?? null)} className={`h-full w-full object-cover ${className}`} />;
+  }
+  if (mini) {
+    return (
+      <div aria-hidden className={`relative h-full w-full overflow-hidden bg-gradient-to-br from-violet-deep via-panel to-ink ${className}`}>
+        <div className="absolute -right-5 top-[36%] h-14 w-14 rounded-full border-[7px] border-gold/70" />
+        <span className="absolute left-2.5 top-2 font-display text-[22px] font-semibold leading-none text-cream/90">{e.title.trim()[0]}</span>
+      </div>
+    );
   }
   return (
     <div className={`relative flex h-full w-full flex-col justify-between overflow-hidden bg-gradient-to-br from-violet-deep via-panel to-ink p-6 ${className}`}>
@@ -31,6 +42,30 @@ export function PosterCard({ e, compact }: { e: ChapterEvent; compact?: boolean 
       <div className="mt-4 flex items-center gap-2 text-[14px] text-mute"><span className="text-violet-soft">{e.type}</span><span aria-hidden>/</span><span>{formatDate(e)}</span></div>
       <h3 className="mt-1 text-lg font-semibold group-hover:text-violet-soft">{e.title}</h3>
       {!compact && <p className="mt-1 text-[15px] text-mute">{e.summary}</p>}
+    </Link>
+  );
+}
+
+/**
+ * Phones: one event as a list row (about 120px): poster thumbnail, a meta line, a two-line title, a one-line summary
+ * and a chevron. Upcoming events show how soon they start in the meta line; past events show their type.
+ * It bleeds to the screen edge so the press tint spans the whole row; use it inside `.wrap`.
+ */
+export function EventRow({ e }: { e: ChapterEvent }) {
+  const upcoming = isUpcoming(e);
+  return (
+    <Link to={`/events/${e.slug}`} className="press -mx-5 flex items-center gap-3.5 px-5 py-3 active:bg-raised/60">
+      <Tilt className="shrink-0 rounded-xl" max={3}>
+        <div className="h-[95px] w-[76px] overflow-hidden rounded-xl border border-line bg-panel"><Poster e={e} mini /></div>
+      </Tilt>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-[14px] text-mute">
+          <span className="text-violet-soft">{upcoming ? statusLabel(e) : e.type}</span><span aria-hidden> · </span><span className="sr-only">, </span>{shortDate(e)}
+        </p>
+        <h3 className="mt-1 line-clamp-2 text-[16px] font-semibold leading-snug">{e.title}</h3>
+        <p className="mt-1 truncate text-[14px] text-mute">{e.summary}</p>
+      </div>
+      <ChevronRight size={18} aria-hidden className="shrink-0 text-mute" />
     </Link>
   );
 }

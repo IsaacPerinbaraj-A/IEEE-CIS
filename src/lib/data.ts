@@ -70,6 +70,23 @@ export function formatTime(t?: string) {
   return b ? `${to12(a)} – ${to12(b)}` : to12(a);
 }
 
+/** Short date for list rows: "18 Sept 2025", "3–6 Mar 2026", "28 Feb – 2 Mar 2026", or "2025–26 season" when undated. */
+export function shortDate(e: ChapterEvent): string {
+  if (!e.date) return `${sessionLabel(e.session)} season`;
+  const full = { day: "numeric", month: "short", year: "numeric" } as const;
+  if (!e.endDate || e.endDate === e.date) return fmt(e.date, full);
+  return e.date.slice(0, 7) === e.endDate.slice(0, 7)
+    ? `${fmt(e.date, { day: "numeric" })}–${fmt(e.endDate, full)}`
+    : `${fmt(e.date, { day: "numeric", month: "short" })} – ${fmt(e.endDate, full)}`;
+}
+
+/** countdown() as a label that starts a line: "In 5 days", "Tomorrow", "Today", "On now". Past events say "Ended". */
+export function statusLabel(e: ChapterEvent): string {
+  if (!isUpcoming(e)) return "Ended";
+  const c = countdown(e);
+  return c ? c[0].toUpperCase() + c.slice(1) : "";
+}
+
 /** Builds a downloadable .ics calendar file for an event. */
 export function calendarFile(e: ChapterEvent): string {
   const d = (s: string) => s.replace(/-/g, "");
