@@ -1,26 +1,147 @@
 [
-  { "domain": "Machine Learning", "links": [
-    { "title": "scikit-learn user guide", "url": "https://scikit-learn.org/stable/user_guide.html", "note": "Classic machine learning, explained with runnable examples." },
-    { "title": "PyTorch tutorials", "url": "https://pytorch.org/tutorials/", "note": "Build and train neural networks step by step." },
-    { "title": "Kaggle Learn", "url": "https://www.kaggle.com/learn", "note": "Short, free, hands-on courses in the browser." } ] },
-  { "domain": "Data Science", "links": [
-    { "title": "pandas documentation", "url": "https://pandas.pydata.org/docs/", "note": "The standard tool for cleaning and analysing data in Python." },
-    { "title": "Power BI documentation", "url": "https://learn.microsoft.com/en-us/power-bi/", "note": "Continue from the Datavizzx workshop." },
-    { "title": "Kaggle datasets", "url": "https://www.kaggle.com/datasets", "note": "Real datasets to practise on." } ] },
-  { "domain": "Computer Vision", "links": [
-    { "title": "OpenCV", "url": "https://opencv.org", "note": "The go-to library for image and video processing." },
-    { "title": "Hugging Face Learn", "url": "https://huggingface.co/learn", "note": "Free courses on vision and language models." } ] },
-  { "domain": "Internet of Things", "links": [
-    { "title": "Arduino documentation", "url": "https://docs.arduino.cc", "note": "Sensors, boards and your first circuits." },
-    { "title": "Raspberry Pi documentation", "url": "https://www.raspberrypi.com/documentation/", "note": "Set up and program a Raspberry Pi." } ] },
-  { "domain": "Web Development", "links": [
-    { "title": "MDN Web Docs", "url": "https://developer.mozilla.org", "note": "The reference for HTML, CSS and JavaScript." },
-    { "title": "React", "url": "https://react.dev", "note": "The library this website is built with." } ] },
-  { "domain": "Cloud and Security", "links": [
-    { "title": "AWS Skill Builder", "url": "https://skillbuilder.aws", "note": "Continue from the Cloudscape workshop." },
-    { "title": "OWASP Top 10", "url": "https://owasp.org/www-project-top-ten/", "note": "The most common web security risks, from Operation Shadow's world." } ] },
-  { "domain": "IEEE", "links": [
-    { "title": "IEEE Computational Intelligence Society", "url": "https://cis.ieee.org", "note": "Society news, conferences, competitions and publications." },
-    { "title": "IEEE Xplore", "url": "https://ieeexplore.ieee.org", "note": "Search IEEE papers and conference proceedings." },
-    { "title": "IEEE membership", "url": "https://www.ieee.org/membership/join", "note": "Join or renew your student membership." } ] }
+  {
+    "domain": "Artificial Intelligence",
+    "links": [
+      {
+        "title": "Hugging Face Learn",
+        "url": "https://huggingface.co/learn",
+        "note": "Free courses on language, vision and agent models."
+      },
+      {
+        "title": "Practical Deep Learning for Coders",
+        "url": "https://course.fast.ai",
+        "note": "fast.ai's free course: build working models from the first lesson."
+      },
+      {
+        "title": "OpenAI Cookbook",
+        "url": "https://cookbook.openai.com",
+        "note": "Worked examples for building with language models."
+      }
+    ]
+  },
+  {
+    "domain": "Machine Learning",
+    "links": [
+      {
+        "title": "scikit-learn user guide",
+        "url": "https://scikit-learn.org/stable/user_guide.html",
+        "note": "Classic machine learning, explained with runnable examples."
+      },
+      {
+        "title": "PyTorch tutorials",
+        "url": "https://pytorch.org/tutorials/",
+        "note": "Build and train neural networks step by step."
+      },
+      {
+        "title": "Kaggle Learn",
+        "url": "https://www.kaggle.com/learn",
+        "note": "Short, free, hands-on courses in the browser."
+      }
+    ]
+  },
+  {
+    "domain": "Data Science",
+    "links": [
+      {
+        "title": "pandas documentation",
+        "url": "https://pandas.pydata.org/docs/",
+        "note": "The standard tool for cleaning and analysing data in Python."
+      },
+      {
+        "title": "Power BI documentation",
+        "url": "https://learn.microsoft.com/en-us/power-bi/",
+        "note": "Continue from the Datavizzx workshop."
+      },
+      {
+        "title": "Kaggle datasets",
+        "url": "https://www.kaggle.com/datasets",
+        "note": "Real datasets to practise on."
+      }
+    ]
+  },
+  {
+    "domain": "Web Development",
+    "links": [
+      {
+        "title": "MDN Web Docs",
+        "url": "https://developer.mozilla.org",
+        "note": "The reference for HTML, CSS and JavaScript."
+      },
+      {
+        "title": "React",
+        "url": "https://react.dev",
+        "note": "The library this website is built with."
+      }
+    ]
+  },
+  {
+    "domain": "Design",
+    "links": [
+      {
+        "title": "Figma resource library",
+        "url": "https://www.figma.com/resource-library/",
+        "note": "Design basics, from layout to handing work to developers."
+      },
+      {
+        "title": "Material Design",
+        "url": "https://m3.material.io",
+        "note": "How spacing, colour and type work together in an interface."
+      },
+      {
+        "title": "Google Fonts Knowledge",
+        "url": "https://fonts.google.com/knowledge",
+        "note": "Choosing and pairing typefaces."
+      }
+    ]
+  },
+  {
+    "domain": "Video",
+    "links": [
+      {
+        "title": "DaVinci Resolve training",
+        "url": "https://www.blackmagicdesign.com/products/davinciresolve/training",
+        "note": "Free official training for the editor, with practice footage."
+      },
+      {
+        "title": "YouTube Creators",
+        "url": "https://www.youtube.com/creators/",
+        "note": "Shooting, editing and publishing videos that people watch."
+      }
+    ]
+  },
+  {
+    "domain": "Cloud and Security",
+    "links": [
+      {
+        "title": "AWS Skill Builder",
+        "url": "https://skillbuilder.aws",
+        "note": "Continue from the Cloudscape workshop."
+      },
+      {
+        "title": "OWASP Top 10",
+        "url": "https://owasp.org/www-project-top-ten/",
+        "note": "The most common web security risks, from Operation Shadow's world."
+      }
+    ]
+  },
+  {
+    "domain": "IEEE",
+    "links": [
+      {
+        "title": "IEEE Computational Intelligence Society",
+        "url": "https://cis.ieee.org",
+        "note": "Society news, conferences, competitions and publications."
+      },
+      {
+        "title": "IEEE Xplore",
+        "url": "https://ieeexplore.ieee.org",
+        "note": "Search IEEE papers and conference proceedings."
+      },
+      {
+        "title": "IEEE membership",
+        "url": "https://www.ieee.org/membership/join",
+        "note": "Join or renew your student membership."
+      }
+    ]
+  }
 ]
