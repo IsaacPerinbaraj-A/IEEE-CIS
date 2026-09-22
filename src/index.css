@@ -63,6 +63,8 @@
 
 /* ---------- Low-power devices (html[data-tier="low"], set from src/lib/device.ts): cheaper blur layers ---------- */
 html[data-tier="low"] .blur-\[120px\] { filter: blur(48px); }
+/* ...except on phones, where the header glow is already a soft gradient with no blur at all (PageHeader.tsx) */
+@media not all and (min-width: 640px) { html[data-tier="low"] .max-sm\:filter-none { filter: none; } }
 html[data-tier="low"] .backdrop-blur, html[data-tier="low"] .backdrop-blur-md { -webkit-backdrop-filter: none; backdrop-filter: none; }
 html[data-tier="low"] .step-card { background-color: rgba(15,10,28,.9); }
 
@@ -82,9 +84,14 @@ html[data-tier="low"] .step-card { background-color: rgba(15,10,28,.9); }
 @media (prefers-reduced-motion: reduce) { .word > span { transform: none; transition: none !important; } }
 
 /* ---------- 3D tilt cards ---------- */
-.tilt { position: relative; transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transform-style: preserve-3d;
+.tilt { position: relative; transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
   transition: transform .5s cubic-bezier(.2,.7,.2,1); will-change: transform; }
+/* preserve-3d only while the card moves (Tilt sets data-live from the first touch or hover until it has settled flat),
+   so a card at rest doesn't split into extra GPU layers */
+.tilt[data-live="1"] { transform-style: preserve-3d; }
 .tilt[data-active="1"] { transition: transform .12s linear; }
+/* Phones: a card at rest has no transform and no GPU layer of its own; pressing it switches the 3D styles on */
+@media (max-width: 639px) { .tilt:not([data-live="1"]) { transform: none; will-change: auto; } }
 .tilt-glare { pointer-events: none; position: absolute; inset: 0; border-radius: inherit; opacity: 0; transition: opacity .3s;
   background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,.28), rgba(196,181,253,.08) 35%, transparent 60%); mix-blend-mode: soft-light; }
 .tilt[data-active="1"] .tilt-glare { opacity: 1; }
@@ -113,7 +120,18 @@ body[data-intro="leaving"] .intro-item { transition-delay: calc(var(--d, 0ms) + 
 @keyframes ring { to { transform: rotate(360deg); } }
 .join-band { background: linear-gradient(120deg, rgba(91,59,168,.75), #181128 35%, rgba(190,24,93,.35) 70%, #181128); background-size: 220% 220%; animation: band 14s ease-in-out infinite; }
 .join-ring { border-top-color: #EC4899; border-left-color: #8B5CF6; animation: ring 18s linear infinite; }
-.join-band[data-play="0"], .join-band[data-play="0"] .join-ring { animation-play-state: paused; }
+.join-band[data-play="0"], .join-band[data-play="0"]::before, .join-band[data-play="0"] .join-ring { animation-play-state: paused; }
+/* Phones: the same gradient and the same 14s drift, but moved as a layer (transform) instead of repainting the band
+   every frame. The layer is 220% of the band, like the background-size above, and slides the way background-position
+   0% -> 100% does; it carries the page colour under the gradient, so the band's own (now still) background only shows
+   in the 1px border. */
+@keyframes band-move { 0%, 100% { transform: translate(0, -27.272727%); } 50% { transform: translate(-54.545455%, -27.272727%); } }
+@media (max-width: 639px) {
+  .join-band { animation: none; background-position: 0% 50%; }
+  .join-band::before { content: ""; position: absolute; left: 0; top: 0; width: 220%; height: 220%; pointer-events: none;
+    background: linear-gradient(120deg, rgba(91,59,168,.75), #181128 35%, rgba(190,24,93,.35) 70%, #181128), #0F0A1C;
+    animation: band-move 14s ease-in-out infinite; }
+}
 body[data-intro="on"] .story-shade { opacity: 0; }
 
 /* Story glows: centred behind the name during the intro, then drifting right to sit behind the globe */
@@ -170,6 +188,8 @@ body[data-intro="on"] .story-shade { opacity: 0; }
   .hero-cue { display: none; }
   .hero-wrap { padding-bottom: 3.5rem; }
 }
+/* Phones: the Skip intro button (ParticleStory) sits over the live canvas, so a solid tint replaces its backdrop blur */
+@media (max-width: 639px) { .intro-overlay > button { -webkit-backdrop-filter: none; backdrop-filter: none; background-color: rgba(15,10,28,.85); } }
 body[data-intro="on"] .glow-a { right: calc(50% - 30vh); top: calc(50% - 34vh); }
 body[data-intro="on"] .glow-b { right: calc(50% - 10vh); bottom: calc(50% - 40vh); }
 
@@ -189,6 +209,9 @@ body[data-intro="on"] .glow-b { right: calc(50% - 10vh); bottom: calc(50% - 40vh
   /* With the subtitle gone, move the name down to the middle of the bar, level with the logo and Menu */
   .site-header[data-scrolled="1"] .site-brand-name { transform: translateY(9px); }
 }
+/* Phones: no backdrop blur (over the live particle canvas it has to be redone every frame); a slightly stronger tint
+   instead. The slimmed bar above keeps its .95. */
+@media (max-width: 639px) { .site-header::before { -webkit-backdrop-filter: none; backdrop-filter: none; background-color: rgba(15,10,28,.9); } }
 /* Only the visible bar takes taps. When the phone header slims, its box is still 68px tall; the transparent strip
    under the bar lets taps through to anything pinned below it (sticky year headers, the Team strip). */
 .site-header { pointer-events: none; }
@@ -249,6 +272,10 @@ html[data-page-transition] .page-curtain { display: block; position: fixed; inse
 @keyframes titleIn { from { opacity: 0; transform: translateY(24px); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
 .page-title > *:not(.words) { animation: titleIn .9s cubic-bezier(.2,.7,.2,1) both; }
 .page-title > *:nth-child(2) { animation-delay: .12s; }
+/* Phones: a page opened through the curtain (Layout gives it .page-quiet instead of .page-enter) skips its own rise-in,
+   and the lines under its title only fade, without the blur, so the curtain never runs alongside heavy filters */
+@keyframes titleFade { from { opacity: 0; } to { opacity: 1; } }
+.page-quiet .page-title > *:not(.words) { animation-name: titleFade; }
 
 /* ---------- Custom cursor: a small glowing dot (mouse only; added by JS so the normal cursor returns if scripts fail) ---------- */
 html[data-aura="on"], html[data-aura="on"] * { cursor: none !important; }

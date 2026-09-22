@@ -67,12 +67,13 @@ export default function Home() {
         <p className="hero-lede intro-item mt-5 max-w-[56ch] text-[17px] text-cream/80 max-sm:order-last max-sm:mt-7 sm:text-lg" style={d(280)}>{home.hero.intro}</p>
         <div className="intro-item mt-8 flex flex-wrap gap-3 max-sm:mt-7 max-sm:flex-col" style={d(360)}>
           <Magnetic className="max-sm:w-full"><Link to={home.hero.primaryLink} className="btn-gold max-sm:min-h-[50px] max-sm:w-full"><RollLabel>{home.hero.primaryLabel}</RollLabel></Link></Magnetic>
-          <Link to={home.hero.secondaryLink} className="btn-ghost bg-ink/40 backdrop-blur max-sm:min-h-[50px] max-sm:w-full">{home.hero.secondaryLabel}</Link>
+          {/* Phones: a solid tint instead of the backdrop blur, which would be redone every frame over the live particles */}
+          <Link to={home.hero.secondaryLink} className="btn-ghost bg-ink/40 backdrop-blur max-sm:min-h-[50px] max-sm:w-full max-sm:bg-ink/85 max-sm:backdrop-filter-none">{home.hero.secondaryLabel}</Link>
         </div>
         {/* The next (or latest) event, reachable from the first screen */}
         {spotlight && (
           <div className="intro-item mt-6" style={d(480)}>
-            <Link to={`/events/${spotlight.slug}`} className="press group inline-flex max-w-full items-center gap-2.5 rounded-full border border-line bg-ink/50 py-2 pl-3.5 pr-4 text-[14px] text-mute backdrop-blur transition-colors hover:border-violet-soft hover:text-cream max-sm:flex max-sm:min-h-[44px] max-sm:w-full">
+            <Link to={`/events/${spotlight.slug}`} className="press group inline-flex max-w-full items-center gap-2.5 rounded-full border border-line bg-ink/50 py-2 pl-3.5 pr-4 text-[14px] text-mute backdrop-blur transition-colors hover:border-violet-soft hover:text-cream max-sm:flex max-sm:min-h-[44px] max-sm:w-full max-sm:bg-ink/85 max-sm:backdrop-filter-none">
               <span aria-hidden className={`h-2 w-2 shrink-0 rounded-full ${next ? "bg-gold" : "bg-violet-soft"}`} />
               <span className="shrink-0">{next ? "Next event" : "Latest event"}</span>
               <span className="truncate font-medium text-cream">{spotlight.title}</span>

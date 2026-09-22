@@ -78,8 +78,20 @@ export function Tilt({ children, className = "", max = 9 }: { children: ReactNod
   useEffect(() => {
     const el = ref.current!;
     if (reduced()) return;
-    let raf = 0;
+    let raf = 0, settle = 0;
+    // The 3D styles (and the GPU layer they need) are on only while the card moves: from the first hover or touch until
+    // it has settled flat again (index.css, .tilt[data-live]). The switch happens with transitions off and the card
+    // flat, so it never shows.
+    const live = (on: boolean) => {
+      clearTimeout(settle);
+      if ((el.dataset.live === "1") === on) return;
+      el.style.transition = "none";
+      el.dataset.live = on ? "1" : "0";
+      getComputedStyle(el).getPropertyValue("transform"); // applies the switch now, while transitions are off
+      el.style.transition = "";
+    };
     const tiltTo = (e: PointerEvent, m: number) => {
+      live(true);
       const r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
@@ -87,11 +99,15 @@ export function Tilt({ children, className = "", max = 9 }: { children: ReactNod
         el.style.setProperty("--gx", `${x * 100}%`); el.style.setProperty("--gy", `${y * 100}%`); el.dataset.active = "1";
       });
     };
-    const reset = () => { cancelAnimationFrame(raf); el.style.setProperty("--rx", "0deg"); el.style.setProperty("--ry", "0deg"); el.dataset.active = "0"; el.dataset.touch = "0"; };
+    const reset = () => {
+      cancelAnimationFrame(raf); el.style.setProperty("--rx", "0deg"); el.style.setProperty("--ry", "0deg"); el.dataset.active = "0"; el.dataset.touch = "0";
+      // Back to rest once the .5s return and the .3s glare fade are over
+      if (el.dataset.live === "1") { clearTimeout(settle); settle = window.setTimeout(() => live(false), 600); }
+    };
     if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
       const move = (e: PointerEvent) => tiltTo(e, max);
       el.addEventListener("pointermove", move); el.addEventListener("pointerleave", reset);
-      return () => { el.removeEventListener("pointermove", move); el.removeEventListener("pointerleave", reset); cancelAnimationFrame(raf); };
+      return () => { el.removeEventListener("pointermove", move); el.removeEventListener("pointerleave", reset); cancelAnimationFrame(raf); clearTimeout(settle); };
     }
     // Touch: pointercancel fires as soon as the finger starts a scroll, so a scroll never leaves a card tilted
     const down = (e: PointerEvent) => { if (e.pointerType === "mouse") return; el.dataset.touch = "1"; tiltTo(e, Math.min(3, max)); };
@@ -99,7 +115,7 @@ export function Tilt({ children, className = "", max = 9 }: { children: ReactNod
     el.addEventListener("pointerup", reset); el.addEventListener("pointercancel", reset); el.addEventListener("pointerleave", reset);
     return () => {
       el.removeEventListener("pointerdown", down); el.removeEventListener("pointerup", reset);
-      el.removeEventListener("pointercancel", reset); el.removeEventListener("pointerleave", reset); cancelAnimationFrame(raf);
+      el.removeEventListener("pointercancel", reset); el.removeEventListener("pointerleave", reset); cancelAnimationFrame(raf); clearTimeout(settle);
     };
   }, [max]);
   return <div ref={ref} className={`tilt ${className}`}>{children}<span aria-hidden className="tilt-glare" /></div>;
@@ -236,9 +252,10 @@ export function BackToTop() {
     window.addEventListener("scroll", onScroll, { passive: true }); window.addEventListener("resize", onScroll);
     return () => { cancelAnimationFrame(raf); window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); };
   }, []);
+  // Phones: a solid tint instead of the backdrop blur, which would be redone every frame over the Home particles
   return (
     <button ref={btn} data-show="0" aria-label="Back to top" onClick={() => window.scrollTo({ top: 0, behavior: reduced() ? "auto" : "smooth" })}
-      className="back-to-top group fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-4 z-40 grid h-11 w-11 place-items-center rounded-full border border-line bg-panel/80 text-cream shadow-[0_10px_40px_-10px_rgba(139,92,246,.7)] backdrop-blur-md sm:bottom-7 sm:right-7 sm:h-14 sm:w-14">
+      className="back-to-top group fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-4 z-40 grid h-11 w-11 place-items-center rounded-full border border-line bg-panel/80 text-cream shadow-[0_10px_40px_-10px_rgba(139,92,246,.7)] backdrop-blur-md max-sm:bg-panel/90 max-sm:backdrop-filter-none sm:bottom-7 sm:right-7 sm:h-14 sm:w-14">
       <svg viewBox="0 0 36 36" className="absolute inset-0 h-full w-full -rotate-90" aria-hidden>
         <defs><linearGradient id="btt" x1="0" x2="1"><stop offset="0" stopColor="#8B5CF6" /><stop offset=".55" stopColor="#EC4899" /><stop offset="1" stopColor="#F2B544" /></linearGradient></defs>
         <circle cx="18" cy="18" r="16.5" fill="none" stroke="url(#btt)" strokeWidth="2" strokeLinecap="round" pathLength={100} strokeDasharray="100" ref={ring} />

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { Menu, X, Mail, ArrowRight, ChevronDown } from "lucide-react";
 import { RecMark } from "./Brand";
@@ -8,6 +8,7 @@ import { ScrollProgress, CursorAura, BackToTop, Magnetic, RollLabel } from "./Mo
 import { usePageTransitions } from "../lib/pageTransitions";
 import { useScrollMemory } from "../lib/scrollMemory";
 import ErrorBoundary from "./ErrorBoundary";
+import { PHONE } from "../lib/useMediaQuery";
 
 const nav = [
   { to: "/events", label: "Events" },
@@ -197,6 +198,18 @@ function FooterCol({ title, links, external, className = "" }: { title: string; 
   );
 }
 
+/**
+ * Each page (except the landing page, which has its own intro) rises in when opened. On phones, a page opened through
+ * the page-change curtain skips that rise (the curtain already moves it) and its title lines only fade (.page-quiet in
+ * index.css), so the curtain never runs alongside heavy blur filters. Decided once when the page opens, so a later
+ * re-render (a filter changing the URL, say) never replays or changes it.
+ */
+function PageFrame({ home, children }: { home: boolean; children: ReactNode }) {
+  const [cls] = useState(() => home ? ""
+    : document.documentElement.dataset.pageTransition && window.matchMedia(PHONE).matches ? "page-quiet" : "page-enter");
+  return <div className={cls}>{children}</div>;
+}
+
 /** Shown in place of a page that crashed; the header and footer stay usable. */
 function PageError({ onRetry }: { onRetry: () => void }) {
   return (
@@ -223,11 +236,10 @@ export default function Layout() {
       <ScrollProgress />
       <Navbar />
       <main id="main" className="flex-1">
-        {/* Each page (except the landing page, which has its own intro) rises in when opened */}
-        <div key={pathname} className={pathname === "/" ? "" : "page-enter"}>
+        <PageFrame key={pathname} home={pathname === "/"}>
           {/* Keyed by page, so moving to another page clears a previous crash */}
           <ErrorBoundary fallback={retry => <PageError onRetry={retry} />}><Outlet /></ErrorBoundary>
-        </div>
+        </PageFrame>
       </main>
       <Footer />
       <BackToTop />
