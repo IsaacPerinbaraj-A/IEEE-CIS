@@ -311,3 +311,17 @@ body[data-intro="on"] .back-to-top { opacity: 0; pointer-events: none; }
   .btn-sm { @apply min-h-[38px] px-4 text-[14px]; }
   .btn-danger { @apply btn border border-[#7F1D1D] text-[#FCA5A5] hover:bg-[#7F1D1D]/30; }
 }
+
+/* ---------- Home on phones: the story glows glide with transform, so the end of the intro isn't a layout shift ----------
+   When the intro ends, the two glows drift from behind the chapter name to behind the globe. Moving them with
+   right/top/bottom made that a layout shift (about 0.17 of Home's CLS on a phone). Here they stay at their resting place
+   (.glow-a / .glow-b above) and the intro position is a translate of the same distance, so the path looks the same.
+   The sticky scene is 100vw by 100svh on phones (no scrollbar during the intro), so, for .glow-a (60vh square):
+   x: (50% - 30vh) - (-30%) of the width => 30vh - 80vw; y: (50% - 34vh) - 0 of the height => 50svh - 34vh.
+   For .glow-b (50vh square): x: (50% - 10vh) - 20% => 10vh - 30vw; y: bottom (50% - 40vh) vs -10% => 40vh - 60svh.
+   Keep in sync with the body[data-intro="on"] .glow-* rules if those positions change. */
+@media (max-width: 639px) {
+  .glow-a, .glow-b { transition-property: background-color, transform; }
+  body[data-intro="on"] .glow-a { right: -30%; top: 0; transform: translate(calc(30vh - 80vw), calc(50svh - 34vh)); }
+  body[data-intro="on"] .glow-b { right: 20%; bottom: -10%; transform: translate(calc(10vh - 30vw), calc(40vh - 60svh)); }
+}

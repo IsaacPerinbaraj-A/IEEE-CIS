@@ -2,16 +2,8 @@ import { lazy, Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
-import Events from "./pages/Events";
-import EventDetail from "./pages/EventDetail";
-import Team from "./pages/Team";
-import About from "./pages/About";
-import Resources from "./pages/Resources";
-import Join from "./pages/Join";
-import Contact from "./pages/Contact";
-import Achievements from "./pages/Achievements";
-import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { pageRoutes } from "./lib/routes";
 
 // Loaded only when someone opens /admin, so visitors never download the admin code
 const AdminApp = lazy(() => import("./admin/AdminApp"));
@@ -27,22 +19,25 @@ const adminError = () => (
   </div>
 );
 
+/**
+ * Stands in for a page while its code downloads (a direct visit on a slow connection): the plain page background,
+ * a screen tall, so the footer doesn't jump. Links inside the site wait for the code instead (src/lib/pageTransitions.ts).
+ */
+function PageLoading() {
+  return <div data-page-loading className="min-h-[100svh] bg-ink" role="status"><span className="sr-only">Loading the page…</span></div>;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="admin/*" element={<ErrorBoundary fallback={adminError}><Suspense fallback={<div className="grid min-h-screen place-items-center bg-ink text-mute">Loading admin…</div>}><AdminApp /></Suspense></ErrorBoundary>} />
         <Route element={<Layout />}>
+          {/* Home is in the main bundle; every other page (src/lib/routeTable.ts) loads its own code */}
           <Route index element={<Home />} />
-          <Route path="events" element={<Events />} />
-          <Route path="events/:slug" element={<EventDetail />} />
-          <Route path="team" element={<Team />} />
-          <Route path="about" element={<About />} />
-          <Route path="achievements" element={<Achievements />} />
-          <Route path="resources" element={<Resources />} />
-          <Route path="join" element={<Join />} />
-          <Route path="contact" element={<Contact />} />
-          <Route path="*" element={<NotFound />} />
+          {pageRoutes.map(({ path, page: { Page } }) => (
+            <Route key={path} path={path} element={<Suspense fallback={<PageLoading />}><Page /></Suspense>} />
+          ))}
         </Route>
       </Routes>
     </BrowserRouter>
