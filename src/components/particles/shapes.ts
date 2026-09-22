@@ -59,7 +59,11 @@ export const neural = (n: number) => {
 /** Landscape: overlapping hills over a floor grid (abstract decoration). */
 export const fuzzy = (n: number) => {
   const centres = [-1.25, 0, 1.25];
-  const mu = (x: number, z: number) => Math.max(...centres.map(c => Math.exp(-((x - c) ** 2) / (2 * 0.36 ** 2)))) * (0.82 + 0.18 * Math.cos(z * 3));
+  const mu = (x: number, z: number) => {
+    let top = 0;
+    for (const c of centres) { const v = Math.exp(-((x - c) ** 2) / (2 * 0.36 ** 2)); if (v > top) top = v; }
+    return top * (0.82 + 0.18 * Math.cos(z * 3));
+  };
   const surf = Math.floor(n * 0.76);
   return fill(n, i => {
     if (i < surf) { const x = rnd(-2.1, 2.1), z = rnd(-1.1, 1.1); return [x, mu(x, z) * 1.6 - 0.85, z]; }
@@ -97,19 +101,23 @@ export async function textShape(n: number, lines: string[], width: number) {
   try { await document.fonts.load("600 160px Unbounded"); } catch { /* fall back to system font */ }
   const W = 1400, lh = 190, H = lh * lines.length + 60;
   const c = document.createElement("canvas"); c.width = W; c.height = H;
-  const ctx = c.getContext("2d")!;
+  // Read back once, so a CPU-backed canvas avoids a slow copy from the GPU
+  const ctx = c.getContext("2d", { willReadFrequently: true })!;
   ctx.fillStyle = "#fff"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
   let size = 170;
   const font = () => `600 ${size}px Unbounded, system-ui, sans-serif`;
   ctx.font = font();
   while (Math.max(...lines.map(l => ctx.measureText(l).width)) > W * 0.94 && size > 40) { size -= 6; ctx.font = font(); }
   lines.forEach((l, i) => ctx.fillText(l, W / 2, 30 + lh * i + lh / 2));
-  const data = ctx.getImageData(0, 0, W, H).data, pts: [number, number][] = [];
-  for (let y = 0; y < H; y += 3) for (let x = 0; x < W; x += 3) if (data[(y * W + x) * 4 + 3] > 140) pts.push([x, y]);
-  let minX = W, maxX = 0; pts.forEach(([x]) => { minX = Math.min(minX, x); maxX = Math.max(maxX, x); });
-  const k = width / Math.max(1, maxX - minX), cy = H / 2;
+  // Every third pixel inside the letters, kept as two flat lists instead of one small array per point
+  const data = ctx.getImageData(0, 0, W, H).data, xs: number[] = [], ys: number[] = [];
+  let minX = W, maxX = 0;
+  for (let y = 0; y < H; y += 3) for (let x = 0; x < W; x += 3) if (data[(y * W + x) * 4 + 3] > 140) {
+    xs.push(x); ys.push(y); if (x < minX) minX = x; if (x > maxX) maxX = x;
+  }
+  const k = width / Math.max(1, maxX - minX), cy = H / 2, np = xs.length;
   return fill(n, () => {
-    const [x, y] = pts[Math.floor(Math.random() * pts.length)] || [W / 2, cy];
+    const j = Math.floor(Math.random() * np), x = np ? xs[j] : W / 2, y = np ? ys[j] : cy;
     return [(x - (minX + maxX) / 2) * k + rnd(-0.008, 0.008), -(y - cy) * k + rnd(-0.008, 0.008), rnd(-0.06, 0.06)];
   });
 }

@@ -13,3 +13,14 @@ export function deviceTier(): DeviceTier {
   if (cores >= 8 && memory >= 8) return "high";
   return "mid";
 }
+
+export type ParticleBudget = { count: number; maxDpr: number };
+
+/**
+ * Particle budgets on phones (below 640px): how many particles, and the highest pixel ratio the canvas renders at.
+ * Larger screens keep their own budgets in the particle components.
+ */
+export const PHONE_BUDGET: Record<"story" | "header", Record<DeviceTier, ParticleBudget>> = {
+  story: { high: { count: 2600, maxDpr: 1.5 }, mid: { count: 2000, maxDpr: 1.25 }, low: { count: 1300, maxDpr: 1 } },
+  header: { high: { count: 1000, maxDpr: 1.25 }, mid: { count: 900, maxDpr: 1.25 }, low: { count: 600, maxDpr: 1 } },
+};
