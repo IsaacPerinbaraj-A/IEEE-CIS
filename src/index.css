@@ -194,6 +194,17 @@ body[data-intro="on"] .glow-b { right: calc(50% - 10vh); bottom: calc(50% - 40vh
 .site-header { pointer-events: none; }
 .site-header::before, .site-header-row > * { pointer-events: auto; }
 
+/* Phones: bottom action bar (StickyAction.tsx). Sticky elements under the slim header use top: 56px. */
+.action-bar { transform: translateY(110%); transition: transform .32s cubic-bezier(.2,.7,.2,1); }
+.action-bar[data-show="1"] { transform: none; }
+@media (max-width: 639px) {
+  html[data-action-bar="1"] body { padding-bottom: calc(4.5rem + env(safe-area-inset-bottom)); }
+  html[data-action-bar="1"] .back-to-top { bottom: calc(5.25rem + env(safe-area-inset-bottom)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .action-bar { transform: none; opacity: 0; transition: opacity .2s; }
+  .action-bar[data-show="1"] { opacity: 1; }
+}
 html[data-tier="low"] .site-header::before { -webkit-backdrop-filter: none; backdrop-filter: none; background-color: rgba(15,10,28,.96); }
 
 /* ---------- Mobile menu: the panel wipes down from the header, then each link rises out of its row ---------- */
@@ -257,7 +268,7 @@ html[data-aura-press="1"] .cursor-dot span { transform: scale(.75); }
 html[data-aura-hover="label"] .cursor-dot b { opacity: 1; transform: none; }
 
 /* ---------- Back to top ---------- */
-.back-to-top { opacity: 0; transform: translateY(16px) scale(.9); pointer-events: none; transition: opacity .35s, transform .35s cubic-bezier(.2,.7,.2,1), border-color .2s; }
+.back-to-top { opacity: 0; transform: translateY(16px) scale(.9); pointer-events: none; transition: opacity .35s, transform .35s cubic-bezier(.2,.7,.2,1), border-color .2s, bottom .32s cubic-bezier(.2,.7,.2,1); }
 .back-to-top[data-show="1"] { opacity: 1; transform: none; pointer-events: auto; }
 .back-to-top:hover { border-color: #C4B5FD; }
 body[data-intro="on"] .back-to-top { opacity: 0; pointer-events: none; }
