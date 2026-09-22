@@ -45,9 +45,9 @@
               "name": "Sajiv Jess B",
               "role": "Treasurer",
               "photo": "/images/team/sajiv-jess-b.webp",
-              "linkedin": "http://www.linkedin.com/in/sajivjess",
+              "linkedin": "https://www.linkedin.com/in/sajivjess",
               "github": "https://github.com/SajivJess",
-              "instagram": "http://httwww.instagram.com/sajivjess.b.i"
+              "instagram": "https://www.instagram.com/sajivjess.b.i"
             }
           ]
         },
@@ -83,7 +83,7 @@
               "name": "Gunavazhagan B",
               "role": "Web Dev Team",
               "photo": "/images/team/gunavazhagan-b.webp",
-              "linkedin": "http://linkedin.com/in/gunavazhagan-b-a779112a2",
+              "linkedin": "https://www.linkedin.com/in/gunavazhagan-b-a779112a2",
               "github": "https://github.com/Gunavazhagan-B",
               "instagram": ""
             }
@@ -144,7 +144,6 @@
               "role": "DS Senior Associate",
               "photo": "/images/team/lokaa-v.webp",
               "linkedin": "https://www.linkedin.com/in/lokaa-v-0345b42a2",
-              "github": "NIL",
               "instagram": "https://www.instagram.com/lokaa_1910?igsh=MWczMmFyZm85M2xyeA%3D%3D&utm_source=qr"
             }
           ]
@@ -173,7 +172,7 @@
               "name": "Devesh D",
               "role": "CV Senior Associate",
               "photo": "/images/team/devesh-d.webp",
-              "linkedin": "http://www.linkedin.com/in/devesh09",
+              "linkedin": "https://www.linkedin.com/in/devesh09",
               "github": "https://github.com/devesh09D",
               "instagram": "https://instagram.com/_itz_me_dev_sh"
             }
@@ -195,8 +194,7 @@
               "name": "Harish M",
               "role": "IoT Head",
               "photo": "/images/team/harish-m.webp",
-              "linkedin": "linkedin.com/in/harishm007",
-              "github": "git.harishm.tech",
+              "linkedin": "https://www.linkedin.com/in/harishm007",
               "instagram": ""
             },
             {
@@ -226,7 +224,7 @@
               "role": "Design Head",
               "photo": "/images/team/antony-jadrian-a.webp",
               "linkedin": "https://www.linkedin.com/in/antony-jadrien-a-904001311",
-              "github": "AntonyJadrien ",
+              "github": "https://github.com/AntonyJadrien",
               "instagram": "https://instagram.com/jadrien_ un_official"
             },
             {
@@ -248,7 +246,7 @@
               "role": "Event Head",
               "photo": "/images/team/sathyanath-l.webp",
               "linkedin": "https://www.linkedin.com/in/sathyanath-l-246b65310",
-              "github": "@Sathyanath-L",
+              "github": "https://github.com/Sathyanath-L",
               "instagram": "https://www.instagram.com/its__sakthi_?igsh=ZHl6dmd5eDVzdHB0"
             },
             {
