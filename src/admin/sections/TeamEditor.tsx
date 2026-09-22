@@ -28,6 +28,25 @@ export default function TeamEditor() {
     update("team", { sessions: [fresh, ...sessions] }); setSi(0); setNewYear(null);
   };
 
+  const yearModal = newYear !== null && (
+    <Modal title="New academic year" onClose={() => setNewYear(null)}
+      footer={<><button className="btn-ghost" onClick={() => setNewYear(null)}>Cancel</button><button className="btn-gold" onClick={addYear}>Create year</button></>}>
+      <p className="mb-4 text-[15px] text-mute">This copies the team names and faculty from {sessions[0]?.label || "the latest year"}, with no members yet. It becomes the year visitors see first once you publish.</p>
+      <TextField label="Academic year" value={newYear} placeholder="2026–27" onChange={setNewYear}
+        error={newYear && !/^\d{4}[–-]\d{2}$/.test(newYear.trim()) ? "Use the format 2026–27." : undefined} />
+    </Modal>
+  );
+
+  // Every published team has at least one year, but a draft can delete the last one
+  if (!s) return (
+    <>
+      <PageTitle title="Team" actions={<button className="btn-gold" onClick={() => setNewYear("")}><Plus size={18} /> New academic year</button>}>
+        There are no academic years yet. Add one to start listing the team.
+      </PageTitle>
+      {yearModal}
+    </>
+  );
+
   return (
     <>
       <PageTitle title="Team" actions={<button className="btn-ghost" onClick={() => setNewYear("")}><Plus size={18} /> New academic year</button>}>
@@ -102,14 +121,7 @@ export default function TeamEditor() {
         if (name?.trim()) setSession(x => ({ ...x, groups: [...x.groups, { domain: name.trim(), slug: slugify(name), members: [] }] }));
       }}><Plus size={18} /> Add a team</button>
 
-      {newYear !== null && (
-        <Modal title="New academic year" onClose={() => setNewYear(null)}
-          footer={<><button className="btn-ghost" onClick={() => setNewYear(null)}>Cancel</button><button className="btn-gold" onClick={addYear}>Create year</button></>}>
-          <p className="mb-4 text-[15px] text-mute">This copies the team names and faculty from {sessions[0]?.label || "the latest year"}, with no members yet. It becomes the year visitors see first once you publish.</p>
-          <TextField label="Academic year" value={newYear} placeholder="2026–27" onChange={setNewYear}
-            error={newYear && !/^\d{4}[–-]\d{2}$/.test(newYear.trim()) ? "Use the format 2026–27." : undefined} />
-        </Modal>
-      )}
+      {yearModal}
 
       {editing && (
         <MemberForm initial={editing.member} isNew={editing.mi === undefined} groups={s.groups.map(g => g.domain)} groupIndex={editing.gi}
@@ -153,7 +165,7 @@ function MemberForm({ initial, isNew, groups, groupIndex, onClose, onSave, onDel
             <TextField label="Role" value={m.role} error={errors.role} hint="For example Chair, ML Head, Design Senior Associate." onChange={v => set({ role: v })} />
             <SelectField label="Team" value={String(gi)} onChange={v => setGi(Number(v))} options={groups.map((g, i) => ({ value: String(i), label: g }))} />
             <ImageInput square label="Photo" src={preview(m.photo)} onRemove={() => set({ photo: "" })}
-              hint={imgError || "Any photo works. You'll frame it as a square, and it's compressed automatically."}
+              hint={imgError || "Any photo works. You'll frame it as a square, and it's compressed and uploaded straight away."}
               onFile={async f => { setImgError(""); try { setImg(await fileToImage(f)); } catch (e) { setImgError((e as Error).message); } }} />
             <TextField type="url" label="LinkedIn (optional)" value={m.linkedin || ""} error={errors.linkedin} placeholder="https://www.linkedin.com/in/…" onChange={v => set({ linkedin: v })} />
             <TextField type="url" label="GitHub (optional)" value={m.github || ""} error={errors.github} placeholder="https://github.com/…" onChange={v => set({ github: v })} />
@@ -165,7 +177,11 @@ function MemberForm({ initial, isNew, groups, groupIndex, onClose, onSave, onDel
           </div>
         </div>
       </Modal>
-      {img && <CropDialog img={img} onCancel={() => setImg(null)} onDone={blob => { set({ photo: addImage("team", m.name || "member", blob) }); setImg(null); }} />}
+      {img && <CropDialog img={img} onCancel={() => setImg(null)} onDone={async blob => {
+        try { const photo = await addImage("team", m.name || "member", blob); set({ photo }); }
+        catch (e) { setImgError((e as Error).message); }
+        setImg(null);
+      }} />}
     </>
   );
 }

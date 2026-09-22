@@ -3,7 +3,7 @@ import { Modal } from "./ui";
 import { renderSquare, type Crop } from "./image";
 
 /** Drag to position, zoom to frame the face. Produces a 480 × 480 image. */
-export default function CropDialog({ img, onCancel, onDone }: { img: HTMLImageElement; onCancel: () => void; onDone: (blob: Blob) => void }) {
+export default function CropDialog({ img, onCancel, onDone }: { img: HTMLImageElement; onCancel: () => void; onDone: (blob: Blob) => void | Promise<void> }) {
   const [crop, setCrop] = useState<Crop>({ zoom: 1.15, x: 0, y: -0.35 });
   const [busy, setBusy] = useState(false);
   const canvas = useRef<HTMLCanvasElement>(null), drag = useRef<{ x: number; y: number } | null>(null);
@@ -27,8 +27,8 @@ export default function CropDialog({ img, onCancel, onDone }: { img: HTMLImageEl
     <Modal title="Frame the photo" onClose={onCancel}
       footer={<>
         <button type="button" className="btn-ghost" onClick={onCancel}>Cancel</button>
-        <button type="button" className="btn-gold" disabled={busy} onClick={async () => { setBusy(true); try { onDone(await renderSquare(img, crop)); } finally { setBusy(false); } }}>
-          {busy ? "Processing…" : "Use this photo"}
+        <button type="button" className="btn-gold" disabled={busy} onClick={async () => { setBusy(true); try { await onDone(await renderSquare(img, crop)); } finally { setBusy(false); } }}>
+          {busy ? "Uploading…" : "Use this photo"}
         </button>
       </>}>
       <p className="mb-4 text-[15px] text-mute">Drag the photo to move it and use the slider to zoom. Keep the face near the middle.</p>

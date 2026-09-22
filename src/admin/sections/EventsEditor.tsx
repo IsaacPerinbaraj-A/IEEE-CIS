@@ -101,7 +101,7 @@ function EventForm({ initial, originalSlug, onCancel, onSave, onDelete }: {
   };
   const uploadPoster = async (f: File) => {
     setBusy(true); setImgError("");
-    try { const img = await fileToImage(f); set({ poster: addImage("events", e.slug || slugify(e.title) || "event", await renderFit(img)) }); }
+    try { const img = await fileToImage(f); const poster = await addImage("events", e.slug || slugify(e.title) || "event", await renderFit(img)); set({ poster }); }
     catch (err) { setImgError(String((err as Error).message)); }
     finally { setBusy(false); }
   };
@@ -141,7 +141,7 @@ function EventForm({ initial, originalSlug, onCancel, onSave, onDelete }: {
               hint={`One sentence for the event cards. ${160 - e.summary.length} characters left.`} onChange={v => set({ summary: v })} />
             <TextArea label="Description" value={e.description} error={errors.description} hint="Shown on the event's own page." onChange={v => set({ description: v })} />
             <ImageInput label="Poster (optional)" src={preview(e.poster)} busy={busy} onFile={uploadPoster} onRemove={() => set({ poster: "" })}
-              hint={imgError || "Any image works. It's resized to 900 px wide and compressed automatically."} />
+              hint={imgError || "Any image works. It's resized to 900 px wide, compressed and uploaded straight away."} />
             <TextField type="url" label="Registration link (optional)" value={e.register || ""} error={errors.register} placeholder="https://forms.gle/…"
               hint="The Register button only shows while the event is upcoming." onChange={v => set({ register: v })} />
             <TextField label="Coordinator (optional)" value={e.coordinator || ""} onChange={v => set({ coordinator: v })} />

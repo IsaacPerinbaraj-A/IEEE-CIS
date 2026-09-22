@@ -37,9 +37,3 @@ export async function renderFit(img: HTMLImageElement, maxW = 900, maxH = 1400):
   ctx.drawImage(img, 0, 0, c.width, c.height);
   return encode(c);
 }
-
-export const extFor = (b: Blob) => (b.type === "image/webp" ? "webp" : "jpg");
-
-export function blobToBase64(b: Blob): Promise<string> {
-  return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1]); r.onerror = () => rej(r.error); r.readAsDataURL(b); });
-}
