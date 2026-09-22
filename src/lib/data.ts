@@ -87,21 +87,96 @@ export function statusLabel(e: ChapterEvent): string {
   return c ? c[0].toUpperCase() + c.slice(1) : "";
 }
 
-/** Builds a downloadable .ics calendar file for an event. */
-export function calendarFile(e: ChapterEvent): string {
-  const d = (s: string) => s.replace(/-/g, "");
-  const [start, end] = (e.time || "").split("-");
-  const stamp = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//IEEE CIS REC//Events//EN", "BEGIN:VEVENT",
-    `UID:${e.slug}@ieee-cis-rec`, `DTSTAMP:${stamp}`];
-  if (e.date && start && end) {
-    lines.push(`DTSTART;TZID=Asia/Kolkata:${d(e.date)}T${start.replace(":", "")}00`, `DTEND;TZID=Asia/Kolkata:${d(e.date)}T${end.replace(":", "")}00`);
-  } else if (e.date) {
-    const last = new Date((e.endDate || e.date) + "T00:00:00"); last.setDate(last.getDate() + 1);
-    lines.push(`DTSTART;VALUE=DATE:${d(e.date)}`, `DTEND;VALUE=DATE:${last.toISOString().slice(0, 10).replace(/-/g, "")}`);
+/* ---------- Add to calendar ----------
+   Dates are worked out with local date arithmetic (never toISOString, which moves midnight in India back a day).
+   Timed events are written in India time; an event over several days with a time repeats daily at that time. */
+const pad2 = (n: number) => String(n).padStart(2, "0");
+const ymd = (d: Date) => `${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}`;
+const addDays = (s: string, n: number) => { const d = parse(s)!; d.setDate(d.getDate() + n); return d; };
+const hms = (hm: string) => { const [h, m] = hm.trim().split(":").map(Number); return `${pad2(h)}${pad2(m || 0)}00`; };
+
+type CalendarTimes = { allDay: boolean; start: string; end: string; days: number };
+function calendarTimes(e: ChapterEvent): CalendarTimes | null {
+  if (!e.date || isNaN(parse(e.date)!.getTime())) return null;
+  const last = e.endDate && e.endDate > e.date ? e.endDate : e.date;
+  const days = Math.round((parse(last)!.getTime() - parse(e.date)!.getTime()) / 86400000) + 1;
+  const [from, to] = (e.time || "").split("-");
+  if (from && to) {
+    const a = hms(from), b = hms(to);
+    // An evening that runs past midnight ends on the next day
+    return { allDay: false, start: `${ymd(parse(e.date)!)}T${a}`, end: `${ymd(addDays(e.date, b > a ? 0 : 1))}T${b}`, days };
   }
-  lines.push(`SUMMARY:${e.title} (IEEE CIS REC)`, `LOCATION:${e.venue || ""}`, `DESCRIPTION:${e.summary}`, "END:VEVENT", "END:VCALENDAR");
-  return URL.createObjectURL(new Blob([lines.join("\r\n")], { type: "text/calendar" }));
+  // All-day: the end date is the day after the last day
+  return { allDay: true, start: ymd(parse(e.date)!), end: ymd(addDays(last, 1)), days: 1 };
+}
+
+const eventUrl = (e: ChapterEvent) => (typeof window === "undefined" ? "" : `${window.location.origin}/events/${e.slug}`);
+const calendarTitle = (e: ChapterEvent) => `${e.title} (IEEE CIS REC)`;
+
+/** The event as an .ics calendar file (text). Empty when the event has no date. */
+export function calendarIcs(e: ChapterEvent): string {
+  const t = calendarTimes(e);
+  if (!t) return "";
+  // Text values escape \ ; , and new lines; long lines fold at 75 bytes
+  const utf8 = new TextEncoder();
+  const text = (s: string) => s.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+  const fold = (line: string) => {
+    const out: string[] = []; let cur = "", bytes = 0;
+    for (const ch of line) {
+      const n = utf8.encode(ch).length;
+      if (bytes + n > (out.length ? 74 : 75)) { out.push(cur); cur = ""; bytes = 0; }
+      cur += ch; bytes += n;
+    }
+    out.push(cur);
+    return out.join("\r\n ");
+  };
+  const now = new Date();
+  const stamp = `${now.getUTCFullYear()}${pad2(now.getUTCMonth() + 1)}${pad2(now.getUTCDate())}T${pad2(now.getUTCHours())}${pad2(now.getUTCMinutes())}${pad2(now.getUTCSeconds())}Z`;
+  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//IEEE CIS REC//Events//EN", "CALSCALE:GREGORIAN"];
+  if (!t.allDay) lines.push("BEGIN:VTIMEZONE", "TZID:Asia/Kolkata", "BEGIN:STANDARD", "DTSTART:19700101T000000",
+    "TZOFFSETFROM:+0530", "TZOFFSETTO:+0530", "TZNAME:IST", "END:STANDARD", "END:VTIMEZONE");
+  lines.push("BEGIN:VEVENT", `UID:${e.slug}@ieee-cis-rec`, `DTSTAMP:${stamp}`);
+  if (t.allDay) lines.push(`DTSTART;VALUE=DATE:${t.start}`, `DTEND;VALUE=DATE:${t.end}`);
+  else {
+    lines.push(`DTSTART;TZID=Asia/Kolkata:${t.start}`, `DTEND;TZID=Asia/Kolkata:${t.end}`);
+    if (t.days > 1) lines.push(`RRULE:FREQ=DAILY;COUNT=${t.days}`);
+  }
+  lines.push(`SUMMARY:${text(calendarTitle(e))}`);
+  if (e.venue) lines.push(`LOCATION:${text(e.venue)}`);
+  lines.push(`DESCRIPTION:${text(e.summary)}`);
+  const url = eventUrl(e);
+  if (url) lines.push(`URL:${url}`);
+  lines.push("END:VEVENT", "END:VCALENDAR");
+  return lines.map(fold).join("\r\n") + "\r\n";
+}
+
+/** The .ics file as a data: link, for a plain download link that needs no object URL. */
+export const calendarDataUri = (e: ChapterEvent) => `data:text/calendar;charset=utf-8,${encodeURIComponent(calendarIcs(e))}`;
+
+/** Builds the .ics file when asked, downloads it, then releases the object URL. */
+export function downloadCalendar(e: ChapterEvent) {
+  const ics = calendarIcs(e);
+  if (!ics) return;
+  const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar;charset=utf-8" }));
+  const a = document.createElement("a");
+  a.href = url; a.download = `${e.slug}.ics`; a.hidden = true;
+  document.body.appendChild(a); a.click(); a.remove();
+  // Some browsers read the file a moment after the click, so release it a little later
+  window.setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+
+/** A Google Calendar "add event" link with the title, dates, details and location filled in. */
+export function googleCalendarUrl(e: ChapterEvent): string {
+  const t = calendarTimes(e);
+  if (!t) return "";
+  const url = eventUrl(e);
+  const p = new URLSearchParams({ action: "TEMPLATE", text: calendarTitle(e), dates: `${t.start}/${t.end}`, details: url ? `${e.summary}\n\n${url}` : e.summary });
+  if (e.venue) p.set("location", e.venue);
+  if (!t.allDay) {
+    p.set("ctz", "Asia/Kolkata");
+    if (t.days > 1) p.set("recur", `RRULE:FREQ=DAILY;COUNT=${t.days}`);
+  }
+  return `https://calendar.google.com/calendar/render?${p}`;
 }
 
 export const initials = (name: string) => name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join("").toUpperCase();
