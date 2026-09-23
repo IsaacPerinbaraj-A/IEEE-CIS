@@ -23,6 +23,8 @@ const at = (minutes: number) => new Date(T0.getTime() + minutes * 60_000);
 
 let starting: StartingCopy | null = null;
 const startingCopy = async () => (starting ??= await readStartingCopy(process.cwd()));
+/** How many photos the starting content uses. Counted, not typed in, so adding a member's photo can't break tests. */
+const photoCount = () => starting?.images.length ?? 0;
 
 /** A store with the starting copy imported as release 1. `spoil` can damage the copy first, as an old import could. */
 async function imported(spoil?: (copy: StartingCopy) => void): Promise<MemoryStore> {
@@ -54,7 +56,13 @@ const live = async (store: MemoryStore) => (await contentResponse(store)).sectio
 test("reading the starting copy: all sections, all photos, and no rule warnings", async () => {
   const copy = await startingCopy();
   assert.deepEqual(Object.keys(copy.sections), [...SECTION_KEYS]);
-  assert.equal(copy.images.length, 34);
+  // Every photo the content points at was read, and nothing else
+  const used = new Set<string>();
+  for (const s of copy.sections.team.sessions) for (const g of s.groups) for (const m of g.members) if (m.photo) used.add(m.photo);
+  for (const e of copy.sections.events) if (e.poster) used.add(e.poster);
+  for (const a of copy.sections.achievements) if (a.image) used.add(a.image);
+  assert.deepEqual(copy.images.map(i => i.path).sort(), [...used].sort());
+  assert.ok(copy.images.length > 0);
   assert.ok(copy.images.every(i => i.size > 0 && i.width >= 16 && i.sha256.length === 64));
   // The content shipped with the site must always pass the rules, or the first import starts with problems
   const byKey = (w: ErrorItem) => `${w.section}:${w.key} (${w.message})`;
@@ -76,13 +84,13 @@ test("before the import nothing is published; the import makes release 1 once", 
   assert.equal(r1.note, "Imported starting content");
   assert.deepEqual(r1.changed, [...SECTION_KEYS]);
   assert.ok(SECTION_KEYS.every(k => r1.versions[k] === 1 && r1.summaries[k] === "First version"));
-  assert.equal(store.state.images.size, 34);
-  assert.equal(r1.images.length, 34);
+  assert.equal(store.state.images.size, photoCount());
+  assert.equal(r1.images.length, photoCount());
 
   const content = await contentResponse(store);
   assert.equal(content.release, 1);
   assert.equal(content.publishedBy, "Isaac");
-  assert.equal(Object.keys(content.images).length, 34);
+  assert.equal(Object.keys(content.images).length, photoCount());
   assert.deepEqual(content.sections, starting?.sections);
 
   await assert.rejects(store.transaction(s => importStartingInStore(s, starting as StartingCopy, OWNER, at(5))), httpError(409, "not_empty"));
@@ -102,7 +110,7 @@ test("a publish makes a new release with new versions only for the changed secti
   assert.equal(r.versions.events, 1);
   assert.equal(r.summaries.faqs, "1 question added (When are meetings held?)");
   assert.deepEqual(r.merged, []);
-  assert.equal(r.images.length, 34);
+  assert.equal(r.images.length, photoCount());
 
   const response = publishResponse(out, { state: "skipped", at: at(1).toISOString() });
   assert.equal(response.release, 2);
@@ -304,7 +312,7 @@ test("the build export has every section normalised and the photos it uses, sort
   const { body, missing } = await exportPublished(store);
   assert.equal(body.release, 1);
   assert.deepEqual(Object.keys(body.sections), [...SECTION_KEYS]);
-  assert.equal(body.images.length, 34);
+  assert.equal(body.images.length, photoCount());
   assert.deepEqual(body.images.map(i => i.path), [...body.images.map(i => i.path)].sort());
   assert.deepEqual(Object.keys(body.images[0]).sort(), ["contentType", "path", "sha256", "size"]);
   assert.deepEqual(missing, []);
