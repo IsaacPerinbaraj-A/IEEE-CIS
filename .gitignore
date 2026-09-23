@@ -29,5 +29,5 @@ dist-ssr
 !.env.example
 
 # written by the build (scripts/fetch-content.ts)
-public/content-version.json
-public/content-snapshot.json
+frontend/public/content-version.json
+frontend/public/content-snapshot.json

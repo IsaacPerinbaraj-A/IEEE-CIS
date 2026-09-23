@@ -6,7 +6,7 @@ import type { ChapterEvent, HomeContent, SectionContent, SiteSettings, TeamConte
 
 const clone = <T,>(v: T): T => structuredClone(v);
 const load = <K extends keyof SectionContent>(key: K): SectionContent[K] =>
-  JSON.parse(readFileSync(new URL(`../src/data/${key}.json`, import.meta.url), "utf8")) as SectionContent[K];
+  JSON.parse(readFileSync(new URL(`../frontend/src/data/${key}.json`, import.meta.url), "utf8")) as SectionContent[K];
 const ev = (slug: string, title: string, extra: Partial<ChapterEvent> = {}): ChapterEvent => ({
   slug, title, type: "Workshop", session: "2025-26", summary: "s", description: "d", ...extra,
 });

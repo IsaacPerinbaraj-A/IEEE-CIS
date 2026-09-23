@@ -6,7 +6,7 @@ import type { ChapterEvent, Faq, HomeContent, JoinContent, ResourceGroup, Sectio
 
 const clone = <T,>(v: T): T => structuredClone(v);
 const load = <K extends keyof SectionContent>(key: K): SectionContent[K] =>
-  JSON.parse(readFileSync(new URL(`../src/data/${key}.json`, import.meta.url), "utf8")) as SectionContent[K];
+  JSON.parse(readFileSync(new URL(`../frontend/src/data/${key}.json`, import.meta.url), "utf8")) as SectionContent[K];
 /** Freezes deeply, so a merge that changes its inputs throws. */
 function freeze<T>(v: T): T {
   if (v && typeof v === "object") { Object.values(v).forEach(freeze); Object.freeze(v); }

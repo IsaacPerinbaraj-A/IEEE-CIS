@@ -5,7 +5,7 @@ The website runs on three free services. Each keeps one job:
 | Service | Job | Holds |
 |---|---|---|
 | **Vercel** | Serves the website to visitors and rebuilds it after every Publish | The built site, CONTENT_EXPORT_URL and CONTENT_EXPORT_TOKEN |
-| **Render** | Runs the admin server (`server/`) that the `/admin` page talks to | Every secret: database link, export token, rebuild link |
+| **Render** | Runs the admin server (`backend/`) that the `/admin` page talks to | Every secret: database link, export token, rebuild link |
 | **MongoDB Atlas** | The database: accounts, every published release, photos, activity log | Only Render can connect to it |
 
 GitHub holds only the code. The admin never uses GitHub tokens and never makes commits.
@@ -70,7 +70,7 @@ Before you start, the code you want live must be on the `main` branch on GitHub.
    Click **Apply**.
 
    *Without the Blueprint:* **New** → **Web Service** → the repository → Language **Node**, Branch `main`, Region
-   **Singapore**, Root Directory empty, Build Command `npm ci`, Start Command `node server/index.ts`, Instance Type
+   **Singapore**, Root Directory empty, Build Command `npm ci`, Start Command `node backend/index.ts`, Instance Type
    **Free**. Under **Advanced** set Health Check Path `/healthz`, and add every setting in the table plus
    `NODE_VERSION` = `24` and `MONGODB_DB` = `cis`.
 3. Wait for the first deploy to finish. The logs show `server_started`. Note the service address at the top of the
@@ -91,8 +91,9 @@ Before you start, the code you want live must be on the `main` branch on GitHub.
    for you; the address isn't secret.)
 2. Sign up at <https://vercel.com> (Hobby) with the club email and connect GitHub. Hobby can only import repositories
    owned by a personal GitHub account, not by an organisation.
-3. **Add New** → **Project** → import the repository. Framework Preset **Vite** (detected), Build Command
-   `npm run build`, Output Directory `dist`. Open **Environment Variables** and add:
+3. **Add New** → **Project** → import the repository. Framework Preset **Vite** (detected); leave Root Directory,
+   Build Command and Output Directory as they are — `vercel.json` already sets them (the site is built from
+   `frontend/`). Open **Environment Variables** and add:
 
    | Name | Value |
    |---|---|
@@ -110,7 +111,7 @@ Before you start, the code you want live must be on the `main` branch on GitHub.
    exactly (https, no slash at the end). Fix it in Render if needed.
 8. **Deployments** → the latest one → **⋯** → **Redeploy**, so the build runs with the settings above. Nothing is
    published yet, so the build log shows `WARNING: nothing is published in the admin yet` and then uses the content
-   in `src/data`. That is expected for this first build.
+   in `frontend/src/data`. That is expected for this first build.
 
 ## 4. Your owner account
 
@@ -130,8 +131,8 @@ value, choose a new passphrase, then remove `SETUP_TOKEN` again.
 
 ## 5. Starting content and the first publish
 
-1. In the admin, open **Accounts** → **Import starting content**. It copies the current `src/data` files and the
-   photos in `public/images` into the database as **release #1**.
+1. In the admin, open **Accounts** → **Import starting content**. It copies the current `frontend/src/data` files and the
+   photos in `frontend/public/images` into the database as **release #1**.
 2. The admin then lists five team profile links in the starting copy that aren't full links
    (`linkedin.com/in/harishm007`, `git.harishm.tech`, `NIL`, `AntonyJadrien`, `@Sathyanath-L`). Open **Team**, put
    in the full `https://` links (ask the members) or clear them, and **Publish**. This is release #2.
@@ -153,7 +154,7 @@ You need Node.js **22.18 or newer** (24 recommended), because the admin server a
 files that Node runs directly.
 
 ```bash
-npm install
+npm install                  # one install for all three projects (frontend, backend, shared)
 cp .env.example .env.local   # then fill it in (it is never committed)
 npm run server               # terminal 1: the admin server on http://localhost:8787 (reads .env.local)
 npm run dev -- --port 5175   # terminal 2: the site on http://localhost:5175; /api goes to the admin server
@@ -168,10 +169,10 @@ npm run dev -- --port 5175   # terminal 2: the site on http://localhost:5175; /a
   `http://localhost:5175/admin/setup/owner#<SETUP_TOKEN>`.
 - **Without a database** (`MONGODB_URI` empty) the server still starts; the admin says no database is connected.
 - **Publishing locally** saves a release but doesn't rebuild anything (no `DEPLOY_HOOK_URL`). `npm run dev` keeps
-  showing the files in `src/data`. To bake the published content into a local build, run
+  showing the files in `frontend/src/data`. To bake the published content into a local build, run
   `CONTENT_EXPORT_URL=http://localhost:8787/api/export/published CONTENT_EXPORT_TOKEN=<EXPORT_TOKEN> npm run build`.
-  This overwrites `src/data/*.json` and adds photos to `public/images`; don't commit those changes
-  (`git restore src/data public/images` undoes the edits and `git clean -n public/images` lists the added photos).
+  This overwrites `frontend/src/data/*.json` and adds photos to `frontend/public/images`; don't commit those changes
+  (`git restore frontend/src/data frontend/public/images` undoes the edits and `git clean -n frontend/public/images` lists the added photos).
 - **Checks:** `npm run lint`, `npm run test:server` (no database needed) and `npm run build`.
 
 ## What each setting does
@@ -195,15 +196,15 @@ Access** → **Edit**, then update `MONGODB_URI` on Render.
 
 ## How a build gets its content
 
-Every Vercel build first runs `scripts/fetch-content.ts`:
+Every Vercel build first runs `frontend/scripts/fetch-content.ts`:
 
 1. It asks the admin server for the published content, retrying for about 3 minutes while Render wakes up.
 2. It checks every section with the same rules as the admin. If anything breaks a rule, the build stops with a list
    of the problems, and Vercel keeps the current site online.
-3. It downloads only new or changed photos, checks each one, and writes `src/data/*.json`, the photos,
+3. It downloads only new or changed photos, checks each one, and writes `frontend/src/data/*.json`, the photos,
    `/content-snapshot.json` and `/content-version.json` (the release the admin waits for after Publish).
 4. If the admin server can't be reached, it copies the content that is live right now from the site's own
    `/content-snapshot.json`, so a code change can still go out and content never goes back to old files. Only the
-   very first build, when the live site has no snapshot yet, uses the repository's `src/data`.
+   very first build, when the live site has no snapshot yet, uses the repository's `frontend/src/data`.
 
-So after go-live, editing `src/data` in GitHub doesn't change the live site. Use the admin.
+So after go-live, editing `frontend/src/data` in GitHub doesn't change the live site. Use the admin.

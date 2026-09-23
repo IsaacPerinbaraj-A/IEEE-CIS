@@ -1,6 +1,7 @@
 # Render Blueprint for the admin server (Render → New → Blueprint → pick this repository).
-# One free web service in Singapore. It runs server/index.ts directly (Node 24 runs TypeScript with no build step)
-# from the repository root, so it can also read shared/ and the starting copy in src/data and public/images.
+# One free web service in Singapore. It runs backend/index.ts directly (Node 24 runs TypeScript with no build step)
+# from the repository root, so it can also read shared/ and the starting copy in frontend/src/data and
+# frontend/public/images.
 # Values marked "sync: false" are typed into Render's dashboard when the Blueprint is created (docs/SETUP.md);
 # they are never stored in this file.
 services:
@@ -11,15 +12,15 @@ services:
     region: singapore
     branch: main
     buildCommand: npm ci
-    startCommand: node server/index.ts
+    startCommand: node backend/index.ts
     healthCheckPath: /healthz
     # Redeploy only when the server's code or the starting copy changes (a content publish never touches GitHub)
     buildFilter:
       paths:
-        - server/**
+        - backend/**
         - shared/**
-        - src/data/**
-        - public/images/**
+        - frontend/src/data/**
+        - frontend/public/images/**
         - package.json
         - package-lock.json
     envVars:

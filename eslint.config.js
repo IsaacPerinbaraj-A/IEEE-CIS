@@ -34,7 +34,7 @@ export default tseslint.config([
   },
   // Admin server, build scripts and shared code run in Node (shared code also runs in the browser)
   {
-    files: ['server/**/*.ts', 'scripts/**/*.ts', 'shared/**/*.ts'],
+    files: ['backend/**/*.ts', 'frontend/scripts/**/*.ts', 'shared/**/*.ts'],
     languageOptions: {
       ecmaVersion: 2023,
       globals: globals.node,
@@ -50,11 +50,11 @@ export default tseslint.config([
     files: ['server/**/*.ts'],
     rules: {
       'no-restricted-imports': ['error', {
-        patterns: [{ regex: '^([.][.]?/)+(.+/)?src(/|$)', message: 'The admin server must not import the website code (src/). Put shared code in shared/.' }],
+        patterns: [{ regex: '^([.][.]?/)+(.+/)?frontend(/|$)', message: 'The admin server must not import the website code (frontend/). Put shared code in shared/.' }],
       }],
     },
   },
-  // shared/ is imported by the browser and by Node: no Node-only or browser-only APIs, and no imports from src/ or server/
+  // shared/ is imported by the browser and by Node: no Node-only or browser-only APIs, and no imports from frontend/ or backend/
   {
     files: ['shared/**/*.ts'],
     ignores: ['shared/**/*.test.ts'],
@@ -64,7 +64,7 @@ export default tseslint.config([
     rules: {
       'no-restricted-imports': ['error', {
         patterns: [
-          { regex: '^([.][.]?/)+(.+/)?(src|server|scripts)(/|$)', message: 'shared/ must stand alone (it is used by the admin, the server and the build).' },
+          { regex: '^([.][.]?/)+(.+/)?(frontend|backend)(/|$)', message: 'shared/ must stand alone (it is used by the admin, the server and the build).' },
           { regex: '^node:|^(express|mongodb|react|react-dom|react-router-dom|lucide-react)(/|$)', message: 'shared/ must not use Node-only or browser-only packages.' },
         ],
       }],

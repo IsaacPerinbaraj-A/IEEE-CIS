@@ -139,7 +139,7 @@ the server.
 ### Removing a photo completely
 
 Removing a photo in the admin takes it off the site at the next rebuild. Old releases and backups still contain it,
-so it can be restored. Photos from the starting copy are also files in the repository (`public/images`); if someone
+so it can be restored. Photos from the starting copy are also files in the repository (`frontend/public/images`); if someone
 asks for their photo to be taken down for good, also delete that file from the repository.
 
 ### Yearly handover checklist

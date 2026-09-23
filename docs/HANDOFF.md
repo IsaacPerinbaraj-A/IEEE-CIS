@@ -84,59 +84,63 @@ The newest, complete version of the site is the `website/` folder. The standalon
 - React 18, TypeScript 5.8, Vite 7, Tailwind 3, React Router 6, lucide-react **0.294** (keep this version: newer versions removed the LinkedIn/GitHub/Instagram brand icons), self-hosted fonts via `@fontsource/unbounded` (500, 600) and `@fontsource-variable/geist`.
 - Removed from the old project: three.js, Vanta, snow, admin login, `.env`.
 - Admin server: `express` 5 and `mongodb` 7 (run on Render; Node runs the TypeScript directly). Dev-only: `@types/node`, `@types/express`.
-- Commands: `npm install`, `npm run dev` (localhost:5173; proxies `/api` to the admin server), `npm run server` (admin server on :8787, reads `.env.local`), `npm run build` (content pull, then `tsc -b` and Vite; outputs `dist/`), `npm run lint`, `npm run test:server`. Node 22.18 or newer.
+- Commands: `npm install`, `npm run dev` (localhost:5173; proxies `/api` to the admin server), `npm run server` (admin server on :8787, reads `.env.local`), `npm run build` (content pull, then `tsc -b` and Vite; outputs `frontend/dist/`), `npm run lint`, `npm run test:server`. Node 22.18 or newer.
 - Build size: main JS about 278 KB (89 KB gzipped); admin loads separately (about 65 KB, 20 KB gzipped); CSS about 47 KB. Images 1.2 MB total (old: ~45 MB).
 
 ### Hosting
 
-- Vercel serves the site (`BrowserRouter`; `vercel.json` has the SPA fallback for deep links). Render runs the admin server (`render.yaml`). MongoDB Atlas M0 is the database. Netlify isn't used (`public/_redirects` was removed).
+- Vercel serves the site (`BrowserRouter`; `vercel.json` has the SPA fallback for deep links). Render runs the admin server (`render.yaml`). MongoDB Atlas M0 is the database. Netlify isn't used (`frontend/public/_redirects` was removed).
 - `vercel.json`: `/api/*` is rewritten to the Render service (placeholder host `REPLACE-WITH-RENDER-SERVICE` until go-live), no caching for `/api` and `/content-version.json`, and `/admin` is served from `admin.html` with a strict Content-Security-Policy, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer` and `noindex`.
-- Content updates: through `/admin`. Publish saves a release in the database and calls Vercel's Deploy Hook; the build pulls the release into `src/data` and `public/images` (`scripts/fetch-content.ts`). After go-live, editing `src/data` in GitHub doesn't change the live site.
-- `public/robots.txt` disallows `/admin`.
+- Content updates: through `/admin`. Publish saves a release in the database and calls Vercel's Deploy Hook; the build pulls the release into `frontend/src/data` and `frontend/public/images` (`frontend/scripts/fetch-content.ts`). After go-live, editing `frontend/src/data` in GitHub doesn't change the live site.
+- `frontend/public/robots.txt` disallows `/admin`.
 
 ### File structure
 
+Three projects in one repository, wired together as npm workspaces (one `npm install` at the top):
+`frontend/` (the site and /admin, built by Vite, deployed to Vercel), `backend/` (the admin server on Render)
+and `shared/` (content types and rules, used by both). Commands are run from the top folder.
+
 ```
-index.html                 meta/OG tags, favicon, <script src="/intro.js"> that hides the chrome before the intro
-public/intro.js            sets body[data-intro="on"] before first paint on / (a file so the admin's CSP allows it)
+frontend/index.html        meta/OG tags, favicon, <script src="/intro.js"> that hides the chrome before the intro
+frontend/public/intro.js            sets body[data-intro="on"] before first paint on / (a file so the admin's CSP allows it)
 vercel.json                Vercel: /api rewrite to Render, /admin → admin.html with CSP, SPA fallback
-render.yaml                Render Blueprint for the admin server (free, Singapore, node server/index.ts, /healthz)
+render.yaml                Render Blueprint for the admin server (free, Singapore, node backend/index.ts, /healthz)
 .env.example               the admin server's settings, placeholders only (real values: .env.local, Render, Vercel)
-public/brand/              rec-main-logo.png (REC purple/gold), ieee-logo.svg (IEEE CIS logo, black text)
-public/images/team/        28 face-cropped 480x480 WebP photos
-public/images/events/      6 posters (max 900px WebP)
-tailwind.config.js         colour tokens and fonts
-src/index.css              base styles, component classes, all animation/intro/cursor CSS
-src/main.tsx               font imports, app mount
-src/App.tsx                routes
-src/data/                  events.json, team.json, site.json, faqs.json, resources.json, achievements.json
-src/lib/data.ts            types, loaders, upcoming/past logic, date/time formatting, .ics calendar files, initials
-src/lib/icons.ts           brand icons + domain icon map (kept out of component files for the lint rule)
-src/lib/useTitle.ts        per-page document titles
-src/components/Layout.tsx  navbar (desktop + full-screen mobile menu), footer, skip link, scroll-to-top on route change,
+frontend/public/brand/              rec-main-logo.png (REC purple/gold), ieee-logo.svg (IEEE CIS logo, black text)
+frontend/public/images/team/        28 face-cropped 480x480 WebP photos
+frontend/public/images/events/      6 posters (max 900px WebP)
+frontend/tailwind.config.js         colour tokens and fonts
+frontend/src/index.css              base styles, component classes, all animation/intro/cursor CSS
+frontend/src/main.tsx               font imports, app mount
+frontend/src/App.tsx                routes
+frontend/src/data/                  events.json, team.json, site.json, faqs.json, resources.json, achievements.json
+frontend/src/lib/data.ts            types, loaders, upcoming/past logic, date/time formatting, .ics calendar files, initials
+frontend/src/lib/icons.ts           brand icons + domain icon map (kept out of component files for the lint rule)
+frontend/src/lib/useTitle.ts        per-page document titles
+frontend/src/components/Layout.tsx  navbar (desktop + full-screen mobile menu), footer, skip link, scroll-to-top on route change,
                            ScrollProgress, BackToTop, CursorAura
-src/components/PageHeader.tsx       page title block with HeaderParticles (prop `shape`)
-src/components/EventCards.tsx       Poster (typographic fallback when no poster), PosterCard (tilt, data-cursor="View"), UpcomingCard
-src/components/MemberCard.tsx       photo with tilt, name, role, social buttons, initials fallback
-src/components/Accordion.tsx        FAQ accordion
-src/components/Brand.tsx            CisLogoTile (logo on a cream tile for readability), RecMark
-src/components/Icons.tsx            AreaGlyph (line drawings for the four CI areas; gold marks "the best")
-src/components/Motion.tsx           Reveal, Tilt, Marquee, ScrollProgress, CursorAura, BackToTop
-src/components/particles/engine.ts          custom WebGL particle engine
-src/components/particles/shapes.ts          point-cloud generators
-src/components/particles/ParticleStory.tsx  home intro + scroll story
-src/components/particles/HeaderParticles.tsx page header formations
-src/pages/                  Home, Events, EventDetail, Team, About, Milestones (Achievements.tsx), Resources, Join, Contact, NotFound
-src/components/particles/layout.ts          SIDE_QUERY (side-by-side vs stacked), BOUNDS per formation, fitShape()
-src/admin/                  the admin client: sign-in and setup links, editors (incl. Home), autosaved drafts, publish
+frontend/src/components/PageHeader.tsx       page title block with HeaderParticles (prop `shape`)
+frontend/src/components/EventCards.tsx       Poster (typographic fallback when no poster), PosterCard (tilt, data-cursor="View"), UpcomingCard
+frontend/src/components/MemberCard.tsx       photo with tilt, name, role, social buttons, initials fallback
+frontend/src/components/Accordion.tsx        FAQ accordion
+frontend/src/components/Brand.tsx            CisLogoTile (logo on a cream tile for readability), RecMark
+frontend/src/components/Icons.tsx            AreaGlyph (line drawings for the four CI areas; gold marks "the best")
+frontend/src/components/Motion.tsx           Reveal, Tilt, Marquee, ScrollProgress, CursorAura, BackToTop
+frontend/src/components/particles/engine.ts          custom WebGL particle engine
+frontend/src/components/particles/shapes.ts          point-cloud generators
+frontend/src/components/particles/ParticleStory.tsx  home intro + scroll story
+frontend/src/components/particles/HeaderParticles.tsx page header formations
+frontend/src/pages/                  Home, Events, EventDetail, Team, About, Milestones (Achievements.tsx), Resources, Join, Contact, NotFound
+frontend/src/components/particles/layout.ts          SIDE_QUERY (side-by-side vs stacked), BOUNDS per formation, fitShape()
+frontend/src/admin/                  the admin client: sign-in and setup links, editors (incl. Home), autosaved drafts, publish
                             with merge/conflict handling and live status, History, Accounts (owner), image processing
 shared/                     content types, section list, validators, 3-way merge, diff, passphrase rules, API contract
-server/                     admin server (Express 5 + mongodb driver): auth, sessions, throttling, publish, history,
+backend/                     admin server (Express 5 + mongodb driver): auth, sessions, throttling, publish, history,
                             images, presence, accounts, backups, build export
-scripts/fetch-content.ts    prebuild: pulls the published release into src/data + public/images (content-build.ts)
+frontend/scripts/fetch-content.ts    prebuild: pulls the published release into frontend/src/data + frontend/public/images (content-build.ts)
 docs/SETUP.md               click-by-click setup of Atlas, Render and Vercel, first owner, local running
 docs/ADMIN-GUIDE.md         guide for office bearers and the web lead (backups, outages, yearly handover)
-public/robots.txt           keeps /admin out of search engines
+frontend/public/robots.txt           keeps /admin out of search engines
 CLAUDE.md, docs/HANDOFF.md  instructions for Claude Code and this handoff
 README.md                   how to run, deploy, use the admin, update content, prepare images, tweak animations
 ```
@@ -164,9 +168,9 @@ README.md                   how to run, deploy, use the admin, update content, p
 - **Editing:** events, team, achievements, site settings, Join page, FAQs, resources and the Home page (hero, About the Society, What We Do: at least 6 items). Unpublished edits autosave on the device (per signed-in user) until Publish. A presence note shows who is editing which section.
 - **Publish:** every publish is a numbered release, kept forever. Changes are merged item by item against the release the editor started from; only same-item clashes are reported ("Load theirs" / "Publish mine anyway"). After saving, the server calls Vercel's Deploy Hook; the admin polls `/content-version.json` until the new release is live.
 - **History and undo:** make an old release (or one section of it) live again; that creates a new release.
-- **Images:** processed in the browser (square 480 px, posters 900 px wide, WebP with JPEG fallback), stored in MongoDB under content-addressed paths (`/images/<folder>/<name>-<10 hex of sha256>.webp`), copied into `public/images` at build time.
-- **Owner extras:** Accounts (invite, reset link, deactivate/reactivate, activity log), monthly backup download and import, "Import starting content" (loads `src/data` + `public/images` as release #1).
-- **Build:** `scripts/fetch-content.ts` pulls the release (retries about 3 min while Render wakes), validates every section (stops the build on any rule break), downloads only new or changed images (SHA-256 checked), and writes `/content-snapshot.json` and `/content-version.json`. If Render can't be reached it copies the live site's snapshot instead; only the very first deploy uses the repo's `src/data`.
+- **Images:** processed in the browser (square 480 px, posters 900 px wide, WebP with JPEG fallback), stored in MongoDB under content-addressed paths (`/images/<folder>/<name>-<10 hex of sha256>.webp`), copied into `frontend/public/images` at build time.
+- **Owner extras:** Accounts (invite, reset link, deactivate/reactivate, activity log), monthly backup download and import, "Import starting content" (loads `frontend/src/data` + `frontend/public/images` as release #1).
+- **Build:** `frontend/scripts/fetch-content.ts` pulls the release (retries about 3 min while Render wakes), validates every section (stops the build on any rule break), downloads only new or changed images (SHA-256 checked), and writes `/content-snapshot.json` and `/content-version.json`. If Render can't be reached it copies the live site's snapshot instead; only the very first deploy uses the repo's `frontend/src/data`.
 
 ### Design system
 
@@ -194,9 +198,9 @@ README.md                   how to run, deploy, use the admin, update content, p
 - Rotation angle wraps within one turn so shapes never unwind several times. Gold sparks on ~3.5% of particles.
 
 **Home (`ParticleStory.tsx`):** formations 0 intro cloud, 1 chapter-name text, 2 hero globe, 3-8 one abstract formation per What We Do item: network (faces camera with sway), helix, hills, constellation, ripple, swarm. 6,500 particles desktop, 2,600 phones. The canvas is sticky while the hero and six step cards scroll over it; formation index is interpolated from each step element's real position; soft glow blobs behind change colour per formation.
-- Step cards: "What We Do · 1 of 6" to "6 of 6" from `src/data/home.json` (Technical Learning, Innovation & Development, Research & Exploration, Collaboration, Events & Discussions, Industry & Professional Development). The four CI ideas (neural networks, fuzzy systems, evolutionary computation, swarm intelligence) were removed from all visible content at the club's request in Sept 2026; do not bring them back.
+- Step cards: "What We Do · 1 of 6" to "6 of 6" from `frontend/src/data/home.json` (Technical Learning, Innovation & Development, Research & Exploration, Collaboration, Events & Discussions, Industry & Professional Development). The four CI ideas (neural networks, fuzzy systems, evolutionary computation, swarm intelligence) were removed from all visible content at the club's request in Sept 2026; do not bring them back.
 - **Intro:** plays when the site is opened or refreshed on `/` (module flag `openedOnHome` + `introPlayedThisLoad`, set only when the intro finishes). Not on in-site navigation back to Home, not after opening another page first. Forces scroll to top (`history.scrollRestoration = "manual"`). Timeline: loading bar, then gather into "IEEE CIS / REC" (desktop) or "IEEE / CIS / REC" (phones) over 1.7 s, hold 1.3 s with "Computational Intelligence Society / Rajalakshmi Engineering College, Chennai" under the text, then release into the globe over 1.5 s. Skip button (with countdown ring) or Esc skips (0.7 s release). Particles are **not interactive during the intro**.
-- `body[data-intro]` states: `on` (header, hero items `.intro-item`, progress bar, back-to-top, `.story-shade` hidden; scroll locked), `leaving` (chrome animates in with delays), `done`. `public/intro.js` (a blocking `<script src>` at the start of `<body>` in `index.html`) sets `on` before first paint on `/` (unless reduced motion). Fallbacks set `done` if WebGL is missing.
+- `body[data-intro]` states: `on` (header, hero items `.intro-item`, progress bar, back-to-top, `.story-shade` hidden; scroll locked), `leaving` (chrome animates in with delays), `done`. `frontend/public/intro.js` (a blocking `<script src>` at the start of `<body>` in `index.html`) sets `on` before first paint on `/` (unless reduced motion). Fallbacks set `done` if WebGL is missing.
 - Clicking empty space on the home scene sends a shockwave. Home scene wrapper is pulled up under the navbar (`-mt-[69px]`).
 
 **Page headers (`HeaderParticles.tsx`):** 3,000 particles desktop, 1,500 phones; assemble from a scattered cloud over 1.8 s; force field and click shockwave active; presets: sphere, neural, fuzzy, helix, swarm, chaos, rings, constellation, ripple.
@@ -208,7 +212,7 @@ README.md                   how to run, deploy, use the admin, update content, p
 
 **Performance and accessibility:** animations pause off screen and in background tabs; DPR capped (1.75 desktop, 1.5 phones); fewer particles on phones; reduced-motion users get still versions, no intro, no custom cursor; no-WebGL browsers show the page normally; skip link; focus-visible outlines; aria labels on icon buttons; tested: no page errors.
 
-### Content data (`src/data/`)
+### Content data (`frontend/src/data/`)
 
 **`events.json`** (upcoming/past computed from dates at runtime; undated events count as past; grouped by `session`):
 
@@ -276,10 +280,10 @@ Session **2024–25** (from posters): Pugal M (Chair), Shrinithi S (Vice Chair),
 
 ## 7. Technical gotchas for whoever continues
 
-- `tsconfig.app.json` has `erasableSyntaxOnly`: no constructor parameter properties (declare fields, assign in constructor). `resolveJsonModule` was added for JSON imports.
-- ESLint `react-refresh/only-export-components`: files exporting components must only export components. That's why icon maps live in `src/lib/icons.ts`.
-- The intro depends on three places staying in sync: `public/intro.js` (loaded from `index.html`), `ParticleStory.tsx`, and the `body[data-intro]` rules in `index.css`.
-- The admin runs under a strict CSP (`vercel.json`): no inline scripts, no third-party requests. `dist/admin.html` is `index.html` minus its inline preload script (the `adminHtml` plugin in `vite.config.ts`).
+- `frontend/tsconfig.json` has `erasableSyntaxOnly`: no constructor parameter properties (declare fields, assign in constructor). `resolveJsonModule` was added for JSON imports.
+- ESLint `react-refresh/only-export-components`: files exporting components must only export components. That's why icon maps live in `frontend/src/lib/icons.ts`.
+- The intro depends on three places staying in sync: `frontend/public/intro.js` (loaded from `index.html`), `ParticleStory.tsx`, and the `body[data-intro]` rules in `index.css`.
+- The admin runs under a strict CSP (`vercel.json`): no inline scripts, no third-party requests. `frontend/dist/admin.html` is `index.html` minus its inline preload script (the `adminHtml` plugin in `frontend/vite.config.ts`).
 - Content rules (`shared/validate.ts`) run in the admin, on the server and in the build; a build stops on any rule break (Vercel keeps the old site).
 - `PageHeader` accepts `shape` (formation) and optional `aside` / `below` slots.
 - `data-cursor="Label"` on any element shows that label in the cursor ring.

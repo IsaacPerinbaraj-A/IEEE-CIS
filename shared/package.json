@@ -1,0 +1,7 @@
+{
+  "name": "@cis/shared",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Content types, rules and merging used by both the website/admin (frontend) and the admin server (backend). Imported by relative path, so Node runs the TypeScript directly with no build step."
+}

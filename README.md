@@ -10,7 +10,7 @@ You need Node.js 22.18 or newer (24 recommended).
 ```bash
 npm install
 npm run dev       # opens a live preview at http://localhost:5173
-npm run build     # makes the final site in the dist/ folder
+npm run build     # makes the final site in the frontend/dist/ folder
 ```
 
 The admin needs its server too: `npm run server` in a second terminal (settings in `.env.local`, see
@@ -22,7 +22,7 @@ The site is set up for three free services (step by step in [docs/SETUP.md](docs
 
 - **Vercel** serves the website. `vercel.json` handles page links like `/events/rewired`, forwards `/api` to the
   admin server, and adds security headers to `/admin`.
-- **Render** runs the admin server (`server/`), described in `render.yaml`.
+- **Render** runs the admin server (`backend/`), described in `render.yaml`.
 - **MongoDB Atlas** (free M0) stores the published content, its history, photos and admin accounts.
 
 Code changes pushed to `main` on GitHub redeploy the site automatically. Content changes come from the admin.
@@ -50,12 +50,12 @@ handover) is [docs/ADMIN-GUIDE.md](docs/ADMIN-GUIDE.md).
 
 ## Updating the site by hand
 
-Content lives in `src/data/`. **Once the admin is live, use the admin instead:** every build replaces these files
+Content lives in `frontend/src/data/`. **Once the admin is live, use the admin instead:** every build replaces these files
 with the content published in the admin, so editing them in GitHub doesn't change the live site. They remain the
 starting copy (imported into the admin once) and the content `npm run dev` shows on your computer. The formats
 below are also what the admin stores.
 
-### Add an event: `src/data/events.json`
+### Add an event: `frontend/src/data/events.json`
 
 Copy an existing event block and change it. Order doesn't matter; the site sorts by date.
 
@@ -87,7 +87,7 @@ Copy an existing event block and change it. Order doesn't matter; the site sorts
   The Register button and "Add to calendar" only show while it's upcoming.
 - No poster yet? Leave `poster` empty and the site draws a clean title card instead.
 
-### Update the team: `src/data/team.json`
+### Update the team: `frontend/src/data/team.json`
 
 The file holds one block per academic year in `sessions`. **The first block is shown by default**, so add
 a new year at the top and older years stay available in the year switcher.
@@ -114,8 +114,8 @@ Large photos make the site slow on mobile data. Before adding images:
 
 The admin prepares photos for you. For the starting copy and local work:
 
-- **Team photos:** square, about 480 × 480 px, face in the middle. Save as `.webp` in `public/images/team/`.
-- **Posters:** at most 900 px wide, `.webp`, in `public/images/events/`.
+- **Team photos:** square, about 480 × 480 px, face in the middle. Save as `.webp` in `frontend/public/images/team/`.
+- **Posters:** at most 900 px wide, `.webp`, in `frontend/public/images/events/`.
 - Aim for under 150 KB each. Free tool: https://squoosh.app
 
 Use lowercase file names with dashes, and no spaces.
@@ -124,39 +124,49 @@ Use lowercase file names with dashes, and no spaces.
 
 The home page and page headers are fully responsive. The home page switches between **side by side** (text left,
 3D shape right) and **stacked** (shape above the text) using one media query that lives in two places and must stay
-identical: `SIDE_QUERY` in `src/components/particles/layout.ts` and the matching `@media` block in `src/index.css`.
+identical: `SIDE_QUERY` in `frontend/src/components/particles/layout.ts` and the matching `@media` block in `frontend/src/index.css`.
 The 3D shapes measure the page's content column and use `fitShape()` to stay fully inside the free space, allowing
 for perspective, so they never run off the screen edge or under the text.
 
 ## Where things are
 
+The repository holds three projects (npm workspaces, so one `npm install` at the top installs all of them):
+
 ```
-src/data/                  content: the starting copy (each live build overwrites it with the published content)
-src/pages/                 one file per page
-src/components/            shared pieces: navbar, footer, cards, motion effects
-src/components/particles/  3D engine, formations, home story, header particles, layout fitting
-src/admin/                 the /admin page: sign-in, editors, publishing, history, accounts, image processing
-shared/                    content types, rules, merging and the API contract, used by the admin, server and build
-server/                    the admin server (Render): Express + MongoDB, run by Node directly (no build step)
-scripts/                   fetch-content.ts: pulls the published content into src/data and public/images at build time
-src/lib/                   data loading, date formatting, calendar files, icons
-public/images/             team photos, posters, achievement photos
-public/brand/              REC and IEEE CIS logos
-public/intro.js            hides the page chrome before first paint while the home intro plays
+frontend/                  the website and the /admin page (React + Vite) — deployed to Vercel
+  src/data/                content: the starting copy (each live build overwrites it with the published content)
+  src/pages/               one file per page
+  src/components/          shared pieces: navbar, footer, cards, motion effects
+  src/components/particles/  3D engine, formations, home story, header particles, layout fitting
+  src/admin/               the /admin page: sign-in, editors, publishing, history, accounts, image processing
+  src/lib/                 data loading, date formatting, calendar files, icons
+  scripts/                 fetch-content.ts: pulls the published content into src/data and public/images at build time
+  public/images/           team photos, posters, achievement photos
+  public/brand/            REC and IEEE CIS logos
+  public/intro.js          hides the page chrome before first paint while the home intro plays
+  index.html, vite.config.ts, tailwind.config.js
+
+backend/                   the admin server (Render): Express + MongoDB, run by Node directly (no build step)
+
+shared/                    content types, rules, merging and the API contract, used by all three
+
 vercel.json, render.yaml   hosting settings for Vercel (site) and Render (admin server)
 docs/                      SETUP.md (hosting setup), ADMIN-GUIDE.md (using the admin), HANDOFF.md (project history)
 ```
 
+Every command below is run from the top folder; `npm run dev`, `npm run build` and `npm run server` know which
+project to start.
+
 ## Animations and 3D effects
 
-The site runs a small custom 3D engine (`src/components/particles/`, written directly in WebGL, no three.js).
+The site runs a small custom 3D engine (`frontend/src/components/particles/`, written directly in WebGL, no three.js).
 
 **Landing page** (`ParticleStory.tsx`)
 1. **Intro**: plays every time the home page is loaded or refreshed (not when you come back to it from another page
    of the site). A scattered cloud gathers into "IEEE CIS REC", holds with the society name underneath, then bursts
    into the hero globe. The cursor does not affect the particles during the intro. Visitors can press **Skip intro** or Esc.
 2. **Scroll story**: the particles change shape for each of the six "What We Do" items (Technical Learning through
-   Industry & Professional Development). The shapes are abstract decoration; the text comes from `src/data/home.json`.
+   Industry & Professional Development). The shapes are abstract decoration; the text comes from `frontend/src/data/home.json`.
 3. **Cursor**: particles swirl out of the way around the pointer like a vortex, and the shape tilts toward it.
    **Clicking** empty space sends a gold shockwave ring through the particles.
 
@@ -166,7 +176,7 @@ cloud when the page opens and reacts to the cursor and clicks the same way. Chan
 `"sphere"` (About), `"helix"` (Resources), `"swarm"` (Join), `"ripple"` (Contact), `"fuzzy"` (Achievements),
 plus `"neural"` and `"chaos"`.
 
-**Across the site** (`src/components/Motion.tsx`): pages rise in when opened, sections reveal as you scroll
+**Across the site** (`frontend/src/components/Motion.tsx`): pages rise in when opened, sections reveal as you scroll
 (`Reveal`), posters, team photos and cards tilt in 3D with a light glare (`Tilt`), event names race sideways with
 your scroll (`Marquee`), a custom cursor with a gold dot, trailing ring and stardust trail grows over links, shows
 a label over anything with `data-cursor="..."` (posters say "View"), bursts into sparks on click and turns into a
@@ -177,7 +187,7 @@ Performance and accessibility are built in: animations pause when off screen or 
 fewer particles, visitors with reduced motion turned on get still versions with no intro, touch devices skip the
 mouse effects, and browsers without WebGL simply show the pages without particles.
 
-**Common tweaks** (in `src/components/particles/ParticleStory.tsx`):
+**Common tweaks** (in `frontend/src/components/particles/ParticleStory.tsx`):
 - Change the intro text: edit `["IEEE CIS", "REC"]` (desktop) and `["IEEE", "CIS", "REC"]` (phones).
 - Change colours: edit the `COLORS` and `GLOW` lists (one pair per formation).
 - Turn the intro off completely: in `ParticleStory.tsx` set `const playIntro = false`, and remove the `<script src="/intro.js">` line in `index.html`.
