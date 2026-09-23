@@ -79,10 +79,6 @@ export default function Home() {
           </div>
         )}
       </div>
-      <div className="hero-cue intro-item absolute bottom-8 left-5 flex items-center gap-4 sm:left-8" style={d(700)}>
-        <span aria-hidden className="scroll-cue block h-9 w-6 shrink-0 rounded-full border-2 border-mute/60" />
-        <p className="max-w-[34ch] text-[14px] leading-snug text-mute">Move your cursor through the particles, then scroll to see what we do.</p>
-      </div>
     </div>
   );
 

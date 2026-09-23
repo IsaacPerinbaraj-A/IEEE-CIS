@@ -111,10 +111,6 @@ body[data-intro="on"] .intro-item { opacity: 0; transform: translateY(28px); }
 body[data-intro="leaving"] header { transition-delay: .5s; }
 body[data-intro="leaving"] .intro-item { transition-delay: calc(var(--d, 0ms) + 600ms); }
 
-/* Scroll cue */
-@keyframes cue { 0% { transform: translateY(0); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(12px); opacity: 0; } }
-.scroll-cue::after { content: ""; display: block; width: 4px; height: 8px; margin: 7px auto 0; border-radius: 4px; background: #F2B544; animation: cue 1.8s ease-in-out infinite; }
-
 /* Join band: slowly shifting gradient and a spinning ring */
 @keyframes band { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 @keyframes ring { to { transform: rotate(360deg); } }
@@ -138,7 +134,7 @@ body[data-intro="on"] .story-shade { opacity: 0; }
 /* ---------- Home layout: stacked (shape above text) by default, side by side when there's room ----------
    The same media query lives in src/components/particles/layout.ts (SIDE_QUERY) so shapes and text always agree. */
 .hero-stage { align-items: flex-start; }
-.hero-wrap { padding-top: 40svh; padding-bottom: 7.5rem; }
+.hero-wrap { padding-top: 40svh; padding-bottom: 3.5rem; }
 .hero-title { font-size: clamp(2rem, min(8.4vw, 7.5svh), 3.6rem); }
 .story-step { min-height: 100svh; align-items: flex-end; padding-bottom: 2.5rem; }
 .step-card { max-width: 560px; }
@@ -159,7 +155,7 @@ body[data-intro="on"] .story-shade { opacity: 0; }
 .glow-b { right: 20%; bottom: -10%; }
 @media (min-width: 1024px), (min-width: 640px) and (min-aspect-ratio: 13/10) {
   .hero-stage { align-items: center; }
-  .hero-wrap { padding-top: 1.5rem; padding-bottom: 8rem; }
+  .hero-wrap { padding-top: 1.5rem; padding-bottom: 4rem; }
   .hero-copy { max-width: 54%; }
   .hero-title { font-size: clamp(2rem, min(4.8vw, 8.2svh), 4.5rem); }
   /* What We Do steps alternate sides; shorter steps keep the gap between cards small */
@@ -172,8 +168,7 @@ body[data-intro="on"] .story-shade { opacity: 0; }
   [data-side="right"] .story-shade-right { opacity: 1; }
   .glow-a { right: -10%; top: 10%; }
 }
-/* Short screens (landscape phones, small laptops): tighter spacing, no scroll hint */
-@media (max-height: 700px) { .hero-cue { display: none; } }
+/* Short screens (landscape phones, small laptops): tighter spacing */
 @media (max-height: 560px) {
   .hero-wrap { padding-bottom: 2.5rem; }
   .hero-lede { font-size: 1rem; margin-top: 1rem; }
@@ -183,11 +178,6 @@ body[data-intro="on"] .story-shade { opacity: 0; }
 }
 /* Phones: a smaller globe above the copy, so the title, both buttons and the event link fit on the first screen */
 @media (max-width: 639px) { .hero-wrap { padding-top: 30svh; } }
-/* Touch screens: the "move your cursor" hint doesn't apply, so drop it and the space kept for it */
-@media (pointer: coarse) {
-  .hero-cue { display: none; }
-  .hero-wrap { padding-bottom: 3.5rem; }
-}
 /* Phones: the Skip intro button (ParticleStory) sits over the live canvas, so a solid tint replaces its backdrop blur */
 @media (max-width: 639px) { .intro-overlay > button { -webkit-backdrop-filter: none; backdrop-filter: none; background-color: rgba(15,10,28,.85); } }
 body[data-intro="on"] .glow-a { right: calc(50% - 30vh); top: calc(50% - 34vh); }
