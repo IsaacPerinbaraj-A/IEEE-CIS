@@ -1,7 +1,22 @@
 [
-  { "q": "Who can join IEEE CIS REC?", "a": "Any student at Rajalakshmi Engineering College, from any department and any year. You don't need to be an AI expert, just curious." },
-  { "q": "Do I need to be an IEEE member to attend events?", "a": "Registration details are listed on each event page. Check there, or message us on Instagram if you're unsure." },
-  { "q": "How much does membership cost?", "a": "IEEE sets the student membership fee, and it changes over time. Check the current rate on the IEEE website before you sign up." },
-  { "q": "How do I join one of the domain teams?", "a": "Domain teams such as ML, Data Science, Computer Vision, IoT and Web Development recruit through the chapter. Watch our Instagram and LinkedIn for announcements." },
-  { "q": "Can I propose a workshop or talk?", "a": "Yes. Email us with the topic, who would run it, and roughly when. Student-led sessions are welcome." }
+  {
+    "q": "Who can join IEEE CIS REC?",
+    "a": "Any student at Rajalakshmi Engineering College, from any department and any year. You don't need to be an AI expert, just curious."
+  },
+  {
+    "q": "Do I need to be an IEEE member to attend events?",
+    "a": "Registration details are listed on each event page. Check there, or message us on Instagram if you're unsure."
+  },
+  {
+    "q": "How much does membership cost?",
+    "a": "IEEE sets the student membership fee, and it changes over time. Check the current rate on the IEEE website before you sign up."
+  },
+  {
+    "q": "How do I join one of the domain teams?",
+    "a": "Domain teams such as ML, Data Science, Computer Vision, IoT and Web Development recruit through the chapter. Watch our Instagram and LinkedIn for announcements."
+  },
+  {
+    "q": "Can I propose a workshop or talk?",
+    "a": "Yes. Email us with the topic, who would run it, and roughly when. Student-led sessions are welcome."
+  }
 ]

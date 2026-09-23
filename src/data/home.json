@@ -23,12 +23,36 @@
     "label": "What We Do",
     "title": "Learn. Build. Connect.",
     "items": [
-      { "icon": "learning", "title": "Technical Learning", "text": "Technical workshops, seminars, and hands-on sessions that develop knowledge across core and emerging areas of computing." },
-      { "icon": "innovation", "title": "Innovation & Development", "text": "Project-based initiatives that transform ideas into practical prototypes, applications, and technology-driven solutions." },
-      { "icon": "research", "title": "Research & Exploration", "text": "Opportunities to explore emerging technologies, engage in research, and examine developments shaping the field of computing." },
-      { "icon": "collaboration", "title": "Collaboration", "text": "Interdisciplinary collaboration that encourages knowledge exchange, teamwork, and collective problem-solving." },
-      { "icon": "events", "title": "Events & Discussions", "text": "Technical events, panel discussions, expert sessions, competitions, and forums that facilitate meaningful exchange of ideas." },
-      { "icon": "industry", "title": "Industry & Professional Development", "text": "Industry interactions and professional initiatives that provide exposure to current practices, career pathways, and evolving technology roles." }
+      {
+        "icon": "learning",
+        "title": "Technical Learning",
+        "text": "Technical workshops, seminars, and hands-on sessions that develop knowledge across core and emerging areas of computing."
+      },
+      {
+        "icon": "innovation",
+        "title": "Innovation & Development",
+        "text": "Project-based initiatives that transform ideas into practical prototypes, applications, and technology-driven solutions."
+      },
+      {
+        "icon": "research",
+        "title": "Research & Exploration",
+        "text": "Opportunities to explore emerging technologies, engage in research, and examine developments shaping the field of computing."
+      },
+      {
+        "icon": "collaboration",
+        "title": "Collaboration",
+        "text": "Interdisciplinary collaboration that encourages knowledge exchange, teamwork, and collective problem-solving."
+      },
+      {
+        "icon": "events",
+        "title": "Events & Discussions",
+        "text": "Technical events, panel discussions, expert sessions, competitions, and forums that facilitate meaningful exchange of ideas."
+      },
+      {
+        "icon": "industry",
+        "title": "Industry & Professional Development",
+        "text": "Industry interactions and professional initiatives that provide exposure to current practices, career pathways, and evolving technology roles."
+      }
     ]
   }
 }
