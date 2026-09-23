@@ -24,7 +24,7 @@ export default function Dashboard() {
     { to: "home", Icon: Home, title: "Home page", text: `Hero, About and ${content.home.whatWeDo.items.length} What We Do items` },
     { to: "events", Icon: CalendarDays, title: "Events", text: `${upcoming} upcoming, ${content.events.length - upcoming} past` },
     { to: "team", Icon: Users, title: "Team", text: `${people} members in ${content.team.sessions[0]?.label || "the latest year"}` },
-    { to: "achievements", Icon: Trophy, title: "Achievements", text: content.achievements.length ? `${content.achievements.length} listed` : "None yet" },
+    { to: "achievements", Icon: Trophy, title: "Milestones", text: content.achievements.length ? `${content.achievements.length} listed` : "None yet" },
     { to: "site", Icon: Settings, title: "Site settings", text: "Email, social links, membership form" },
     { to: "join", Icon: UserPlus, title: "Join page", text: `${content.join.steps.length} steps, ${content.join.benefits.length} benefits` },
     { to: "faqs", Icon: HelpCircle, title: "FAQs", text: `${content.faqs.length} questions` },

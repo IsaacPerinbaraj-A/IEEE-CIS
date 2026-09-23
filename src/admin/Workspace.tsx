@@ -39,7 +39,7 @@ const NAV: NavItem[] = [
   { to: "/admin/home", label: "Home page", Icon: Home, section: "home" },
   { to: "/admin/events", label: "Events", Icon: CalendarDays, section: "events" },
   { to: "/admin/team", label: "Team", Icon: Users, section: "team" },
-  { to: "/admin/achievements", label: "Achievements", Icon: Trophy, section: "achievements" },
+  { to: "/admin/achievements", label: "Milestones", Icon: Trophy, section: "achievements" },
   { to: "/admin/site", label: "Site settings", Icon: Settings, section: "site" },
   { to: "/admin/join", label: "Join page", Icon: UserPlus, section: "join" },
   { to: "/admin/faqs", label: "FAQs", Icon: HelpCircle, section: "faqs" },

@@ -10,7 +10,7 @@ export type SectionKey = (typeof SECTION_KEYS)[number];
 export const SECTION_LABELS: Record<SectionKey, string> = {
   events: "Events",
   team: "Team",
-  achievements: "Achievements",
+  achievements: "Milestones",
   site: "Site settings",
   join: "Join page",
   faqs: "FAQs",

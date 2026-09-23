@@ -12,10 +12,10 @@ export default function AchievementsEditor() {
   const edit = (fn: (a: Achievement[]) => void) => { const next = clone(list); fn(next); update("achievements", next); };
   return (
     <>
-      <PageTitle title="Achievements" actions={<button className="btn-gold" onClick={() => edit(a => { a.unshift({ title: "", year: String(new Date().getFullYear()), description: "", people: "", link: "", image: "" }); })}><Plus size={18} /> Add achievement</button>}>
-        Wins, papers and milestones. The Achievements page and its menu link appear on the site as soon as there's at least one.
+      <PageTitle title="Milestones" actions={<button className="btn-gold" onClick={() => edit(a => { a.unshift({ title: "", year: String(new Date().getFullYear()), description: "", people: "", link: "", image: "" }); })}><Plus size={18} /> Add achievement</button>}>
+        Wins, papers and milestones. The Milestones page and its menu link appear on the site as soon as there's at least one.
       </PageTitle>
-      {list.length === 0 && <p className="adm-card text-mute">No achievements yet. SIH results, competition wins and published papers are great to add here.</p>}
+      {list.length === 0 && <p className="adm-card text-mute">No milestones yet. SIH results, competition wins and published papers are great to add here.</p>}
       <div className="grid grid-cols-1 gap-5">
         {list.map((a, i) => (
           <section key={i} className="adm-card grid gap-4 sm:grid-cols-2">
@@ -33,7 +33,7 @@ export default function AchievementsEditor() {
                 finally { setBusy(-1); }
               }} />
             <div className="flex justify-end sm:col-span-2">
-              <IconButton label={`Delete ${a.title || "achievement"}`} tone="danger" onClick={() => { if (confirm("Delete this achievement?")) edit(x => { x.splice(i, 1); }); }}><Trash2 size={16} /></IconButton>
+              <IconButton label={`Delete ${a.title || "milestone"}`} tone="danger" onClick={() => { if (confirm("Delete this achievement?")) edit(x => { x.splice(i, 1); }); }}><Trash2 size={16} /></IconButton>
             </div>
           </section>
         ))}

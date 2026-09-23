@@ -10,7 +10,7 @@ export const PAGE_ROUTES = [
   ["events/:slug", "EventDetail"],
   ["team", "Team"],
   ["about", "About"],
-  ["achievements", "Achievements"],
+  ["milestones", "Achievements"],
   ["resources", "Resources"],
   ["join", "Join"],
   ["contact", "Contact"],

@@ -14,7 +14,7 @@ const nav = [
   { to: "/events", label: "Events" },
   { to: "/team", label: "Team" },
   { to: "/about", label: "About" },
-  ...(achievements.length ? [{ to: "/achievements", label: "Achievements" }] : []),
+  ...(achievements.length ? [{ to: "/milestones", label: "Milestones" }] : []),
   { to: "/resources", label: "Resources" },
   { to: "/contact", label: "Contact" },
 ];

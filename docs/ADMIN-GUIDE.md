@@ -26,7 +26,7 @@ minutes without use; wait and it continues on its own. Visitors to the website a
 
 ## Editing
 
-- Pick a section in the sidebar: **Events**, **Team**, **Achievements**, **Site settings**, **Join page**, **FAQs**,
+- Pick a section in the sidebar: **Events**, **Team**, **Milestones**, **Site settings**, **Join page**, **FAQs**,
   **Resources** or **Home page**. Each form shows a live preview.
 - **Your changes save on this device automatically**, for your account in this browser, until you publish. Other
   editors don't see them, and they don't carry over to your other devices. Don't clear the browser's data before you

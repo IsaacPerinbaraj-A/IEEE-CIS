@@ -341,7 +341,7 @@ function StartingContent({ onDone }: { onDone: () => void }) {
             <button className="btn-gold" disabled={busy} onClick={() => void go()}>{busy ? "Importing…" : "Import"}</button>
           </>}>
           <div className="grid grid-cols-1 gap-3 text-[15px]">
-            <p>This copies every section (events, team, achievements, site settings, the Join page, FAQs, resources and the Home page) and the team, event and achievement photos into the database as release #1.</p>
+            <p>This copies every section (events, team, milestones, site settings, the Join page, FAQs, resources and the Home page) and the team, event and achievement photos into the database as release #1.</p>
             <p className="text-mute">It works only while the database has no releases, so it can't overwrite anything. Anything the content rules flag is listed afterwards, to fix here and publish. The site is rebuilt from the database once nothing needs fixing.</p>
             {error && <p role="alert" className="adm-error">{error}</p>}
           </div>

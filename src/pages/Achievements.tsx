@@ -7,7 +7,7 @@ import { useMediaQuery, PHONE } from "../lib/useMediaQuery";
 import { Reveal } from "../components/Motion";
 
 export default function Achievements() {
-  useTitle("Achievements", "Wins, papers and milestones from IEEE CIS REC members.");
+  useTitle("Milestones", "Wins, papers and milestones from IEEE CIS REC members.");
   const phone = useMediaQuery(PHONE);
   const empty = (
     <div role="status" className="relative overflow-hidden rounded-3xl border border-line bg-gradient-to-br from-violet-deep/40 via-panel to-ink p-8 max-sm:p-5 sm:p-12">
@@ -15,7 +15,7 @@ export default function Achievements() {
       <div className="relative max-w-[56ch]">
         <span className="grid h-12 w-12 place-items-center rounded-2xl bg-raised text-violet-soft"><Trophy size={22} aria-hidden /></span>
         <h2 className="mt-6 text-2xl font-semibold sm:text-3xl">Nothing listed yet</h2>
-        <p className="mt-3 text-mute">Achievements are being added. Check back soon.</p>
+        <p className="mt-3 text-mute">Milestones are being added. Check back soon.</p>
         {/* Phones: two equal buttons side by side, full width one above the other where both labels don't fit in a row */}
         <div className="mt-7 flex flex-wrap gap-3 max-sm:grid max-sm:grid-cols-2 max-sm:gap-2 max-[389px]:grid-cols-1">
           <Link className="btn-ghost max-sm:min-h-[48px] max-sm:whitespace-nowrap max-sm:px-3" to="/events?tab=past">See past events</Link>
@@ -26,7 +26,7 @@ export default function Achievements() {
   );
   return (
     <>
-      <PageHeader title="Achievements" shape="fuzzy">Wins, papers and milestones from our members.</PageHeader>
+      <PageHeader title="Milestones" shape="fuzzy">Wins, papers and milestones from our members.</PageHeader>
       <div className="wrap mt-12 max-sm:mt-8">
         {achievements.length === 0
           ? (phone ? <Reveal>{empty}</Reveal> : empty)

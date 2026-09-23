@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -38,6 +38,8 @@ export default function App() {
           {pageRoutes.map(({ path, page: { Page } }) => (
             <Route key={path} path={path} element={<Suspense fallback={<PageLoading />}><Page /></Suspense>} />
           ))}
+          {/* The page was called Achievements until Sept 2026; links shared back then still open it */}
+          <Route path="achievements" element={<Navigate to="/milestones" replace />} />
         </Route>
       </Routes>
     </BrowserRouter>

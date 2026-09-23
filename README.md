@@ -103,7 +103,7 @@ Team `slug` values power the filter and the icons, so keep them as they are.
 ### Other files
 
 - `site.json` holds the email, LinkedIn, Instagram and the **membership form link** (`memberForm`, currently empty).
-- `achievements.json` holds wins, papers and awards. It's empty now; once you add one entry, an "Achievements" link appears in the menu.
+- `achievements.json` holds wins, papers and awards. It's empty now; once you add one entry, a "Milestones" link appears in the menu.
   Example: `{ "title": "SIH 2025 finalists", "year": "2025", "people": "Team names", "description": "...", "link": "" }`
 - `faqs.json` holds the questions on the Join page.
 - `resources.json` holds the learning links on the Resources page.

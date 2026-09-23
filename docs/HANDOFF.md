@@ -126,7 +126,7 @@ src/components/particles/engine.ts          custom WebGL particle engine
 src/components/particles/shapes.ts          point-cloud generators
 src/components/particles/ParticleStory.tsx  home intro + scroll story
 src/components/particles/HeaderParticles.tsx page header formations
-src/pages/                  Home, Events, EventDetail, Team, About, Achievements, Resources, Join, Contact, NotFound
+src/pages/                  Home, Events, EventDetail, Team, About, Milestones (Achievements.tsx), Resources, Join, Contact, NotFound
 src/components/particles/layout.ts          SIDE_QUERY (side-by-side vs stacked), BOUNDS per formation, fitShape()
 src/admin/                  the admin client: sign-in and setup links, editors (incl. Home), autosaved drafts, publish
                             with merge/conflict handling and live status, History, Accounts (owner), image processing
@@ -150,12 +150,12 @@ README.md                   how to run, deploy, use the admin, update content, p
 | `/events/:slug` | Event detail | (none) | Poster at natural shape, facts (date, time, venue, coordinator), description, Register + Add to calendar (upcoming only), Share, more events |
 | `/team` | Team | constellation (9 clusters sized by real team sizes) | Year switcher (2025–26 latest, 2024–25), domain chips, faculty, groups; `?year=` and `?domain=` |
 | `/about` | About | globe | Mission, event counts computed from data, four CI areas, domain marquee, IEEE CIS worldwide, team CTA |
-| `/achievements` | Achievements | peaks (fuzzy) | Timeline; menu link appears only when `achievements.json` has entries (currently empty) |
+| `/milestones` | Milestones | peaks (fuzzy) | Timeline; menu link appears only when `achievements.json` has entries (currently empty) |
 | `/resources` | Resources | helix | Curated official learning links by domain |
 | `/join` | Join | swarm | 3 steps (IEEE membership, add CIS, chapter form), benefits, FAQ |
 | `/contact` | Contact | ripples | Email/Instagram/LinkedIn/campus cards, message form that opens the email app (mailto), Google Maps embed |
 | `*` | 404 | chaos | "This page doesn't exist" with links |
-| `/admin/*` | Admin (outside the site layout) | none | Dashboard, Events, Team, Achievements, Site settings, FAQs, Resources, Publish |
+| `/admin/*` | Admin (outside the site layout) | none | Dashboard, Events, Team, Milestones, Site settings, FAQs, Resources, Publish |
 
 ### Admin page (database-backed, since 22 September 2026)
 

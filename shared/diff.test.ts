@@ -125,5 +125,5 @@ test("join, faqs, resources and achievements", () => {
   r2.push({ domain: "Robotics", links: [] });
   assert.equal(describeChanges("resources", res, r2), "1 link added (fast.ai), 1 topic added (Robotics)");
 
-  assert.equal(describeChanges("achievements", [], [{ title: "SIH winners", year: "2025", description: "Won." }]), "1 achievement added (SIH winners)");
+  assert.equal(describeChanges("achievements", [], [{ title: "SIH winners", year: "2025", description: "Won." }]), "1 milestone added (SIH winners)");
 });

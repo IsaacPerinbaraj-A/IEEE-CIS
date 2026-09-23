@@ -43,7 +43,7 @@ Full history, data sources, open questions and pending work: `docs/HANDOFF.md` (
 - Headings use Unbounded (`font-display`); body and member names use Geist (`font-sans`). Unbounded wraps badly for names.
 - Pages start with `<PageHeader title shape="...">`. Each page has its own particle formation
   (Events `rings`, Team `constellation`, About `sphere`, Resources `helix`, Join `swarm`, Contact `ripple`,
-  Achievements `fuzzy`, 404 `chaos`). New pages should get a distinct formation.
+  Milestones `fuzzy` (page /milestones, section key `achievements`), 404 `chaos`). New pages should get a distinct formation.
 - Wrap new sections/cards in `Reveal` (with staggered `delay`) and interactive cards in `Tilt` from `components/Motion.tsx`.
 - `data-cursor="Label"` on an element makes the custom cursor ring show that label (posters use "View").
 - Writing style on the site: plain, specific, sentence case, no unverified claims or invented numbers.

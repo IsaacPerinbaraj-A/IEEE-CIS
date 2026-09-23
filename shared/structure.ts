@@ -116,7 +116,7 @@ export const SPECS: Record<SectionKey, Spec> = {
   team: record(() => "Team", { sessions: list(v => str(v, "id"), sessionSpec) }),
   achievements: list(
     v => `${str(v, "title").trim()} (${str(v, "year").trim()})`,
-    atom(v => `Achievement ${q(str(v, "title"))} (${str(v, "year")})`, noun("achievement", "achievements", v => str(v, "title"))),
+    atom(v => `Milestone ${q(str(v, "title"))} (${str(v, "year")})`, noun("milestone", "milestones", v => str(v, "title"))),
   ),
   site: record(() => "Site settings", siteFields),
   join: record(() => "Join page", {
