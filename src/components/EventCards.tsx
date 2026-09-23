@@ -2,30 +2,37 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { CalendarDays, ChevronRight, MapPin } from "lucide-react";
 import { type ChapterEvent, formatDate, isUpcoming, shortDate, statusLabel } from "../lib/data";
+import { coverOf } from "../lib/cover";
 import { Tilt } from "./Motion";
 
 /**
- * Shows the poster, or a typographic stand-in for events that don't have one yet (or whose poster file fails to load).
- * `mini` is the small stand-in for list-row thumbnails: the gold ring and the first letter of the title.
+ * Shows the poster, or a generated cover for events that have no poster yet (or whose poster file fails to load).
+ * The cover's colours come from the event's own name (src/lib/cover.ts), so each one looks different but on-brand.
+ * `mini` is the small version for list-row thumbnails.
  */
 export function Poster({ e, className = "", mini }: { e: ChapterEvent; className?: string; mini?: boolean }) {
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
   if (e.poster && failedSrc !== e.poster) {
     return <img src={e.poster} alt={`${e.title} poster`} loading="lazy" decoding="async" onError={() => setFailedSrc(e.poster ?? null)} className={`h-full w-full object-cover ${className}`} />;
   }
+  const cover = coverOf(e.slug || e.title);
   if (mini) {
     return (
-      <div aria-hidden className={`relative h-full w-full overflow-hidden bg-gradient-to-br from-violet-deep via-panel to-ink ${className}`}>
-        <div className="absolute -right-5 top-[36%] h-14 w-14 rounded-full border-[7px] border-gold/70" />
+      <div aria-hidden className={`relative h-full w-full overflow-hidden ${className}`} style={{ background: cover.background }}>
+        <div className="absolute -right-5 top-[36%] h-14 w-14 rounded-full border-[7px]" style={{ borderColor: cover.ring, transform: `rotate(${cover.tilt}deg)` }} />
         <span className="absolute left-2.5 top-2 font-display text-[22px] font-semibold leading-none text-cream/90">{e.title.trim()[0]}</span>
       </div>
     );
   }
   return (
-    <div className={`relative flex h-full w-full flex-col justify-between overflow-hidden bg-gradient-to-br from-violet-deep via-panel to-ink p-6 ${className}`}>
-      <div aria-hidden className="absolute -right-12 top-[30%] h-40 w-40 rounded-full border-[18px] border-gold/70" />
+    <div className={`relative flex h-full w-full flex-col justify-between overflow-hidden p-6 ${className}`} style={{ background: cover.background }}>
+      <div aria-hidden className="absolute -right-12 top-[30%] h-40 w-40 rounded-full border-[18px]" style={{ borderColor: cover.ring, transform: `rotate(${cover.tilt}deg)` }} />
+      <div aria-hidden className="absolute -left-16 bottom-[18%] h-28 w-28 rounded-full border-[10px] border-cream/10" />
       <span className="relative max-w-[60%] text-[14px] text-violet-soft">{e.series || e.type}</span>
-      <span className="relative break-words font-display text-[clamp(1.2rem,2.3vw,1.7rem)] font-semibold leading-tight">{e.title}</span>
+      <span className="relative">
+        <span className="block break-words font-display text-[clamp(1.2rem,2.3vw,1.7rem)] font-semibold leading-tight">{e.title}</span>
+        <span className="mt-2 block text-[14px] text-cream/70">{shortDate(e)}</span>
+      </span>
     </div>
   );
 }

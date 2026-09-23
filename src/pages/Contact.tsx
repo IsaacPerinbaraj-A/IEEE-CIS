@@ -144,12 +144,24 @@ export default function Contact() {
   const phone = useMediaQuery(PHONE);
   const [f, setF] = useState({ name: "", email: "", topic: topics[0], message: "" });
   const [error, setError] = useState("");
+  const [sent, setSent] = useState<{ subject: string; body: string } | null>(null);
+  const [copied, setCopied] = useState(false);
   const emailField = useRef<HTMLInputElement>(null), messageField = useRef<HTMLTextAreaElement>(null);
   const send = () => {
     if (!f.name.trim() || !f.message.trim()) { setError("Add your name and a message so we know who's writing and what about."); return; }
     setError("");
+    const subject = `${f.topic}: message from ${f.name}`;
     const body = `${f.message}\n\n${f.name}${f.email ? ` (${f.email})` : ""}`;
-    window.location.href = `mailto:${site.email}?subject=${encodeURIComponent(`${f.topic}: message from ${f.name}`)}&body=${encodeURIComponent(body)}`;
+    window.location.href = `mailto:${site.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    // The page can't tell whether the email app opened, so it says what should have happened and offers a way out
+    setSent({ subject, body });
+    setCopied(false);
+  };
+  const copyMessage = async () => {
+    if (!sent) return;
+    const text = `To: ${site.email}\nSubject: ${sent.subject}\n\n${sent.body}`;
+    try { await navigator.clipboard.writeText(text); } catch { /* older browsers: the message stays on screen to copy by hand */ }
+    setCopied(true);
   };
   // Phones: 17px text so iOS doesn't zoom into the field
   const field = "mt-2 w-full rounded-xl border border-line bg-ink px-4 py-3 text-cream placeholder:text-mute/60 focus:border-violet-soft focus:outline-none max-sm:text-[17px]";
@@ -176,6 +188,20 @@ export default function Contact() {
           </ul>
         )}
         <Reveal delay={150} className="min-w-0 rounded-3xl border border-line bg-panel p-6 sm:p-9">
+          {sent ? (
+            <div role="status">
+              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-raised text-violet-soft"><Check size={24} aria-hidden /></span>
+              <h2 className="mt-5 text-2xl font-semibold">Your email app should have opened</h2>
+              <p className="mt-3 text-[15px] text-mute">The message to {site.email} is filled in and ready. Press send there and we'll have it.</p>
+              <p className="mt-2 text-[15px] text-mute">Nothing opened? Copy the message and send it from wherever you read email.</p>
+              <pre className="mt-5 max-h-40 overflow-auto whitespace-pre-wrap rounded-2xl border border-line bg-ink p-4 text-[14px] text-cream/85">{sent.body}</pre>
+              <div className="mt-6 flex flex-wrap gap-3 max-sm:flex-col">
+                <button className="btn-gold max-sm:min-h-[48px] max-sm:w-full" onClick={copyMessage}>{copied ? "Copied" : "Copy the message"}</button>
+                <button className="btn-ghost max-sm:min-h-[48px] max-sm:w-full" onClick={() => { setSent(null); setF({ name: "", email: "", topic: topics[0], message: "" }); }}>Write another message</button>
+              </div>
+            </div>
+          ) : (
+          <>
           <h2 className="text-2xl font-semibold">Send a message</h2>
           <p className="mt-2 text-[15px] text-mute">This opens your email app with the message filled in.</p>
           <div className="mt-7 grid gap-5 sm:grid-cols-2">
@@ -191,6 +217,8 @@ export default function Contact() {
             name="message" autoCapitalize="sentences" /></label>
           {error && <p role="alert" className="mt-4 text-[15px] text-gold">{error}</p>}
           <button className="btn-gold mt-6 max-sm:min-h-[48px] max-sm:w-full" onClick={send}>Write the email</button>
+          </>
+          )}
         </Reveal>
       </section>
       {phone ? <PhoneMap /> : (

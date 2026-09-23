@@ -16,8 +16,9 @@ export default function Accordion({ items }: { items: { q: string; a: string }[]
         return (
           <div key={it.q}>
             <h3 className="font-sans">
-              <button className="flex w-full items-center justify-between gap-6 py-5 text-left text-lg font-medium" aria-expanded={isOpen} aria-controls={`${id}-${i}`} onClick={() => setOpen(isOpen ? null : i)}>
-                {it.q}
+              <button className="flex w-full items-center gap-4 py-5 text-left text-lg font-medium sm:gap-6" aria-expanded={isOpen} aria-controls={`${id}-${i}`} onClick={() => setOpen(isOpen ? null : i)}>
+                <span aria-hidden className={`shrink-0 font-display text-[15px] font-semibold tabular-nums transition-colors ${isOpen ? "text-gold" : "text-mute"}`}>{String(i + 1).padStart(2, "0")}</span>
+                <span className="flex-1">{it.q}</span>
                 <Plus size={20} className={`shrink-0 text-violet-soft transition-transform duration-200 ${isOpen ? "rotate-45" : ""}`} />
               </button>
             </h3>
