@@ -134,6 +134,7 @@ export function validateFaculty(f: Faculty): Errors {
   const err: Errors = {};
   if (!f.name.trim()) err.name = "Add the faculty member's name.";
   if (!f.role.trim()) err.role = "Add their role, for example Faculty Coordinator.";
+  image(err, "photo", f.photo);
   cap(err, "name", f.name, MAX.name); cap(err, "role", f.role, MAX.role);
   return err;
 }
@@ -412,7 +413,7 @@ const EVENT_FIELDS: FieldRules<ChapterEvent> = {
   poster: "optional", register: "optional", coordinator: "optional",
 };
 const MEMBER_FIELDS: FieldRules<Member> = { name: "required", role: "required", photo: "optional", linkedin: "optional", github: "optional", instagram: "optional" };
-const FACULTY_FIELDS: FieldRules<Faculty> = { name: "required", role: "required" };
+const FACULTY_FIELDS: FieldRules<Faculty> = { name: "required", role: "required", photo: "optional" };
 const ACHIEVEMENT_FIELDS: FieldRules<Achievement> = {
   title: "required", year: "required", description: "required", people: "optional", link: "optional", image: "optional",
 };
@@ -629,7 +630,7 @@ export function errorLabel<K extends SectionKey>(section: K, value: SectionConte
       const year = `Team ${s?.label || s?.id || n(1) + 1}`;
       if (p[2] === "faculty") {
         if (p[3] === undefined) return `${year}: faculty`;
-        return withField(`${year}, ${named("faculty member", s?.faculty[n(3)]?.name, n(3))}`, field({ name: "name", role: "role" }, p[4]));
+        return withField(`${year}, ${named("faculty member", s?.faculty[n(3)]?.name, n(3))}`, field({ name: "name", role: "role", photo: "photo" }, p[4]));
       }
       if (p[2] === "groups") {
         if (p[3] === undefined) return `${year}: teams`;

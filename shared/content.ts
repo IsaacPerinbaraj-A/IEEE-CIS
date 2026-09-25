@@ -17,7 +17,7 @@ export type ChapterEvent = {
 /* ---------- Team (src/data/team.json) ---------- */
 
 export type Member = { name: string; role: string; photo?: string; linkedin?: string; github?: string; instagram?: string };
-export type Faculty = { name: string; role: string };
+export type Faculty = { name: string; role: string; photo?: string };
 /**
  * One team. `kind` decides where Home lists it: "technical" teams do the learning and building, "chapter" teams
  * keep the chapter running. `note` is the one-line description Home shows, and `icon` is one of TEAM_ICONS.

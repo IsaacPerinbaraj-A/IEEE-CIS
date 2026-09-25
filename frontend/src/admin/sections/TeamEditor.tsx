@@ -12,9 +12,12 @@ import { initials } from "../../lib/data";
 const move = <T,>(arr: T[], i: number, d: number) => { const a = [...arr], j = i + d; if (j < 0 || j >= a.length) return a; [a[i], a[j]] = [a[j], a[i]]; return a; };
 
 export default function TeamEditor() {
-  const { content, update, preview } = useAdmin();
+  const { addImage, content, update, preview } = useAdmin();
   const sessions = content.team.sessions;
   const [si, setSi] = useState(0);
+  // Which faculty photo is being framed, and anything that went wrong with it
+  const [facultyCrop, setFacultyCrop] = useState<{ i: number; img: HTMLImageElement } | null>(null);
+  const [facultyImgError, setFacultyImgError] = useState("");
   const [editing, setEditing] = useState<{ gi: number; mi?: number; member: Member } | null>(null);
   const [newYear, setNewYear] = useState<string | null>(null);
   const s = sessions[Math.min(si, sessions.length - 1)];
@@ -79,10 +82,22 @@ export default function TeamEditor() {
         {s.faculty.length === 0 && <p className="text-[15px] text-mute">No faculty listed for this year.</p>}
         <div className="grid grid-cols-1 gap-4">
           {s.faculty.map((f, i) => (
-            <div key={i} className="grid items-end gap-3 sm:grid-cols-[1fr_1fr_auto]">
-              <TextField label="Name" value={f.name} onChange={v => setSession(x => { x.faculty[i].name = v; return x; })} />
-              <TextField label="Role" value={f.role} onChange={v => setSession(x => { x.faculty[i].role = v; return x; })} />
-              <IconButton label={`Remove ${f.name || "faculty member"}`} tone="danger" onClick={() => setSession(x => ({ ...x, faculty: x.faculty.filter((_, j) => j !== i) }))}><Trash2 size={16} /></IconButton>
+            <div key={i} className="rounded-2xl border border-line p-4">
+              <div className="grid items-end gap-3 sm:grid-cols-[1fr_1fr_auto]">
+                <TextField label="Name" value={f.name} onChange={v => setSession(x => { x.faculty[i].name = v; return x; })} />
+                <TextField label="Role" value={f.role} onChange={v => setSession(x => { x.faculty[i].role = v; return x; })} />
+                <IconButton label={`Remove ${f.name || "faculty member"}`} tone="danger" onClick={() => setSession(x => ({ ...x, faculty: x.faculty.filter((_, j) => j !== i) }))}><Trash2 size={16} /></IconButton>
+              </div>
+              <div className="mt-4">
+                <ImageInput square label="Photo (optional)" src={preview(f.photo)}
+                  onRemove={() => setSession(x => { delete x.faculty[i].photo; return x; })}
+                  hint={facultyImgError || "Any photo works. You'll frame it as a square, and it's compressed and uploaded straight away."}
+                  onFile={async file => {
+                    setFacultyImgError("");
+                    try { setFacultyCrop({ i, img: await fileToImage(file) }); }
+                    catch (e) { setFacultyImgError((e as Error).message); }
+                  }} />
+              </div>
             </div>
           ))}
         </div>
@@ -136,6 +151,15 @@ export default function TeamEditor() {
       }}><Plus size={18} /> Add a team</button>
 
       {yearModal}
+
+      {facultyCrop && <CropDialog img={facultyCrop.img} onCancel={() => setFacultyCrop(null)} onDone={async blob => {
+        const { i } = facultyCrop;
+        try {
+          const photo = await addImage("team", s.faculty[i]?.name || "faculty", blob);
+          setSession(x => { x.faculty[i].photo = photo; return x; });
+        } catch (e) { setFacultyImgError((e as Error).message); }
+        setFacultyCrop(null);
+      }} />}
 
       {editing && (
         <MemberForm initial={editing.member} isNew={editing.mi === undefined} groups={s.groups.map(g => g.domain)} groupIndex={editing.gi}
