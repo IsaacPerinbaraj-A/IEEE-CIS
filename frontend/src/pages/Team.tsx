@@ -5,26 +5,10 @@ import MemberCard from "../components/MemberCard";
 import MemberRow from "../components/MemberRow";
 import BearerDeck from "../components/BearerDeck";
 import { Reveal } from "../components/Motion";
-import { initials, sessions, type Faculty, type Session } from "../lib/data";
+import { sessions, type Session } from "../lib/data";
 import { useTitle } from "../lib/useTitle";
 import { prefersReducedMotion, revealChip } from "../lib/motion";
 import { useMediaQuery, PHONE } from "../lib/useMediaQuery";
-
-/** Dr., Ms., Mr., Mrs. and Prof. are titles, not names: they must not become someone's initials. */
-const TITLE = /^\s*(dr|mr|mrs|ms|prof|professor)\.?\s+/i;
-
-/** A faculty member's photo, falling back to their initials like the member cards do. */
-function FacultyFace({ f, size }: { f: Faculty; size: number }) {
-  const [failed, setFailed] = useState(false);
-  const style = { width: size, height: size };
-  return (
-    <div style={style} className="grid shrink-0 place-items-center overflow-hidden rounded-full border border-line bg-gradient-to-br from-violet-deep to-panel font-display text-violet-soft">
-      {f.photo && !failed
-        ? <img src={f.photo} alt="" loading="lazy" decoding="async" onError={() => setFailed(true)} className="h-full w-full object-cover" />
-        : <span style={{ fontSize: Math.round(size / 2.6) }}>{initials(f.name.replace(TITLE, "") || f.name)}</span>}
-    </div>
-  );
-}
 
 /** On phones the team strip sticks just under the slim site header, which is 56px tall once you scroll. */
 const HEADER = 56;
@@ -167,11 +151,8 @@ function PhoneTeam({ session, domain, fadeIn }: { session: Session; domain: stri
             <Reveal>
               <div className="flex h-[60px] items-center"><h2 className="text-[18px] font-semibold">Faculty</h2></div>
               <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-panel">
-                {session.faculty.map(f => (
-                  <li key={f.name} className="flex min-h-[64px] items-center gap-3 px-4 py-3">
-                    <FacultyFace f={f} size={44} />
-                    <div className="min-w-0"><p className="font-semibold">{f.name}</p><p className="text-[15px] text-mute">{f.role}</p></div>
-                  </li>
+                {session.faculty.map((f, i) => (
+                  <MemberRow key={f.name} m={f} id={`faculty-${i}`} open={false} onToggle={() => {}} />
                 ))}
               </ul>
             </Reveal>
@@ -276,14 +257,12 @@ export default function Team() {
 
         {session.faculty.length > 0 && domain === "all" && (
           <section className="mt-14">
-            <h2 className="mb-6 text-xl font-semibold">Faculty</h2>
-            <div className="flex flex-wrap gap-4">
-              {session.faculty.map(f => (
-                <div key={f.name} className="flex items-center gap-4 rounded-2xl border border-line bg-panel px-6 py-4">
-                  <FacultyFace f={f} size={56} />
-                  <div className="min-w-0"><p className="font-semibold">{f.name}</p><p className="text-[15px] text-mute">{f.role}</p></div>
-                </div>
-              ))}
+            <div className="mb-8 flex items-baseline gap-4 border-b border-line pb-4">
+              <h2 className="text-2xl font-semibold">Faculty</h2>
+              <span className="text-mute">{session.faculty.length}</span>
+            </div>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-5">
+              {session.faculty.map((f, i) => <Reveal key={f.name} delay={(i % 5) * 80} className="h-full"><MemberCard m={f} large /></Reveal>)}
             </div>
           </section>
         )}

@@ -183,4 +183,7 @@ export function googleCalendarUrl(e: ChapterEvent): string {
   return `https://calendar.google.com/calendar/render?${p}`;
 }
 
-export const initials = (name: string) => name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join("").toUpperCase();
+/** Dr., Ms., Mr., Mrs. and Prof. are titles, not names, so they never become someone's initials. */
+const TITLE = /^\s*(dr|mr|mrs|ms|prof|professor)\.?\s+/i;
+export const initials = (name: string) =>
+  (name.replace(TITLE, "").trim() || name).split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join("").toUpperCase();
