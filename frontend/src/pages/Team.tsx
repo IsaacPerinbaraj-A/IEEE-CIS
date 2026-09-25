@@ -233,7 +233,7 @@ export default function Team() {
             Academic year
             <select value={session.id} onChange={e => set("year", e.target.value === sessions[0].id ? "" : e.target.value)}
               className="min-h-[46px] rounded-full border border-line bg-panel px-5 pr-10 text-[15px] text-cream">
-              {sessions.map(s => <option key={s.id} value={s.id}>{s.label}{s === sessions[0] ? " (latest)" : ""}</option>)}
+              {sessions.map(s => <option key={s.id} value={s.id}>{s.label}{s === sessions[0] ? " (current)" : ""}</option>)}
             </select>
           </label>
         )}>
