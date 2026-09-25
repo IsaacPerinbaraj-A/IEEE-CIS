@@ -10,7 +10,22 @@ The website runs on three free services. Each keeps one job:
 
 GitHub holds only the code. The admin never uses GitHub tokens and never makes commits.
 
-Plan for about an hour. Use the **club email** for every account (with 2-step login turned on), keep every password
+### Who owns what
+
+| Thing | Account |
+|---|---|
+| **GitHub** (the code, private repository) | the web lead's personal account — the club can be given the code later |
+| **Vercel** and **Render** (hosting) | the **club email**, so the chapter keeps the site when the web lead leaves |
+| **MongoDB Atlas** (the database) | currently the web lead's personal account; can be moved to the club email later |
+
+Because the repository is **private and owned by a personal GitHub account**, the GitHub account you connect inside
+Vercel and Render must be that same personal account — a club Vercel/Render account cannot see the repository on its
+own. So: sign up for Vercel and Render **with the club email** (not "Continue with GitHub"), then, inside each one,
+connect GitHub and sign in with the personal account that owns the repository, giving the Vercel/Render GitHub App
+access to **only** this repository. The club owns the hosting; the code link runs through the web lead's GitHub until
+the repository itself moves to a club account.
+
+Plan for about an hour. Turn on 2-step login for every account, keep every password
 and token in the club's password manager, and **never add a payment card** anywhere: without a card, going over a free
 limit pauses a service instead of charging the club.
 
